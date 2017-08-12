@@ -1,0 +1,14 @@
+{
+    "settings": {
+        "plugins": {},
+        "themes": {
+            "Compact-User-List": {
+                "alt": true,
+                "ctrl": false,
+                "hotkey": "KeyU",
+                "keycode": 85,
+                "shift": false
+            }
+        }
+    }
+}

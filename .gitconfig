@@ -1,0 +1,11 @@
+[user]
+	name = Brayden Banks
+	email = bb010g@gmail.com
+[core]
+	excludesfile = /home/bb010g/.config/gitignore_global
+[status]
+	submoduleSummary = true
+[diff]
+	submodule = log
+[push]
+	recurseSubmodules = check

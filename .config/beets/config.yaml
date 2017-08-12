@@ -1,0 +1,18 @@
+directory: ~/Music
+library: ~/MusicLibrary.blb
+paths:
+    singleton: $artist/Non-Album/$title
+
+plugins: inline convert web chroma acousticbrainz bpm fetchart lyrics mbsync replaygain scrub the ftintitle badfiles random types info missing
+
+import:
+    copy: yes
+
+keyfinder:
+    bin: keyfinder-cli
+
+replaygain:
+    backend: bs1770gain
+
+types:
+    rating: int

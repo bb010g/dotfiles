@@ -1,0 +1,24 @@
+#!/usr/bin/env ion
+
+match $(dmenu @args[1..] <<< 'brightness
+lock
+mpc
+shoot
+suspend
+volume')
+  case brightness; light -S @(light -G | dmenu @args[1..])
+  case lock; ~/tools/lock
+  case mpc
+    let cmd = $(ion -c "echo toggle; mpc | sed '2~1s/ \\{2,\}/\\n/g'; echo 'repeat
+random
+single
+consume'" | dmenu @args[1..])
+    dash -c "mpc "$cmd" | sed '2~1s/ \{2,\}/\n/g' | dmenu @args[1..]"
+  case shoot
+    let type = $(dmenu @args[1..] <<< 'select
+full')
+    # TODO rewrite to match when patched
+    ion -c 'maim '$(/usr/bin/test $type = select && echo -s)' '$(date +%s)'.png'
+  case suspend; ~/tools/suspend
+  case volume; ponymix set-volume @(ponymix --short get-volume | dmenu @args[1..]) > /dev/null
+end

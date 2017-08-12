@@ -1,0 +1,4 @@
+#!/usr/bin/env ion
+sleep 1
+xset dpms force off
+killall -SIGUSR1 dunst && i3lock -efc 131736 && systemctl suspend && killall -SIGUSR2 dunst

@@ -1,0 +1,4 @@
+include "/usr/share/X11/locale/en_US.UTF-8/Compose"
+
+<Multi_key> <space> <0>                 : "​"   zerowidthspace # ZERO WIDTH SPACE
+<Multi_key> <space> <underscore>        : "‌"   zerowidthnonjoiner # ZERO WIDTH NON-JOINER
