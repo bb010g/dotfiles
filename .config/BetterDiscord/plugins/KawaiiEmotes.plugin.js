@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/noodlebox/KawaiiEmotes.plugin.js

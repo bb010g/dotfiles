@@ -1,0 +1,11 @@
+{
+    "settings": {
+        "autoopen": false,
+        "copyimages": false,
+        "dldir": "/home/bb010g/downloads",
+        "imagemodals": true,
+        "itp": true,
+        "prompt": true,
+        "showinstead": false
+    }
+}

@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/samogot/v1/quoter.plugin.js

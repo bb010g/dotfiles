@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/Inve1951/plugins/toggleYourStuff.plugin.js

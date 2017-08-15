@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/rauenzi/Plugins/BlurNSFW/BlurNSFW.plugin.js

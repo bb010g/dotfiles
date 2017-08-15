@@ -1,0 +1,39 @@
+//META{"name":"DnD","description":"A snippet that adds flavor text to the status list. Forked from martmists/Discord-DnD.","author":"bb010g","version":"0.3"}*//{}
+
+.status-dnd ~ .status-text {
+	font-size: 0;
+}
+
+.status-dnd ~ .status-text::after {
+	content: "Dungeons and Dragons";
+	font-size: 15px;
+}
+
+.status-picker .popout-menu-item:nth-child(4) .helper{
+	font-size: 0;
+}
+
+.status-picker .popout-menu-item:nth-child(4) .helper::after{
+	content: "Signifies that you are playing Dungeons and Dragons." !important;
+	font-size: 12px;
+}
+
+/* Invisible */
+
+.status-invisible ~ .status-text {
+	font-size: 0;
+}
+
+.status-invisible ~ .status-text::after {
+	content: "Invisible";
+	font-size: 15px;
+}
+
+.status-picker .popout-menu-item:nth-child(5) .helper{
+	font-size: 0;
+}
+
+.status-picker .popout-menu-item:nth-child(5) .helper::after{
+	content: "No one likes you so you decide to turn invisible because people don't notice you anyway." !important;
+	font-size: 12px;
+}

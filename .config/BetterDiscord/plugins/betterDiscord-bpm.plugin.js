@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/BPM-for-Discord/betterDiscord-bpm.plugin.js

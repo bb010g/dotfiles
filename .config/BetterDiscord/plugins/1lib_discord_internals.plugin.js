@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/samogot/v1/1lib_discord_internals.plugin.js

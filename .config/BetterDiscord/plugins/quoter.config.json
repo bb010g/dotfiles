@@ -1,0 +1,9 @@
+{
+    "settings": {
+        "citeFull": true,
+        "embeds": true,
+        "mention": false,
+        "noEmbedsServers": "",
+        "utc": false
+    }
+}

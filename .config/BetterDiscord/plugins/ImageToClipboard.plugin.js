@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/rauenzi/Plugins/ImageToClipboard/ImageToClipboard.plugin.js
