@@ -5,6 +5,7 @@
 	excludesfile = /home/bb010g/.config/gitignore_global
 [status]
 	submoduleSummary = true
+	showStash = true
 [diff]
 	submodule = log
 [push]

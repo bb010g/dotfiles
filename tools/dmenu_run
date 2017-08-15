@@ -18,7 +18,7 @@ consume'" | dmenu @args[1..])
     let type = $(dmenu @args[1..] <<< 'select
 full')
     # TODO rewrite to match when patched
-    ion -c 'maim '$(/usr/bin/test $type = select && echo -s)' '$(date +%s)'.png'
+    ion -c 'maim '$(/usr/bin/test $type = select && /usr/bin/echo -s)' '$(date +%s)'.png'
   case suspend; ~/tools/suspend
   case volume; ponymix set-volume @(ponymix --short get-volume | dmenu @args[1..]) > /dev/null
 end

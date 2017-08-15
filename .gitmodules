@@ -1,27 +1,40 @@
 [submodule ".emacs.d"]
 	path = .emacs.d
 	url = https://github.com/syl20bnr/spacemacs
+	branch = develop
 [submodule ".config/BetterDiscord-sources/Inve1951"]
 	path = .config/BetterDiscord-sources/Inve1951
 	url = https://github.com/Inve1951/BetterDiscordStuff
+	branch = master
 [submodule ".config/BetterDiscord-sources/mrmaple240"]
 	path = .config/BetterDiscord-sources/mrmaple240
 	url = https://github.com/mrmaple240/betterdiscord-mini-themes
+	branch = master
 [submodule ".config/BetterDiscord-sources/Natsulus"]
 	path = .config/BetterDiscord-sources/Natsulus
 	url = https://github.com/Natsulus/BD-Repo
+	branch = master
 [submodule ".config/BetterDiscord-sources/SmarterEmbeds"]
 	path = .config/BetterDiscord-sources/SmarterEmbeds
 	url = https://github.com/BeardDesign1/SmarterEmbeds
+	branch = master
 [submodule ".config/BetterDiscord-sources/rauenzi"]
 	path = .config/BetterDiscord-sources/rauenzi
 	url = https://github.com/rauenzi/BetterDiscordAddons
+	branch = master
 [submodule ".config/BetterDiscord-sources/samogot"]
 	path = .config/BetterDiscord-sources/samogot
 	url = https://github.com/samogot/betterdiscord-plugins
+	branch = master
 [submodule ".config/BetterDiscord-sources/noodlebox"]
 	path = .config/BetterDiscord-sources/noodlebox
 	url = https://github.com/noodlebox/betterdiscord-plugins
+	branch = master
 [submodule ".config/BetterDiscord-sources/Anxeal"]
 	path = .config/BetterDiscord-sources/Anxeal
 	url = https://github.com/Anxeal/BDEnhancements
+	branch = master
+[submodule ".skim"]
+	path = .skim
+	url = git@github.com:lotabout/skim.git
+	branch = master

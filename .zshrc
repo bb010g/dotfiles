@@ -23,6 +23,8 @@ zplug "RobSis/zsh-completion-generator"
 #zplug "Tarrasch/zsh-functional"
 zplug "zsh-users/zsh-completions", depth:1
 
+zplug "~/Documents/local-completions", from:local
+
 zplug "agkozak/agkozak-zsh-theme"
 
 # Install plugins if there are plugins that have not been installed
@@ -76,24 +78,30 @@ if (( ${+terminfo[smkx]} )) && (( ${+terminfo[rmkx]} )); then
   zle -N zle-line-finish
 fi
 
-setopt extended_glob
 setopt append_history
+setopt auto_pushd
+setopt extended_glob
 setopt hist_expire_dups_first
 setopt hist_ignore_space
 setopt hist_reduce_blanks
 setopt hist_verify
-setopt share_history
-setopt auto_pushd
+setopt longlistjobs
+setopt nobeep
 setopt nonomatch
+setopt share_history
 
+autoload -U tetriscurses
 autoload -U zargs
 autoload -U zcalc
 autoload -U zed
 autoload -U zmv
-autoload -U tetriscurses
 
 EDITOR=emc
-alias ls='ls --color=auto -F'
+eval "$(dircolors -b)"
+alias grep='grep --color=auto '
+alias ls='ls --color=auto -F '
+alias sudo='sudo '
+alias tree='tree -F '
 function reset_dnscrypt() {
   sudo systemctl restart dnscrypt-proxy.service dnscrypt-proxy.socket unbound.service
 }
