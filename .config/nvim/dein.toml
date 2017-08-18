@@ -1,0 +1,170 @@
+[[plugins]]
+repo = '~/.local/dein/repos/github.com/Shougo/dein.vim'
+
+[[plugins]]
+repo = 'hecal3/vim-leader-guide'
+lazy = 1
+hook_post_source = '''
+call leaderGuide#register_prefix_descriptions("\<LocalLeader>", "g:llmap")
+call leaderGuide#register_prefix_descriptions('', "g:topdict")
+function! s:my_displayfunc()
+    let g:leaderGuide#displayname = substitute(g:leaderGuide#displayname, '^<SID>(\(.*\))$', '\1', '')
+    let g:leaderGuide#displayname = substitute(g:leaderGuide#displayname, '^\w\{-1,}-', '', '')
+endfunction
+let g:leaderGuide_displayfunc = [function('s:my_displayfunc')]
+'''
+on_cmd = ['LeaderGuide', 'LeaderGuideVisual', 'LeaderGuideD', 'LeaderGuideVisualD']
+[plugin.on_map]
+nx = ['<Plug>leaderguide-global', '<Plug>leaderguide-buffer']
+
+[[plugins]]
+repo = 'itchyny/lightline.vim'
+
+[[plugins]]
+repo = 'junegunn/goyo.vim'
+lazy = 1
+on_cmd = ['Goyo']
+
+[[plugins]]
+repo = 'Shougo/denite.nvim'
+lazy = 1
+hook_post_source = '''
+augroup deniteresize
+    autocmd!
+    autocmd VimResized,VimEnter * call denite#custom#option('default,
+        \'winheight', winheight(0) / 2)
+augroup end
+call denite#custom#option('default', {
+    \ 'prompt': '>'
+    \ })
+call denite#custom#var('file_rec', 'command',
+    \ ['rg', '--files', ':directory'])
+call denite#custom#var('grep', 'command', ['rg'])
+call denite#custom#var('grep', 'default_opts',
+    \ ['--hidden', '--vimgrep', '--no-heading', '-S'])
+call denite#custom#var('grep', 'recursive_opts', [])
+call denite#custom#var('grep', 'pattern_opt', ['--regexp'])
+call denite#custom#var('grep', 'separator', ['--'])
+call denite#custom#var('grep', 'final_opts', [])
+'''
+on_cmd = ['Denite', 'DeniteBufferDir', 'DeniteCursorWord', 'DeniteProjectDir']
+
+[[plugins]]
+repo = 'Shougo/deol.nvim'
+lazy = 1
+on_cmd = ['Deol', 'DeolCd', 'DeolEdit']
+
+[[plugins]]
+repo = 'Shougo/deoplete.nvim'
+lazy = 1
+on_event = ['InsertEnter']
+
+[[plugins]]
+repo = 'Shougo/junkfile.vim'
+lazy = 1
+on_cmd = ['JunkfileOpen']
+
+[[plugins]]
+repo = 'Shougo/neosnippet.vim'
+lazy = 1
+on_event = ['InsertEnter']
+
+[[plugins]]
+repo = 'Shougo/neosnippet-snippets'
+
+[[plugins]]
+repo = 'Shougo/vinarise.vim'
+lazy = 1
+on_cmd = ['Vinarise']
+
+[[plugins]]
+repo = 'tommcdo/vim-lion'
+lazy = 1
+[plugins.on_map]
+n = ['<Plug>LionRepeat', '<Plug>LionRight', '<Plug>LionLeft']
+x = ['<Plug>VLionRight', '<Plug>VLionLeft']
+
+[[plugins]]
+repo = 'tpope/vim-characterize'
+lazy = 1
+[plugins.on_map]
+n = ['ga']
+
+[[plugins]]
+repo = 'tpope/vim-commentary'
+depends = 'vim-repeat'
+lazy = 1
+on_cmd = ['Commentary']
+[plugins.on_map]
+nxo = ['gc']
+
+[[plugins]]
+repo = 'tpope/vim-eunuch'
+
+[[plugins]]
+repo = 'tpope/vim-repeat'
+lazy = 1
+[plugins.on_map]
+nx = '.'
+
+[[plugins]]
+repo = 'tpope/vim-surround'
+depends = 'vim-repeat'
+lazy = 1
+[plugins.on_map]
+n = ['cs', 'ds', 'ys']
+x = ['S']
+
+[[plugins]]
+repo = 'wellle/targets.vim'
+
+# theme
+
+[[plugins]]
+repo = 'guns/xterm-color-table.vim'
+lazy = 1
+on_cmd = ['XtermColorTable']
+
+[[plugins]]
+repo = 'dracula/vim'
+name = 'dracula'
+
+# syntax
+
+[[plugins]]
+repo = 'cespare/vim-toml'
+
+# deoplete completions
+
+[[plugins]]
+repo = 'fszymanski/deoplete-emoji'
+depends = 'deoplete.nvim'
+lazy = 1
+on_event = ['InsertEnter']
+
+[[plugins]]
+repo = 'Shougo/neco-syntax'
+depends = 'deoplete.nvim'
+lazy = 1
+on_event = ['InsertEnter']
+
+[[plugins]]
+repo = 'Shougo/neco-vim'
+depends = 'deoplete.nvim'
+lazy = 1
+on_event = ['InsertEnter']
+on_if = '&filetype == "vim"'
+
+[[plugins]]
+repo = 'zchee/deoplete-clang'
+depends = 'deoplete.nvim'
+lazy = 1
+on_event = ['InsertEnter']
+on_if = 'count(["c", "cpp", "objc"], &filetype)'
+
+[[plugins]]
+repo = 'zchee/deoplete-zsh'
+depends = 'deoplete.nvim'
+lazy = 1
+on_event = ['InsertEnter']
+on_if = '&filetype == "zsh"'

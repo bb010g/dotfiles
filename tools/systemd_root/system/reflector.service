@@ -1,0 +1,6 @@
+[Unit]
+Description=Pacman mirrorlist update
+
+[Service]
+Type=oneshot
+ExecStart=/usr/bin/reflector -p https -p rsync -c 'United States' -c Canada --sort score --save /etc/pacman.d/mirrorlist

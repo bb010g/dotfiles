@@ -1,44 +1,22 @@
 if &compatible
-  set nocompatible               " Be iMproved
+  set nocompatible
 endif
-set runtimepath+=/home/bb010g/.local/dein/repos/github.com/Shougo/dein.vim
+let s:dein_dir = '~/.local/dein'
+execute 'set runtimepath+=~/.local/dein/repos/github.com/Shougo/dein.vim'
 
-if dein#load_state('/home/bb010g/.local/dein')
-  call dein#begin('/home/bb010g/.local/dein')
+let mapleader = "\<Space>"
+let maplocalleader = ","
 
-  " Let dein manage dein
-  call dein#add('/home/bb010g/.local/dein/repos/github.com/Shougo/dein.vim')
+if dein#load_state(s:dein_dir)
+    call dein#begin(s:dein_dir)
 
-  " Add or remove your plugins here:
-  call dein#add('itchyny/lightline.vim')
-  call dein#add('junegunn/goyo.vim', {'on_cmd': 'Goyo'})
-  call dein#add('Shougo/denite.nvim', {'on_cmd': ['Denite', 'DeniteBufferDir', 'DeniteCursorWord', 'DeniteProjectDir']})
-  call dein#add('Shougo/deol.nvim', {'on_cmd': ['Deol', 'DeolCd', 'DeolEdit']})
-  call dein#add('Shougo/deoplete.nvim', {'on_event': 'InsertEnter'})
-  call dein#add('Shougo/junkfile.vim', {'on_cmd': 'JunkfileOpen'})
-  call dein#add('Shougo/neosnippet.vim', {'on_event': 'InsertEnter'})
-  call dein#add('Shougo/neosnippet-snippets', {'depends': 'neosnippet.vim'})
-  call dein#add('Shougo/vinarise.vim', {'on_cmd': 'Vinarise'})
-  call dein#add('tpope/vim-characterize', {'on_map': {'n': ['ga']}})
-  call dein#add('tpope/vim-commentary', {'on_map': {'nxo': ['gc']}, 'on_command': 'Commentary', 'depends': 'vim-repeat'})
-  call dein#add('tpope/vim-eunuch')
-  call dein#add('tpope/vim-repeat', {'on_map': '.'})
-  call dein#add('tpope/vim-surround', {'on_map': {'n': ['cs', 'ds', 'ys'], 'x': 'S'}, 'depends': 'vim-repeat'})
+    call dein#load_toml('~/.config/nvim/dein.toml')
 
-  " theme
-  call dein#add('guns/xterm-color-table.vim', {'on_cmd': 'XtermColorTable'})
-  call dein#add('https://github.com/dracula/vim', {'name': 'dracula'})
-
-  " deoplete completions
-  call dein#add('fszymanski/deoplete-emoji', {'depends': 'deoplete.nvim', 'lazy': 1, 'on_event': 'InsertEnter'})
-  call dein#add('Shougo/neco-syntax', {'depends': 'deoplete.nvim', 'lazy': 1, 'on_event': 'InsertEnter'})
-  call dein#add('Shougo/neco-vim', {'depends': 'deoplete.nvim', 'lazy': 1, 'on_event': 'InsertEnter', 'on_if': '&filetype == "vim"'})
-  call dein#add('zchee/deoplete-clang', {'depends': 'deoplete.nvim', 'lazy': 1, 'on_event': 'InsertEnter', 'on_if': 'count(["c", "cpp", "objc"], &filetype)'})
-  call dein#add('zchee/deoplete-zsh', {'depends': 'deoplete.nvim', 'lazy': 1, 'on_event': 'InsertEnter', 'on_if': '&filetype == "zsh"'})
-
-  call dein#end()
-  call dein#save_state()
+    call dein#end()
+    call dein#save_state()
 endif
+call dein#call_hook('source')
+call dein#call_hook('post_source')
 
 filetype plugin indent on
 syntax enable
@@ -56,20 +34,22 @@ set relativenumber " relative line numbers elsewhere
 set showcmd " show last command in bottom right
 set cursorline " highlight current line
 
-set wildmenu " visual command autocomplete
+set hidden " don't close buffers immediately
 
 set foldenable
 set foldlevelstart=10
 set foldnestmax=10
 set foldmethod=indent
 
-let mapleader = ','
-
 if executable('rg')
   set grepprg=rg\ --vimgrep
 endif
 
 " Plugin config
+
+" denite
+
+let g:webdevicons_enable_denite = 0
 
 " deoplete
 let g:deoplete#enable_at_startup = 1
@@ -79,10 +59,70 @@ let g:deoplete#sources#clang#clang_header = '/usr/lib/clang'
 " deoplete: Eclim
 let g:EclimCompletionMethod = 'omnifunc'
 
+" leader guide
+let g:lmap = {}
+
+let g:lmap.f = {'name': 'Files'}
+    nnoremap <SID>(file-open-vimrc) :e $MYVIMRC<CR>
+    nmap <leader>fd <SID>(file-open-vimrc)
+    nnoremap <SID>(file-open-dein) :e ~/.config/nvim/dein.toml<CR>
+    nmap <leader>fp <SID>(file-open-dein)
+
+let g:lmap.s = {'name': 'Search'}
+    nnoremap <SID>(search-files) :Denite file_rec<CR>
+    nmap <leader>sf <SID>(search-files)
+    nnoremap <SID>(search-project-files) :DeniteProjectDir file_rec<CR>
+    nmap <leader>sF <SID>(search-project-files)
+    nnoremap <SID>(search-grep) :Denite grep<CR>
+    nmap <leader>sg <SID>(search-grep)
+    nnoremap <SID>(search-project-grep) :DeniteProjectDir grep<CR>
+    nmap <leader>sG <SID>(search-project-grep)
+
+let g:lmap.w = {'name': 'Windows'}
+    nnoremap <SID>(window-focus_left) <c-w>h
+    nmap <leader>wh <SID>(window-focus-left)
+    nnoremap <SID>(window-focus-down) <c-w>j
+    nmap <leader>wj <SID>(window-focus-down)
+    nnoremap <SID>(window-focus-up) <c-w>k
+    nmap <leader>wk <SID>(window-focus-up)
+    nnoremap <SID>(window-focus-right) <c-w>l
+    nmap <leader>wl <SID>(window-focus-right)
+
+    nnoremap <SID>(window-split) <c-w>s
+    nmap <leader>ws <SID>(window-split)
+    nnoremap <SID>(window-splitv) <c-w>v
+    nmap <leader>wv <SID>(window-splitv)
+    nnoremap <SID>(window-close) <c-w>c
+    nmap <leader>wc <SID>(window-close)
+
+let g:llmap = {}
+
+let g:topdict = {}
+let g:topdict[mapleader] = g:lmap
+let g:topdict[mapleader]['name'] = '<Leader>'
+let g:topdict[maplocalleader] = g:llmap
+let g:topdict[maplocalleader]['name'] = '<LocalLeader>'
+
+nnoremap <silent> <leader> :<c-u>LeaderGuide '<Space>'<CR>
+vnoremap <silent> <leader> :<c-u>LeaderGuideVisual '<Space>'<CR>
+map <leader>. <Plug>leaderguide-global
+nnoremap <LocalLeader> :<c-u>LeaderGuide ','<CR>
+vnoremap <LocalLeader> :<c-u>LeaderGuideVisual ','<CR>
+map <Localleader>. <Plug>leaderguide-buffer
+
 " lightline
 let g:lightline = {
   \ 'colorscheme': 'Dracula',
   \ }
+
+" lion
+let g:lion_create_maps = 0
+let g:lion_squeeze_spaces = 1 " disable with b:lion_squeeze_spaces
+
+nmap <silent> gl <Plug>LionRight
+vmap <silent> gl <Plug>VLionRight
+nmap <silent> gL <Plug>LionLeft
+vmap <silent> gL <Plug>VLionLeft
 
 " Terminal colors
 
