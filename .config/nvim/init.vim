@@ -62,6 +62,20 @@ let g:EclimCompletionMethod = 'omnifunc'
 " leader guide
 let g:lmap = {}
 
+let g:lmap.b = {'name': 'Buffers'}
+    nnoremap <SID>(buffer-denite) :Denite buffer<CR>
+    nmap <leader>bb <SID>(buffer-denite)
+    nnoremap <SID>(buffer-delete) :bdelete<CR>
+    nmap <leader>bd <SID>(buffer-delete)
+    nnoremap <SID>(buffer-next) :bnext<CR>
+    nmap <leader>bn <SID>(buffer-next)
+    nnoremap <SID>(buffer-previous) :bprevious<CR>
+    nmap <leader>bN <SID>(buffer-previous)
+    nnoremap <SID>(buffer-scratch) :JunkfileOpen<CR>
+    nmap <leader>bs <SID>(buffer-scratch)
+    nnoremap <SID>(buffer-scratch-denite) :Denite junkfile<CR>
+    nmap <leader>bS <SID>(buffer-scratch-denite)
+
 let g:lmap.f = {'name': 'Files'}
     nnoremap <SID>(file-open-vimrc) :e $MYVIMRC<CR>
     nmap <leader>fd <SID>(file-open-vimrc)
@@ -74,19 +88,27 @@ let g:lmap.s = {'name': 'Search'}
     nnoremap <SID>(search-project-files) :DeniteProjectDir file_rec<CR>
     nmap <leader>sF <SID>(search-project-files)
     nnoremap <SID>(search-grep) :Denite grep<CR>
-    nmap <leader>sg <SID>(search-grep)
+    nmap <leader>ss <SID>(search-grep)
     nnoremap <SID>(search-project-grep) :DeniteProjectDir grep<CR>
-    nmap <leader>sG <SID>(search-project-grep)
+    nmap <leader>sS <SID>(search-project-grep)
 
 let g:lmap.w = {'name': 'Windows'}
-    nnoremap <SID>(window-focus_left) <c-w>h
+    nnoremap <SID>(window-focus-left) <c-w>h
     nmap <leader>wh <SID>(window-focus-left)
+        nnoremap <SID>(window-move-left) <c-w>H
+        nmap <leader>wH <SID>(window-move-left)
     nnoremap <SID>(window-focus-down) <c-w>j
     nmap <leader>wj <SID>(window-focus-down)
+        nnoremap <SID>(window-move-down) <c-w>J
+        nmap <leader>wJ <SID>(window-move-down)
     nnoremap <SID>(window-focus-up) <c-w>k
     nmap <leader>wk <SID>(window-focus-up)
+        nnoremap <SID>(window-move-up) <c-w>K
+        nmap <leader>wK <SID>(window-move-up)
     nnoremap <SID>(window-focus-right) <c-w>l
     nmap <leader>wl <SID>(window-focus-right)
+        nnoremap <SID>(window-move-right) <c-w>L
+        nmap <leader>wL <SID>(window-move-right)
 
     nnoremap <SID>(window-split) <c-w>s
     nmap <leader>ws <SID>(window-split)
