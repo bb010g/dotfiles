@@ -7,10 +7,15 @@ execute 'set runtimepath+=~/.local/dein/repos/github.com/Shougo/dein.vim'
 let mapleader = "\<Space>"
 let maplocalleader = ","
 
+augroup MyAutoCmd
+augroup END
+
 if dein#load_state(s:dein_dir)
     call dein#begin(s:dein_dir)
 
     call dein#load_toml('~/.config/nvim/dein.toml')
+    call dein#load_toml('~/.config/nvim/dein-deo.toml')
+    call dein#load_toml('~/.config/nvim/dein-ft.toml')
 
     call dein#end()
     call dein#save_state()
@@ -52,7 +57,6 @@ endif
 let g:webdevicons_enable_denite = 0
 
 " deoplete
-let g:deoplete#enable_at_startup = 1
 " deoplete: deoplete-clang
 let g:deoplete#sources#clang#libclang_path = '/usr/lib/libclang.so'
 let g:deoplete#sources#clang#clang_header = '/usr/lib/clang'
@@ -77,10 +81,10 @@ let g:lmap.b = {'name': 'Buffers'}
     nmap <leader>bS <SID>(buffer-scratch-denite)
 
 let g:lmap.f = {'name': 'Files'}
-    nnoremap <SID>(file-open-vimrc) :e $MYVIMRC<CR>
+    nnoremap <SID>(file-open-vimrc) :e ~/.config/nvim/init.vim<CR>
     nmap <leader>fd <SID>(file-open-vimrc)
-    nnoremap <SID>(file-open-dein) :e ~/.config/nvim/dein.toml<CR>
-    nmap <leader>fp <SID>(file-open-dein)
+    nnoremap <SID>(file-open-vimrc-dir) :e ~/.config/nvim/<CR>
+    nmap <leader>fD <SID>(file-open-vimrc-dir)
 
 let g:lmap.s = {'name': 'Search'}
     nnoremap <SID>(search-files) :Denite file_rec<CR>

@@ -32,6 +32,9 @@ repo = 'nixprime/cpsm'
 lazy = 1
 
 [[plugins]]
+repo = 'Shougo/context_filetype.vim'
+
+[[plugins]]
 repo = 'Shougo/denite.nvim'
 lazy = 1
 depends = 'cpsm'
@@ -63,20 +66,17 @@ lazy = 1
 on_cmd = ['Deol', 'DeolCd', 'DeolEdit']
 
 [[plugins]]
-repo = 'Shougo/deoplete.nvim'
-lazy = 1
-on_event = ['InsertEnter']
-
-[[plugins]]
 repo = 'Shougo/junkfile.vim'
 lazy = 1
 on_cmd = ['JunkfileOpen']
 on_func = ['junkfile#open', 'junkfile#open_immediately', 'junkfile#init', 'junkfile#_open']
+on_source = 'denite.nvim'
 
 [[plugins]]
 repo = 'Shougo/neosnippet.vim'
 lazy = 1
-on_event = ['InsertEnter']
+depends = ['neosnippet-snippets', 'context_filetype.vim']
+on_event = ['InsertCharPre']
 
 [[plugins]]
 repo = 'Shougo/neosnippet-snippets'
@@ -142,38 +142,3 @@ name = 'dracula'
 
 [[plugins]]
 repo = 'cespare/vim-toml'
-
-# deoplete completions
-
-[[plugins]]
-repo = 'fszymanski/deoplete-emoji'
-depends = 'deoplete.nvim'
-lazy = 1
-on_event = ['InsertEnter']
-
-[[plugins]]
-repo = 'Shougo/neco-syntax'
-depends = 'deoplete.nvim'
-lazy = 1
-on_event = ['InsertEnter']
-
-[[plugins]]
-repo = 'Shougo/neco-vim'
-depends = 'deoplete.nvim'
-lazy = 1
-on_event = ['InsertEnter']
-on_if = '&filetype == "vim"'
-
-[[plugins]]
-repo = 'zchee/deoplete-clang'
-depends = 'deoplete.nvim'
-lazy = 1
-on_event = ['InsertEnter']
-on_if = 'count(["c", "cpp", "objc"], &filetype)'
-
-[[plugins]]
-repo = 'zchee/deoplete-zsh'
-depends = 'deoplete.nvim'
-lazy = 1
-on_event = ['InsertEnter']
-on_if = '&filetype == "zsh"'

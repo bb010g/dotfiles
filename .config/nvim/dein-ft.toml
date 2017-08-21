@@ -1,0 +1,31 @@
+hook_add = '''
+" Update filetype.
+autocmd MyAutoCmd BufWritePost * nested
+\ if &l:filetype ==# '' || exists('b:ftdetect')
+\ |   unlet! b:ftdetect
+\ |   filetype detect
+\ | endif
+
+" Reload .vimrc automatically.
+autocmd MyAutoCmd BufWritePost .vimrc,vimrc,*.rc.vim,*.toml source $MYVIMRC | redraw
+'''
+
+[ftplugin]
+
+help = '''
+setlocal iskeyword+=:
+setlocal iskeyword+=#
+setlocal iskeyword+=-
+'''
+
+qfreplace = 'setlocal nofoldenable'
+
+toml = 'syntax sync minlines=500'
+
+vim = '''
+if 5000 < line('$')
+  syntax sync minlines=200
+endif
+
+setlocal foldmethod=indent
+'''
