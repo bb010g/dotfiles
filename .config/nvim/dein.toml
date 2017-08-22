@@ -1,7 +1,10 @@
 [[plugins]]
-repo = '~/.local/dein/repos/github.com/Shougo/dein.vim'
+repo = '~/.local/share/dein/repos/github.com/Shougo/dein.vim'
 
 # normal plugins
+
+[[plugins]]
+repo = 'equalsraf/neovim-gui-shim'
 
 [[plugins]]
 repo = 'hecal3/vim-leader-guide'
@@ -25,11 +28,33 @@ repo = 'itchyny/lightline.vim'
 [[plugins]]
 repo = 'junegunn/goyo.vim'
 lazy = 1
-on_cmd = ['Goyo']
+on_cmd = 'Goyo'
+
+# [[plugins]]
+# repo = 'kana/vim-repeat'
+
+[[plugins]]
+repo = 'kana/vim-smartchr'
+lazy = 1
+on_event = 'InsertCharPre'
+hook_source = '''
+augroup MyAutoCmd
+    autocmd FileType c,cpp inoremap <buffer> <expr> .
+        \ smartchr#loop('.', '->', '...')
+augroup END
+'''
+
+[[plugins]]
+repo = 'katono/rogue.vim'
+lazy = 1
+on_cmd = ['Rogue', 'RogueScores', 'RogueResume']
 
 [[plugins]]
 repo = 'nixprime/cpsm'
-lazy = 1
+build = "dash -c 'PY3=ON ./install.sh'"
+
+[[plugins]]
+repo = 'https://github.com/sgur/vim-editorconfig'
 
 [[plugins]]
 repo = 'Shougo/context_filetype.vim'
@@ -37,7 +62,6 @@ repo = 'Shougo/context_filetype.vim'
 [[plugins]]
 repo = 'Shougo/denite.nvim'
 lazy = 1
-depends = 'cpsm'
 hook_post_source = '''
 augroup deniteresize
     autocmd!
@@ -68,7 +92,7 @@ on_cmd = ['Deol', 'DeolCd', 'DeolEdit']
 [[plugins]]
 repo = 'Shougo/junkfile.vim'
 lazy = 1
-on_cmd = ['JunkfileOpen']
+on_cmd = 'JunkfileOpen'
 on_func = ['junkfile#open', 'junkfile#open_immediately', 'junkfile#init', 'junkfile#_open']
 on_source = 'denite.nvim'
 
@@ -76,7 +100,16 @@ on_source = 'denite.nvim'
 repo = 'Shougo/neosnippet.vim'
 lazy = 1
 depends = ['neosnippet-snippets', 'context_filetype.vim']
-on_event = ['InsertCharPre']
+on_event = 'InsertCharPre'
+on_ft = 'snippet'
+hook_source = '''
+  imap <silent> <C-k> <Plug>(neosnippet_jump_or_expand)
+  smap <silent> <C-k> <Plug>(neosnippet_jump_or_expand)
+  xmap <silent> <C-k> <Plug>(neosnippet_expand_target)
+  let g:neosnippet#enable_snipmate_compatibility = 1
+  let g:neosnippet#enable_completed_snippet = 1
+  let g:neosnippet#expand_word_boundary = 1
+'''
 
 [[plugins]]
 repo = 'Shougo/neosnippet-snippets'
@@ -84,7 +117,7 @@ repo = 'Shougo/neosnippet-snippets'
 [[plugins]]
 repo = 'Shougo/vinarise.vim'
 lazy = 1
-on_cmd = ['Vinarise']
+on_cmd = 'Vinarise'
 
 [[plugins]]
 repo = 'tommcdo/vim-lion'
@@ -97,13 +130,13 @@ x = ['<Plug>VLionRight', '<Plug>VLionLeft']
 repo = 'tpope/vim-characterize'
 lazy = 1
 [plugins.on_map]
-n = ['ga']
+n = 'ga'
 
 [[plugins]]
 repo = 'tpope/vim-commentary'
 depends = 'vim-repeat'
 lazy = 1
-on_cmd = ['Commentary']
+on_cmd = 'Commentary'
 [plugins.on_map]
 nxo = ['gc']
 
@@ -125,6 +158,11 @@ n = ['cs', 'ds', 'ys']
 x = ['S']
 
 [[plugins]]
+repo = 'tweekmonster/startuptime.vim'
+lazy = 1
+on_cmd = 'StartupTime'
+
+[[plugins]]
 repo = 'wellle/targets.vim'
 
 # theme
@@ -132,7 +170,7 @@ repo = 'wellle/targets.vim'
 [[plugins]]
 repo = 'guns/xterm-color-table.vim'
 lazy = 1
-on_cmd = ['XtermColorTable']
+on_cmd = 'XtermColorTable'
 
 [[plugins]]
 repo = 'dracula/vim'

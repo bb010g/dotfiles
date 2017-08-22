@@ -1,8 +1,8 @@
 if &compatible
   set nocompatible
 endif
-let s:dein_dir = '~/.local/dein'
-execute 'set runtimepath+=~/.local/dein/repos/github.com/Shougo/dein.vim'
+let s:dein_dir = '~/.local/share/dein'
+execute 'set runtimepath+='.s:dein_dir.'/repos/github.com/Shougo/dein.vim'
 
 let mapleader = "\<Space>"
 let maplocalleader = ","

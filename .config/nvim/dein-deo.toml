@@ -1,12 +1,21 @@
 [[plugins]]
 repo = 'Shougo/deoplete.nvim'
 lazy = 1
-on_event = ['InsertEnter']
+on_event = 'InsertEnter'
 hook_source = '''
 let g:deoplete#enable_at_startup = 1
+source ~/.config/nvim/deoplete.rc.vim
 '''
 
 # completions
+
+[[plugins]]
+repo = 'artur-shaik/vim-javacomplete2'
+lazy = 1
+on_ft = 'java'
+hook_source = '''
+  autocmd FileType java setlocal omnifunc=javacomplete#Complete
+'''
 
 [[plugins]]
 repo = 'fszymanski/deoplete-emoji'
