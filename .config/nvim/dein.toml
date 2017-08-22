@@ -4,6 +4,10 @@ repo = '~/.local/share/dein/repos/github.com/Shougo/dein.vim'
 # normal plugins
 
 [[plugins]]
+repo = 'ciaranm/securemodelines'
+on_event = 'BufRead'
+
+[[plugins]]
 repo = 'equalsraf/neovim-gui-shim'
 
 [[plugins]]
@@ -50,11 +54,35 @@ lazy = 1
 on_cmd = ['Rogue', 'RogueScores', 'RogueResume']
 
 [[plugins]]
+repo = 'mattn/webapi-vim'
+
+[[plugins]]
 repo = 'nixprime/cpsm'
 build = "dash -c 'PY3=ON ./install.sh'"
 
 [[plugins]]
-repo = 'https://github.com/sgur/vim-editorconfig'
+repo = 'racer-rust/vim-racer'
+on_ft = 'rust'
+hook_source = '''
+let $RUST_SRC_PATH = expand('~/.multirust/toolchains/'
+    \ .'stable-x86_64-unknown-linux-gnu/'
+    \ .'lib/rustlib/src/rust/src/')
+'''
+
+[[plugins]]
+repo = 'rhysd/rust-doc.vim'
+lazy = 1
+on_ft = 'rust'
+on_cmd = ['RustDoc', 'RustDocFuzzy', 'RustDocModule']
+
+[[plugins]]
+repo = 'rust-lang/rust.vim'
+lazy = 1
+on_ft = 'rust'
+on_cmd = 'RustPlay'
+
+[[plugins]]
+repo = 'sgur/vim-editorconfig'
 
 [[plugins]]
 repo = 'Shougo/context_filetype.vim'
@@ -161,6 +189,9 @@ x = ['S']
 repo = 'tweekmonster/startuptime.vim'
 lazy = 1
 on_cmd = 'StartupTime'
+
+[[plugins]]
+repo = 'w0rp/ale'
 
 [[plugins]]
 repo = 'wellle/targets.vim'
