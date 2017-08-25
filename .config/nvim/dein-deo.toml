@@ -13,8 +13,9 @@ source ~/.config/nvim/deoplete.rc.vim
 repo = 'artur-shaik/vim-javacomplete2'
 lazy = 1
 on_ft = 'java'
+on_func = 'javacomplete#logger#Enable'
 hook_source = '''
-  autocmd FileType java setlocal omnifunc=javacomplete#Complete
+autocmd FileType java setlocal omnifunc=javacomplete#Complete
 '''
 
 [[plugins]]
@@ -34,7 +35,7 @@ lazy = 1
 on_ft = ['c', 'cpp']
 # disable fancy Obj-C stuff
 hook_source = '''
-  autocmd FileType c,cpp let b:clang2_orig_maps = {}
+autocmd FileType c,cpp let b:clang2_orig_maps = {}
 '''
 
 [[plugins]]

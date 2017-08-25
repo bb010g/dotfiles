@@ -4,7 +4,22 @@ repo = '~/.local/share/dein/repos/github.com/Shougo/dein.vim'
 # normal plugins
 
 [[plugins]]
+repo = 'apalmer1377/factorus'
+lazy = 1
+on_cmd = [
+    'FExtractMethod', 'FMExtractMethod',
+    'FAddParam', 'FEncapsulate',
+    'FRenameArg', 'FRenameClass', 'FRenameField', 'FRenameMethod',
+        'FRenameType', 'FRenameMacro',
+    'Factorus', 'FRollback', 'FRebuild'
+]
+hook_source = '''
+    let g:factorus_line_length = 100
+'''
+
+[[plugins]]
 repo = 'ciaranm/securemodelines'
+lazy = 1
 on_event = 'BufRead'
 
 [[plugins]]
@@ -33,6 +48,12 @@ repo = 'itchyny/lightline.vim'
 repo = 'junegunn/goyo.vim'
 lazy = 1
 on_cmd = 'Goyo'
+
+[[plugins]]
+repo = 'justinmk/vim-dirvish'
+hook_source = '''
+autocmd FileType dirvish call fugitive#detect(@%)
+'''
 
 # [[plugins]]
 # repo = 'kana/vim-repeat'
@@ -85,6 +106,12 @@ on_cmd = 'RustPlay'
 repo = 'sgur/vim-editorconfig'
 
 [[plugins]]
+repo = 'sjl/gundo.vim'
+lazy = 1
+on_cmd = ['GundoToggle', 'GundoShow', 'GundoHide', 'GundoRenderGraph']
+on_fn = ['gundo#GundoToggle', 'gundo#GundoShow', 'gundo#GundoHide', 'gundo#GundoRenderGraph']
+
+[[plugins]]
 repo = 'Shougo/context_filetype.vim'
 
 [[plugins]]
@@ -96,9 +123,8 @@ augroup deniteresize
     autocmd VimResized,VimEnter * call denite#custom#option('default,
         \'winheight', winheight(0) / 2)
 augroup end
-call denite#custom#option('default', {
-    \ 'prompt': '>'
-    \ })
+call denite#custom#map('insert', '<C-j>', '<denite:move_to_next_line>', 'noremap')
+call denite#custom#map('insert', '<C-k>', '<denite:move_to_previous_line>', 'noremap')
 call denite#custom#var('file_rec', 'command',
     \ ['rg', '--files', ':directory'])
 call denite#custom#source('file_rec', 'matchers', ['matcher_cpsm'])
@@ -172,10 +198,17 @@ nxo = ['gc']
 repo = 'tpope/vim-eunuch'
 
 [[plugins]]
+repo = 'tpope/vim-fugitive'
+
+[[plugins]]
 repo = 'tpope/vim-repeat'
 lazy = 1
 [plugins.on_map]
 nx = '.'
+
+[[plugins]]
+repo = 'tpope/vim-rhubarb'
+depends = 'vim-fugitive'
 
 [[plugins]]
 repo = 'tpope/vim-surround'
@@ -192,6 +225,36 @@ on_cmd = 'StartupTime'
 
 [[plugins]]
 repo = 'w0rp/ale'
+hook_source = '''
+let g:ale_fixers = {
+    \ 'java': ['googlejava'],
+    \}
+'''
+hook_post_source = '''
+if !exists('g:ale_java_googlejava_executable')
+    let g:ale_java_googlejava_executable = 'google-java-format'
+endif
+if !exists('g:ale_java_googlejava_options')
+    let g:ale_java_googlejava_options = ''
+endif
+
+function! Ale_fixers_googlejava_Fix(buffer) abort
+    let l:executable = ale#Var(a:buffer, 'java_googlejava_executable')
+    if !executable(l:executable)
+        return 0
+    endif
+    let l:options = ale#Var(a:buffer, 'java_googlejava_options')
+
+    return {
+    \   'command': ale#Escape(l:executable)
+    \       . (!empty(l:options) ? ' ' . l:options : '')
+    \       . ' -',
+    \}
+endfunction
+
+call ale#fix#registry#Add('googlejava', 'Ale_fixers_googlejava_Fix', ['java'],
+    \ 'Apply google-java-format to a file.')
+'''
 
 [[plugins]]
 repo = 'wellle/targets.vim'
