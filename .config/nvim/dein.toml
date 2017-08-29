@@ -52,7 +52,9 @@ on_cmd = 'Goyo'
 [[plugins]]
 repo = 'justinmk/vim-dirvish'
 hook_source = '''
-autocmd FileType dirvish call fugitive#detect(@%)
+augroup MyAutoCmd
+    autocmd FileType dirvish call fugitive#detect(@%)
+augroup END
 '''
 
 # [[plugins]]
@@ -229,6 +231,8 @@ hook_source = '''
 let g:ale_fixers = {
     \ 'java': ['googlejava'],
     \}
+
+let g:ale_java_javac_options = '-Xlint:-path -Xlint:-processing -implicit:class'
 '''
 hook_post_source = '''
 if !exists('g:ale_java_googlejava_executable')

@@ -1,5 +1,8 @@
 {
     "settings": {
+        "_note": "The plugin uses the keycodes for detecting a match. The hotkeys are for display in settings only.",
+        "cancelDefault": false,
+        "dontSave": false,
         "plugins": {},
         "themes": {
             "Compact-User-List": {
@@ -7,6 +10,13 @@
                 "ctrl": false,
                 "hotkey": "KeyU",
                 "keycode": 85,
+                "shift": false
+            },
+            "Horizontal_Serverlist": {
+                "alt": true,
+                "ctrl": false,
+                "hotkey": "KeyS",
+                "keycode": 83,
                 "shift": false
             }
         }

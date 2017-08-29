@@ -1,5 +1,6 @@
 {
     "settings": {
+        "24h": true,
         "citeFull": true,
         "embeds": true,
         "mention": false,

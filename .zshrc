@@ -102,8 +102,8 @@ alias grep='grep --color=auto '
 alias ls='ls --color=auto -F '
 alias sudo='sudo '
 alias tree='tree -F '
-function reset_dnscrypt() {
-  sudo systemctl restart dnscrypt-proxy.service dnscrypt-proxy.socket unbound.service
+function restart_dnscrypt() {
+  sudo systemctl restart dnscrypt-proxy.socket unbound.service "$@"
 }
 function reset_connman() {
   sudo systemctl restart connman.service wpa_supplicant.service dhcpcd.service

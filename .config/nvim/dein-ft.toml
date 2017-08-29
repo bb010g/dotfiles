@@ -1,13 +1,15 @@
 hook_add = '''
 " Update filetype.
-autocmd MyAutoCmd BufWritePost * nested
-\ if &l:filetype ==# '' || exists('b:ftdetect')
-\ |   unlet! b:ftdetect
-\ |   filetype detect
-\ | endif
+augroup MyAutoCmd
+    autocmd BufWritePost * nested
+    \ if &l:filetype ==# '' || exists('b:ftdetect')
+    \ |   unlet! b:ftdetect
+    \ |   filetype detect
+    \ | endif
 
-" Reload .vimrc automatically.
-autocmd MyAutoCmd BufWritePost .vimrc,vimrc,*.rc.vim,*.toml source $MYVIMRC | redraw
+    " Reload .vimrc automatically.
+    autocmd BufWritePost .vimrc,vimrc,*.rc.vim,*.toml source $MYVIMRC | redraw
+augroup END
 '''
 
 [ftplugin]

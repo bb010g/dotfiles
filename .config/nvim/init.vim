@@ -8,6 +8,7 @@ let mapleader = "\<Space>"
 let maplocalleader = ","
 
 augroup MyAutoCmd
+    autocmd!
 augroup END
 
 if dein#load_state(s:dein_dir)
