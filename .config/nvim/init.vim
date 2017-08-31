@@ -4,8 +4,8 @@ endif
 let s:dein_dir = '~/.local/share/dein'
 execute 'set runtimepath+='.s:dein_dir.'/repos/github.com/Shougo/dein.vim'
 
-let mapleader = "\<Space>"
-let maplocalleader = ","
+let g:mapleader = "\<Space>"
+let g:maplocalleader = ','
 
 augroup MyAutoCmd
     autocmd!
@@ -75,7 +75,7 @@ let g:lmap.b = {'name': 'Buffers'}
     nnoremap <SID>(buffer-next) :bnext<CR>
     nmap <leader>bn <SID>(buffer-next)
     nnoremap <SID>(buffer-previous) :bprevious<CR>
-    nmap <leader>bN <SID>(buffer-previous)
+    nmap <leader>bp <SID>(buffer-previous)
     nnoremap <SID>(buffer-scratch) :JunkfileOpen<CR>
     nmap <leader>bs <SID>(buffer-scratch)
     nnoremap <SID>(buffer-scratch-denite) :Denite junkfile<CR>
@@ -125,10 +125,10 @@ let g:lmap.w = {'name': 'Windows'}
 let g:llmap = {}
 
 let g:topdict = {}
-let g:topdict[mapleader] = g:lmap
-let g:topdict[mapleader]['name'] = '<Leader>'
-let g:topdict[maplocalleader] = g:llmap
-let g:topdict[maplocalleader]['name'] = '<LocalLeader>'
+let g:topdict[g:mapleader] = g:lmap
+let g:topdict[g:mapleader]['name'] = '<Leader>'
+let g:topdict[g:maplocalleader] = g:llmap
+let g:topdict[g:maplocalleader]['name'] = '<LocalLeader>'
 
 nnoremap <silent> <leader> :<c-u>LeaderGuide '<Space>'<CR>
 vnoremap <silent> <leader> :<c-u>LeaderGuideVisual '<Space>'<CR>

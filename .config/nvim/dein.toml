@@ -226,8 +226,12 @@ lazy = 1
 on_cmd = 'StartupTime'
 
 [[plugins]]
-repo = 'w0rp/ale'
+#repo = 'w0rp/ale'
+repo = '~/Documents/ale'
 hook_source = '''
+let g:ale_linters = {
+    \ 'java': ['checkstyle', 'mvn']
+    \}
 let g:ale_fixers = {
     \ 'java': ['googlejava'],
     \}

@@ -16,6 +16,8 @@ on_ft = 'java'
 on_func = 'javacomplete#logger#Enable'
 hook_source = '''
 autocmd FileType java setlocal omnifunc=javacomplete#Complete
+let g:JavaComplete_ImportSortType = 'packageName'
+let g:JavaComplete_ImportOrder = ['*']
 '''
 
 [[plugins]]
