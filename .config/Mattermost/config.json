@@ -1,0 +1,18 @@
+{
+  "teams": [
+    {
+      "name": "[Redox]",
+      "url": "https://chat.redox-os.org/"
+    }
+  ],
+  "showTrayIcon": true,
+  "trayIconTheme": "light",
+  "version": 1,
+  "minimizeToTray": false,
+  "notifications": {
+    "flashWindow": 0
+  },
+  "showUnreadBadge": true,
+  "useSpellChecker": true,
+  "spellCheckerLocale": "en-US"
+}

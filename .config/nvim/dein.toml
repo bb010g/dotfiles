@@ -42,6 +42,9 @@ on_cmd = ['LeaderGuide', 'LeaderGuideVisual', 'LeaderGuideD', 'LeaderGuideVisual
 nx = ['<Plug>leaderguide-global', '<Plug>leaderguide-buffer']
 
 [[plugins]]
+repo = 'HerringtonDarkholme/yats.vim'
+
+[[plugins]]
 repo = 'itchyny/lightline.vim'
 
 [[plugins]]
@@ -82,6 +85,9 @@ repo = 'mattn/webapi-vim'
 [[plugins]]
 repo = 'nixprime/cpsm'
 build = "dash -c 'PY3=ON ./install.sh'"
+
+[[plugins]]
+repo = 'othree/html5.vim'
 
 [[plugins]]
 repo = 'racer-rust/vim-racer'
@@ -153,6 +159,9 @@ on_func = ['junkfile#open', 'junkfile#open_immediately', 'junkfile#init', 'junkf
 on_source = 'denite.nvim'
 
 [[plugins]]
+repo = 'Shougo/neomru.vim'
+
+[[plugins]]
 repo = 'Shougo/neosnippet.vim'
 lazy = 1
 depends = ['neosnippet-snippets', 'context_filetype.vim']
@@ -174,6 +183,9 @@ repo = 'Shougo/neosnippet-snippets'
 repo = 'Shougo/vinarise.vim'
 lazy = 1
 on_cmd = 'Vinarise'
+
+[[plugins]]
+repo = 'stephpy/vim-yaml'
 
 [[plugins]]
 repo = 'tommcdo/vim-lion'

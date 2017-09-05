@@ -24,6 +24,11 @@ let g:JavaComplete_ImportOrder = ['*']
 repo = 'fszymanski/deoplete-emoji'
 
 [[plugins]]
+repo = 'mhartington/nvim-typescript'
+lazy = 1
+on_ft = 'javascript'
+
+[[plugins]]
 repo = 'Shougo/neco-syntax'
 
 [[plugins]]

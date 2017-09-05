@@ -10,3 +10,5 @@
 	submodule = log
 [push]
 	recurseSubmodules = check
+[cola]
+	spellcheck = false
