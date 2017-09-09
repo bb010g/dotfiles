@@ -26,7 +26,7 @@ repo = 'fszymanski/deoplete-emoji'
 [[plugins]]
 repo = 'mhartington/nvim-typescript'
 lazy = 1
-on_ft = 'javascript'
+on_ft = 'typescript'
 
 [[plugins]]
 repo = 'Shougo/neco-syntax'
