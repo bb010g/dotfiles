@@ -97,6 +97,9 @@ let g:lmap.s = {'name': 'Search'}
     nnoremap <SID>(search-project-grep) :DeniteProjectDir grep<CR>
     nmap <leader>sS <SID>(search-project-grep)
 
+let g:lmap.t = {'name': 'Table'}
+    let g:lmap.t.m = {'name': 'table-mode'}
+
 let g:lmap.w = {'name': 'Windows'}
     nnoremap <SID>(window-focus-left) <c-w>h
     nmap <leader>wh <SID>(window-focus-left)

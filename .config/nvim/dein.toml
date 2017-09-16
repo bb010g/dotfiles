@@ -14,13 +14,32 @@ on_cmd = [
     'Factorus', 'FRollback', 'FRebuild'
 ]
 hook_source = '''
-    let g:factorus_line_length = 100
+let g:factorus_line_length = 100
 '''
 
 [[plugins]]
 repo = 'ciaranm/securemodelines'
 lazy = 1
 on_event = 'BufRead'
+
+[[plugins]]
+repo = 'dhruvasagar/vim-table-mode'
+lazy = 1
+on_cmd = ['TableModeEnable', 'TableModeToggle']
+hook_source = '''
+let g:table_mode_map_prefix = '<Leader>tm'
+let g:table_mode_realign_map = '<Leader>tmr'
+let g:table_mode_delete_row_map = '<Leader>tmdd'
+let g:table_mode_delete_column_map = '<Leader>tmdc'
+let g:table_mode_add_formula_map = '<Leader>tmfa'
+let g:table_mode_eval_formula_map = '<Leader>tmfe'
+let g:table_mode_echo_cell_map = '<Leader>tm?'
+let g:table_mode_sort_map = '<Leader>tms'
+
+let g:table_mode_corner = '|'
+'''
+[plugins.on_map]
+n = ['<Leader>tmm']
 
 [[plugins]]
 repo = 'equalsraf/neovim-gui-shim'
@@ -32,7 +51,8 @@ hook_post_source = '''
 call leaderGuide#register_prefix_descriptions("\<LocalLeader>", "g:llmap")
 call leaderGuide#register_prefix_descriptions('', "g:topdict")
 function! s:my_displayfunc()
-    let g:leaderGuide#displayname = substitute(g:leaderGuide#displayname, '^<SID>(\(.*\))$', '\1', '')
+    let g:leaderGuide#displayname = substitute(g:leaderGuide#displayname, '^:\(\)\?call \(.*\)<CR>$', '\1\2', '')
+    let g:leaderGuide#displayname = substitute(g:leaderGuide#displayname, '^<\%(SID\|Plug\)>(\(.*\))$', '\1', '')
     let g:leaderGuide#displayname = substitute(g:leaderGuide#displayname, '^\w\{-1,}-', '', '')
 endfunction
 let g:leaderGuide_displayfunc = [function('s:my_displayfunc')]
@@ -168,12 +188,12 @@ depends = ['neosnippet-snippets', 'context_filetype.vim']
 on_event = 'InsertCharPre'
 on_ft = 'snippet'
 hook_source = '''
-  imap <silent> <C-k> <Plug>(neosnippet_jump_or_expand)
-  smap <silent> <C-k> <Plug>(neosnippet_jump_or_expand)
-  xmap <silent> <C-k> <Plug>(neosnippet_expand_target)
-  let g:neosnippet#enable_snipmate_compatibility = 1
-  let g:neosnippet#enable_completed_snippet = 1
-  let g:neosnippet#expand_word_boundary = 1
+imap <silent> <C-k> <Plug>(neosnippet_jump_or_expand)
+smap <silent> <C-k> <Plug>(neosnippet_jump_or_expand)
+xmap <silent> <C-k> <Plug>(neosnippet_expand_target)
+let g:neosnippet#enable_snipmate_compatibility = 1
+let g:neosnippet#enable_completed_snippet = 1
+let g:neosnippet#expand_word_boundary = 1
 '''
 
 [[plugins]]
