@@ -3,11 +3,14 @@
 	email = bb010g@gmail.com
 [core]
 	excludesfile = /home/bb010g/.config/gitignore_global
+[diff]
+	submodule = log
+[merge "verify"]
+	name = merge and verify driver
+	driver = ~/tools/merge-and-verify-driver %A %O %B
 [status]
 	submoduleSummary = true
 	showStash = true
-[diff]
-	submodule = log
 [push]
 	recurseSubmodules = check
 [cola]
