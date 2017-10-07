@@ -1,3 +1,8 @@
 {
-    "settings": {}
+    "settings": {
+        "allowWide": false,
+        "completionsMenu": true,
+        "forceJumbo": false,
+        "highDpi": false
+    }
 }
