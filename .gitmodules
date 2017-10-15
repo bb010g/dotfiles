@@ -30,11 +30,10 @@
 	path = .config/BetterDiscord-sources/noodlebox
 	url = git@github.com:noodlebox/betterdiscord-plugins
 	branch = master
-[submodule ".config/BetterDiscord-sources/Anxeal"]
-	path = .config/BetterDiscord-sources/Anxeal
-	url = git@github.com:Anxeal/BDEnhancements
-	branch = master
 [submodule ".skim"]
 	path = .skim
 	url = git@github.com:lotabout/skim.git
 	branch = master
+[submodule ".config/BetterDiscord-sources/mwittrien"]
+	path = .config/BetterDiscord-sources/mwittrien
+	url = git@github.com:mwittrien/BetterDiscordAddons

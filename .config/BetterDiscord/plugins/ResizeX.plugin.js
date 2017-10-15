@@ -1,1 +1,0 @@
-../../BetterDiscord-sources/Anxeal/plugins/ResizeX/ResizeX.plugin.js

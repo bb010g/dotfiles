@@ -1,1 +1,0 @@
-../../BetterDiscord-sources/rauenzi/Plugins/AlwaysTyping/AlwaysTyping.plugin.js
