@@ -21,6 +21,15 @@ let g:JavaComplete_ImportOrder = ['*']
 '''
 
 [[plugins]]
+repo = 'autozimu/LanguageClient-neovim'
+hook_source = '''
+let g:LanguageClient_autoStart = 1
+let g:LanguageClient_serverCommands = {
+\ 'javascript': ['flow-language-server', '--stdio'],
+\ }
+'''
+
+[[plugins]]
 repo = 'fszymanski/deoplete-emoji'
 
 [[plugins]]

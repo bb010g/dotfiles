@@ -1,7 +1,7 @@
 {
     "settings": {
         "allowWide": false,
-        "completionsMenu": true,
+        "completionsMenu": false,
         "forceJumbo": false,
         "highDpi": false
     }

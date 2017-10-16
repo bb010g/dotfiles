@@ -105,6 +105,6 @@ alias tree='tree -F '
 function restart_dnscrypt() {
   sudo systemctl restart dnscrypt-proxy.socket unbound.service "$@"
 }
-function reset_connman() {
+function restart_connman() {
   sudo systemctl restart connman.service wpa_supplicant.service dhcpcd.service
 }

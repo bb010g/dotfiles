@@ -39,6 +39,7 @@ set number " current line number
 set relativenumber " relative line numbers elsewhere
 set showcmd " show last command in bottom right
 set cursorline " highlight current line
+set cmdheight=2 " Wider command line
 
 set hidden " don't close buffers immediately
 
