@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/rauenzi/Plugins/StatusEverywhere/StatusEverywhere.plugin.js

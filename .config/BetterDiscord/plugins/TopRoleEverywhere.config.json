@@ -1,0 +1,10 @@
+{
+    "settings": {
+        "disableForBots": false,
+        "showInChat": true,
+        "showInMemberList": false,
+        "showOnBots": false,
+        "showOwnerRole": true,
+        "useOtherStyle": false
+    }
+}

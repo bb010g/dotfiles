@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/mwittrien/Plugins/TopRoleEverywhere/TopRoleEverywhere.plugin.js

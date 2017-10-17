@@ -1,3 +1,5 @@
-*
+/*
 !/.gitignore
-!/plugins
+!/plugins/
+/plugins/BPM_FOR_BETTERDISCORD.config.json
+/plugins/BRC.config.json
