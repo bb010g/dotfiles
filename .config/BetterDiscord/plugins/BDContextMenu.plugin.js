@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/rauenzi/Plugins/BDContextMenu/BDContextMenu.plugin.js

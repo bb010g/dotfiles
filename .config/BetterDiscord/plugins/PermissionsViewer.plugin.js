@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/rauenzi/Plugins/PermissionsViewer/PermissionsViewer.plugin.js
