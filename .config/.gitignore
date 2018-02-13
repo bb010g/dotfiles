@@ -1,1 +1,63 @@
+# System-specific apps
+/autostart/*
+# Data, not config
+/configstore/*
+# I don't even know
+/dconf/*
+# System-specific apps?
+/emaildefaults
+# Too much state
+/geeqie/*
+# System-specific apps
+/gconf/*
+# System-specific conf
+/gtk-2.0/*
+/gtk-3.0/*
+# Too much state
+/htop/*
+# System-specific config
+/jack/*
+# System-specific private data
+/keybase/*
+# Too much state
+/kritadisplayrc
+/kritarc
+# System-specific apps
+/menus/*
+# System-specific apps
+/mimeapps.list
+# Too much state
+/pavucontrol.ini
+# System-specific config
+/pulse/*
+# Too much state
+/rosegardenmusic/*
+# More than just config, and I don't care to sync it
+/supertuxkart/*
+# Too much state
+/vlc/*
+# System-specific
+/whipper/*
+# Cache, not config
+/xbuild/*
+
+# Electron
+
+/Atom/*
+/Keybase/*
+/discord/*
+/discordcanary/*
+# Actually a web browser, but same idea. Bad Google.
+/google-chrome/*
+
+# Qt's overabundence of state
+
+# Also system-specific
+/Cadence/*
+/Fuel-SCM/*
+/QDirStat/*
+/QtProject.conf
+# System-specific libs
 /Trolltech.conf
+/cantata/*
+/cmst/*

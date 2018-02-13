@@ -37,3 +37,6 @@
 [submodule ".config/BetterDiscord-sources/mwittrien"]
 	path = .config/BetterDiscord-sources/mwittrien
 	url = git@github.com:mwittrien/BetterDiscordAddons
+[submodule ".config/BetterDiscord-sources/Arashiryuu"]
+	path = .config/BetterDiscord-sources/Arashiryuu
+	url = git@github.com:Arashiryuu/crap

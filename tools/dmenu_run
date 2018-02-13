@@ -1,24 +1,26 @@
 #!/usr/bin/env ion
 
-match $(dmenu $@ <<< 'brightness
+match "$(dmenu <<< 'brightness
 lock
 mpc
 shoot
 suspend
-volume')
-  case brightness; light -S @(light -G | dmenu $@)
+volume')"
+  case brightness; exec light -S @(light -G | exec dmenu)
   case lock; exec ~/tools/lock
   case mpc
-    let cmd = $(dash -c "echo toggle; mpc | sed '2~1s/ \\{2,\}/\\n/g'; echo 'repeat
-random
-single
-consume'" | dmenu $@)
-    mpc "$cmd" | sed '2~1s/ \{2,\}/\n/g' | dmenu $@
+    let mpc_lines[] = [ @lines("$(mpc)") ]
+    let title playback[] settings[] = @mpc_lines[0] [ @split(@mpc_lines[1]) ] [ @split(@mpc_lines[2], '   ') ]
+    let state track time percent = @playback[0] @playback[1] @playback[2] @playback[3]
+    let input = $join([ toggle repeat random single consume @settings ], "\n")
+    let cmd = "$(exec dmenu -p "$state $title $track | $track $time $percent" <<< $input)"
+    # TODO rewrite to use if or proper conditional expansion when patched
+    test -n $cmd && exec ion -c "mpc $cmd | exec dmenu"
   case shoot
-    let type = $(dmenu $@ <<< 'select
-full')
+    let type = "$(exec dmenu <<< 'select
+full')"
     # TODO rewrite to match when patched
-    ion -c 'maim '$(/usr/bin/test $type = select && /usr/bin/echo -s)' '$(date +%s)'.png'
+    exec ion -c 'exec maim '"$(/usr/bin/test $type = select && /usr/bin/echo -s)"' '"$(date +%s)"'.png'
   case suspend; exec ~/tools/suspend
-  case volume; ponymix set-volume @(ponymix --short get-volume | dmenu $@) > /dev/null
+  case volume; exec ponymix set-volume @(ponymix --short get-volume | exec dmenu) > /dev/null
 end

@@ -29,6 +29,8 @@ syntax enable
 set termguicolors
 color dracula
 
+au BufRead,BufNewFile *.mjs set filetype=javascript
+
 set tabstop=8 " visual <TAB>
 set softtabstop=4 " tab key
 set shiftwidth=4 " actual tab key

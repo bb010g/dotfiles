@@ -18,6 +18,11 @@ let g:factorus_line_length = 100
 '''
 
 [[plugins]]
+repo = 'aurieh/discord.nvim'
+lazy = 1
+on_event = 'BufEnter'
+
+[[plugins]]
 repo = 'ciaranm/securemodelines'
 lazy = 1
 on_event = 'BufRead'

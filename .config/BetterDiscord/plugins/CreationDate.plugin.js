@@ -1,1 +1,1 @@
-../../BetterDiscord-sources/Natsulus/plugins/Creation Date/CreationDate.plugin.js
+../../BetterDiscord-sources/mwittrien/Plugins/CreationDate/CreationDate.plugin.js

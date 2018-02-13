@@ -2,6 +2,7 @@
 #
 # Please see http://i3wm.org/docs/userguide.html for a complete reference!
 
+exec xset -b
 exec compton
 exec xsetroot -cursor_name left_ptr
 exec dunst

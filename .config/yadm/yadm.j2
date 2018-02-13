@@ -1,0 +1,7 @@
+{% set yadm = namespace() -%}
+{% set yadm.disk_paths = ['/'] -%}
+{% set yadm.battery_n = '0' -%}
+{% set yadm.cpu_temp_path = '/sys/devices/platform/coretemp.0/hwmon/hwmon0/temp1_input' -%}
+{% set yadm.interface = dict() -%}
+
+{% include 'machine.j2' -%}

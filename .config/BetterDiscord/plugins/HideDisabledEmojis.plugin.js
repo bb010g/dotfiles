@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/rauenzi/Plugins/HideDisabledEmojis/HideDisabledEmojis.plugin.js

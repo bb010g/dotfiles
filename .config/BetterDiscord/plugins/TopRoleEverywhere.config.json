@@ -1,10 +1,12 @@
 {
     "settings": {
+        "addUserID": false,
+        "darkIdTag": false,
         "disableForBots": false,
+        "includeColorless": false,
         "showInChat": true,
         "showInMemberList": false,
-        "showOnBots": false,
-        "showOwnerRole": true,
+        "showOwnerRole": false,
         "useOtherStyle": false
     }
 }

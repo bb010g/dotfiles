@@ -11,57 +11,49 @@ general {
         interval = 5
 }
 
-{% set disk_paths = ['/'] -%}
-{% set if_wireless = '_first_' -%}
-{% set if_ethernet = '_first_' -%}
-{% set battery_n = '0' -%}
-{% set cpu_temp_path = '/sys/devices/platform/coretemp.0/hwmon/hwmon0/temp1_input' -%}
-{% if YADM_CLASS == 'work' -%}
-  {%- set if_wireless = 'wlp3s0' -%}
-  {%- set if_ethernet = 'eno1' -%}
-  {%- set cpu_temp_path = '/sys/devices/platform/coretemp.0/hwmon/hwmon2/temp1_input' -%}
-{%- elif YADM_CLASS == 'home' -%}
-  {%- set disk_paths = ['/', '/data'] -%}
-  {%- set battery_n = '1' -%}
-{%- endif %}
+{% from 'yadm.j2' import yadm -%}
 
-{% for disk_path in disk_paths -%}
+{% macro interface(name) -%}
+    {{ '_first_' if yadm.interface[name] is not defined else yadm.interface[name] }}
+{%- endmacro -%}
+
+{% for disk_path in yadm.disk_paths -%}
 order += "disk {{ disk_path }}"
 {% endfor -%}
 order += "ipv6"
-order += "wireless {{ if_wireless }}"
-order += "ethernet {{ if_ethernet }}"
+order += "wireless {{ interface('wireless') }}"
+order += "ethernet {{ interface('ethernet') }}"
 order += "cpu_temperature 1"
 order += "load"
-order += "battery {{ battery_n }}"
+order += "battery {{ yadm.battery_n }}"
 order += "volume master"
 order += "tztime local"
 
-{% for disk_path in disk_paths -%}
+{% for disk_path in yadm.disk_paths -%}
 disk "{{ disk_path }}" {
         format = "%avail"
 }
-{% endfor %}
-wireless {{ if_wireless }} {
+{%- endfor %}
+
+wireless {{ interface('wireless') }} {
         format_up = "W: (%quality at %essid) %ip"
         format_down = "W: no"
 }
-
-ethernet {{ if_ethernet }} {
+ethernet {{ interface('ethernet') }} {
         # if you use %speed, i3status requires root privileges
         format_up = "E: %ip (%speed)"
         format_down = "E: no"
 }
 
 cpu_temperature 1 {
-        path = "{{ cpu_temp_path }}"
+        path = "{{ yadm.cpu_temp_path }}"
 }
 
 load {
         format = "%1min"
 }
 
-battery {{ battery_n }} {
+battery {{ yadm.battery_n }} {
         format = "%status %percentage %remaining"
 }
 

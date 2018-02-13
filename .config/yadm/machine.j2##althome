@@ -1,0 +1,1 @@
+{% set yadm.cpu_temp_path = '/sys/devices/platform/coretemp.0/hwmon/hwmon2/temp1_input' -%}

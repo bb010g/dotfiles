@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/rauenzi/Plugins/AccountDetailsPlus/AccountDetailsPlus.plugin.js

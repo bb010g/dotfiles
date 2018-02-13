@@ -1,3 +1,11 @@
 {
-    "settings": "{\"css\":\"font-size: 12px; color: #fff; font-family: inherit; opacity: 0.6; margin-bottom: 10px;\",\"format\":\"$(yyyy-MM-dd HH:mm)$\"}"
+    "settings": {
+        "addCreationTime": true,
+        "addInUserPopout": true,
+        "addInUserProfil": true,
+        "forceZeros": true
+    },
+    "choices": {
+        "creationDateLang": "eo"
+    }
 }

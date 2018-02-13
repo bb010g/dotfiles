@@ -1,0 +1,3 @@
+{% set yadm.disk_paths = ['/', '/data'] -%}
+{% set yadm.battery_n = '1' -%}
+{% set yadm.cpu_temp_path = '/sys/devices/platform/coretemp.0/hwmon/hwmon2/temp1_input' -%}
