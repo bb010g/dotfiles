@@ -15,6 +15,8 @@
 /gtk-3.0/*
 # Too much state
 /htop/*
+# Too much state
+/inkscape/*
 # System-specific config
 /jack/*
 # System-specific private data
@@ -52,6 +54,7 @@
 
 # Qt's overabundence of state
 
+/falkon/*
 # Also system-specific
 /Cadence/*
 /Fuel-SCM/*

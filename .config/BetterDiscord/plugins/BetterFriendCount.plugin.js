@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/mwittrien/Plugins/BetterFriendCount/BetterFriendCount.plugin.js

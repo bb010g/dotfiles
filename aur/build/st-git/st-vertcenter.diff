@@ -1,20 +1,16 @@
-diff --git a/st.h b/st.h
-index 44d4938..a45202f 100644
---- a/st.h
-+++ b/st.h
-@@ -134,6 +134,7 @@ typedef struct {
+diff --git a/x.c b/x.c
+index d43a529..7d489fa 100644
+--- a/x.c
++++ b/x.c
+@@ -80,6 +80,7 @@ typedef struct {
  	int w, h; /* window width and height */
  	int ch; /* char height */
  	int cw; /* char width  */
 +	int cyo; /* char y offset */
- 	char state; /* focus, redraw, visible */
+ 	int mode; /* window state/mode flags */
  	int cursor; /* cursor style */
  } TermWindow;
-diff --git a/x.c b/x.c
-index 743b084..cc6128f 100644
---- a/x.c
-+++ b/x.c
-@@ -826,6 +826,7 @@ xloadfonts(char *fontstr, double fontsize)
+@@ -949,6 +950,7 @@ xloadfonts(char *fontstr, double fontsize)
  	/* Setting character width and height. */
  	win.cw = ceilf(dc.font.width * cwscale);
  	win.ch = ceilf(dc.font.height * chscale);
@@ -22,7 +18,7 @@ index 743b084..cc6128f 100644
  
  	FcPatternDel(pattern, FC_SLANT);
  	FcPatternAddInteger(pattern, FC_SLANT, FC_SLANT_ITALIC);
-@@ -1024,7 +1025,7 @@ xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x
+@@ -1155,7 +1157,7 @@ xmakeglyphfontspecs(XftGlyphFontSpec *specs, const Glyph *glyphs, int len, int x
  				font = &dc.bfont;
  				frcflags = FRC_BOLD;
  			}
@@ -31,7 +27,7 @@ index 743b084..cc6128f 100644
  		}
  
  		/* Lookup character index with default font. */
-@@ -1235,12 +1236,12 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
+@@ -1371,12 +1373,12 @@ xdrawglyphfontspecs(const XftGlyphFontSpec *specs, Glyph base, int len, int x, i
  
  	/* Render underline and strikethrough. */
  	if (base.mode & ATTR_UNDERLINE) {
