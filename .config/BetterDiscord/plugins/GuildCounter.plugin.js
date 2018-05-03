@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/Metalloriff/GuildCounter.plugin.js

@@ -4,6 +4,8 @@
 /configstore/*
 # I don't even know
 /dconf/*
+# Device-specific
+/kdeconnect/*
 # System-specific apps?
 /emaildefaults
 # Too much state
@@ -36,6 +38,10 @@
 /rosegardenmusic/*
 # More than just config, and I don't care to sync it
 /supertuxkart/*
+# Private data
+/telegram-export/*
+# Too much state
+/transmission/*
 # Too much state
 /vlc/*
 # System-specific
@@ -46,7 +52,9 @@
 # Electron
 
 /Atom/*
+/Bitwarden/*
 /Keybase/*
+/Wire/*
 /discord/*
 /discordcanary/*
 # Actually a web browser, but same idea. Bad Google.

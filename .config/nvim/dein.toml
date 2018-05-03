@@ -47,6 +47,9 @@ let g:table_mode_corner = '|'
 n = ['<Leader>tmm']
 
 [[plugins]]
+repo = 'elixir-editors/vim-elixir'
+
+[[plugins]]
 repo = 'equalsraf/neovim-gui-shim'
 
 [[plugins]]
@@ -78,6 +81,9 @@ lazy = 1
 on_cmd = 'Goyo'
 
 [[plugins]]
+repo = 'jeroenbourgois/vim-actionscript'
+
+[[plugins]]
 repo = 'justinmk/vim-dirvish'
 hook_source = '''
 augroup MyAutoCmd
@@ -103,6 +109,18 @@ augroup END
 repo = 'katono/rogue.vim'
 lazy = 1
 on_cmd = ['Rogue', 'RogueScores', 'RogueResume']
+
+[[plugins]]
+repo = 'lucidstack/hex.vim'
+lazy = 1
+on_cmd = [
+    'HexAppendRelease',
+    'HexAllReleases',
+    'HexAllVersions',
+    'HexPackageInfo',
+    'HexOpenHexDocs',
+    'HexOpenGithub',
+]
 
 [[plugins]]
 repo = 'mattn/webapi-vim'
@@ -219,6 +237,11 @@ lazy = 1
 on_cmd = 'Vinarise'
 
 [[plugins]]
+repo = 'slashmili/alchemist.vim'
+lazy = 1
+on_ft = 'elixir'
+
+[[plugins]]
 repo = 'stephpy/vim-yaml'
 
 [[plugins]]
@@ -272,42 +295,12 @@ lazy = 1
 on_cmd = 'StartupTime'
 
 [[plugins]]
-#repo = 'w0rp/ale'
-repo = '~/Documents/ale'
+repo = 'w0rp/ale'
 hook_source = '''
 let g:ale_linters = {
-    \ 'java': ['checkstyle', 'mvn']
     \}
 let g:ale_fixers = {
-    \ 'java': ['googlejava'],
     \}
-
-let g:ale_java_javac_options = '-Xlint:-path -Xlint:-processing -implicit:class'
-'''
-hook_post_source = '''
-if !exists('g:ale_java_googlejava_executable')
-    let g:ale_java_googlejava_executable = 'google-java-format'
-endif
-if !exists('g:ale_java_googlejava_options')
-    let g:ale_java_googlejava_options = ''
-endif
-
-function! Ale_fixers_googlejava_Fix(buffer) abort
-    let l:executable = ale#Var(a:buffer, 'java_googlejava_executable')
-    if !executable(l:executable)
-        return 0
-    endif
-    let l:options = ale#Var(a:buffer, 'java_googlejava_options')
-
-    return {
-    \   'command': ale#Escape(l:executable)
-    \       . (!empty(l:options) ? ' ' . l:options : '')
-    \       . ' -',
-    \}
-endfunction
-
-call ale#fix#registry#Add('googlejava', 'Ale_fixers_googlejava_Fix', ['java'],
-    \ 'Apply google-java-format to a file.')
 '''
 
 [[plugins]]

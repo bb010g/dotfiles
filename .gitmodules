@@ -40,3 +40,6 @@
 [submodule ".config/BetterDiscord-sources/Arashiryuu"]
 	path = .config/BetterDiscord-sources/Arashiryuu
 	url = git@github.com:Arashiryuu/crap
+[submodule ".config/BetterDiscord-sources/Metalloriff"]
+	path = .config/BetterDiscord-sources/Metalloriff
+	url = git@github.com:Metalloriff/BetterDiscordPlugins.git
