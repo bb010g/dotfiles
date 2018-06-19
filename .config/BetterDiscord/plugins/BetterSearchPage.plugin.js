@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/mwittrien/Plugins/BetterSearchPage/BetterSearchPage.plugin.js

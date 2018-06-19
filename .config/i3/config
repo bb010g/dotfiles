@@ -6,9 +6,9 @@ exec xset -b
 exec compton
 exec xsetroot -cursor_name left_ptr
 exec dunst
+exec dex -a
 exec unclutter
 exec redshift-gtk
-exec indicator-kdeconnect
 exec_always sh ~/.fehbg
 # exec_always --no-startup-id $HOME/.config/polybar/launch.sh
 

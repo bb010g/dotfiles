@@ -1,6 +1,9 @@
 #!/bin/dash
 # based off of https://github.com/zplug/zplug/blob/master/base/utils/releases.zsh
 repo="ByzantineFailure/BPM-for-Discord"
+file="betterDiscord-bpm.plugin.js"
+dest="."
+
 version="$1"
 if [ "z${version}z" = "zz" ]; then
     version=$(curl -fsSL "https://github.com/$repo/releases/latest" \
@@ -9,6 +12,6 @@ if [ "z${version}z" = "zz" ]; then
         | sort \
 	| uniq)
 fi
-release_url="https://github.com/$repo/releases/download/$version/betterDiscord-bpm.plugin.js"
+release_url="https://github.com/$repo/releases/download/$version/$file"
 echo "$release_url"
-curl -L -o betterDiscord-bpm.plugin.js "$release_url"
+curl -L -o "$dest/$file" "$release_url"

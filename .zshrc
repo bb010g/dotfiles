@@ -1,5 +1,5 @@
-HISTSIZE=1000
-SAVEHIST=1000
+HISTSIZE=10000
+SAVEHIST=10000
 HISTFILE=~/.zsh_history
 
 # Check if zplug is installed
@@ -25,6 +25,7 @@ zplug "zsh-users/zsh-completions", depth:1
 
 zplug "~/Documents/local-completions", from:local
 
+AGKOZAK_MULTILINE=0
 zplug "agkozak/agkozak-zsh-theme"
 
 # Install plugins if there are plugins that have not been installed
@@ -94,7 +95,19 @@ autoload -U tetriscurses
 autoload -U zargs
 autoload -U zcalc
 autoload -U zed
+autoload -U zmathfunc
 autoload -U zmv
+
+zmathfunc
+zmodload zsh/mathfunc
+
+TIMEFMT='%J   %U  user %S system %P cpu %*E total'$'\n'\
+'avg shared (code):         %X KB'$'\n'\
+'avg unshared (data/stack): %D KB'$'\n'\
+'total (sum):               %K KB'$'\n'\
+'max memory:                %M MB'$'\n'\
+'page faults from disk:     %F'$'\n'\
+'other page faults:         %R'
 
 EDITOR=emc
 eval "$(dircolors -b)"
@@ -102,6 +115,7 @@ alias grep='grep --color=auto '
 alias ls='ls --color=auto -F '
 alias sudo='sudo '
 alias tree='tree -F '
+
 function restart_dnscrypt() {
   sudo systemctl restart dnscrypt-proxy.socket unbound.service "$@"
 }

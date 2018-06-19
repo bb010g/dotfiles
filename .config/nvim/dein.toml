@@ -76,6 +76,9 @@ repo = 'HerringtonDarkholme/yats.vim'
 repo = 'itchyny/lightline.vim'
 
 [[plugins]]
+repo = 'jakwings/vim-pony'
+
+[[plugins]]
 repo = 'junegunn/goyo.vim'
 lazy = 1
 on_cmd = 'Goyo'
@@ -128,9 +131,6 @@ repo = 'mattn/webapi-vim'
 [[plugins]]
 repo = 'nixprime/cpsm'
 build = "dash -c 'PY3=ON ./install.sh'"
-
-[[plugins]]
-repo = 'othree/html5.vim'
 
 [[plugins]]
 repo = 'racer-rust/vim-racer'
@@ -202,7 +202,6 @@ let g:echodoc#enable_at_startup = 1
 '''
 on_event = 'InsertEnter'
 
-
 [[plugins]]
 repo = 'Shougo/junkfile.vim'
 lazy = 1
@@ -240,9 +239,6 @@ on_cmd = 'Vinarise'
 repo = 'slashmili/alchemist.vim'
 lazy = 1
 on_ft = 'elixir'
-
-[[plugins]]
-repo = 'stephpy/vim-yaml'
 
 [[plugins]]
 repo = 'tommcdo/vim-lion'
@@ -317,7 +313,16 @@ on_cmd = 'XtermColorTable'
 repo = 'dracula/vim'
 name = 'dracula'
 
-# syntax
+# completions / indents / syntax
 
 [[plugins]]
 repo = 'cespare/vim-toml'
+
+[[plugins]]
+repo = 'othree/html5.vim'
+
+[[plugins]]
+repo = 'stephpy/vim-yaml'
+
+[[plugins]]
+repo = 'zig-lang/zig.vim'
