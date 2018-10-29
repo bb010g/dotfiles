@@ -5,6 +5,7 @@
 exec xset -b
 exec compton
 exec xsetroot -cursor_name left_ptr
+exec mons -a
 exec dunst
 exec dex -a
 exec unclutter

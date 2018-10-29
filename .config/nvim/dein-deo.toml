@@ -22,12 +22,11 @@ let g:JavaComplete_ImportOrder = ['*']
 
 [[plugins]]
 repo = 'autozimu/LanguageClient-neovim'
-build = './install.sh'
+build = 'bash install.sh'
 rev = 'next'
 hook_source = '''
 let g:LanguageClient_autoStart = 1
 let g:LanguageClient_serverCommands = {
-\ 'javascript': ['flow-language-server', '--stdio'],
 \ }
 '''
 

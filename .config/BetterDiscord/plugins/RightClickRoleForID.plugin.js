@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/Mega-Mewthree/Plugins/RightClickRoleForID/RightClickRoleForID.plugin.js

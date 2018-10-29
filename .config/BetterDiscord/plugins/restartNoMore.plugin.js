@@ -1,1 +1,0 @@
-../../BetterDiscord-sources/Inve1951/plugins/restartNoMore.plugin.js

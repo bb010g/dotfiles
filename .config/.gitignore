@@ -1,3 +1,5 @@
+# Too much state
+/aseprite/*
 # System-specific apps
 /autostart/*
 # Data, not config
@@ -6,6 +8,9 @@
 /dconf/*
 # Device-specific
 /kdeconnect/*
+# System-specific/state
+/evince/accels
+/evince/print-settings
 # System-specific apps?
 /emaildefaults
 # Too much state
@@ -48,6 +53,8 @@
 /vlc/*
 # System-specific
 /whipper/*
+# Too much state
+/wireshark/*
 # Cache, not config
 /xbuild/*
 

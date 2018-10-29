@@ -1,6 +1,3 @@
-[[plugins]]
-repo = '~/.local/share/dein/repos/github.com/Shougo/dein.vim'
-
 # normal plugins
 
 [[plugins]]
@@ -21,6 +18,10 @@ let g:factorus_line_length = 100
 repo = 'aurieh/discord.nvim'
 lazy = 1
 on_event = 'BufEnter'
+
+[[plugins]]
+repo = 'bounceme/remote-viewer'
+depends = 'vim-dirvish'
 
 [[plugins]]
 repo = 'ciaranm/securemodelines'
@@ -53,6 +54,10 @@ repo = 'elixir-editors/vim-elixir'
 repo = 'equalsraf/neovim-gui-shim'
 
 [[plugins]]
+repo = 'eraserhd/parinfer-rust'
+build = 'cargo build --release'
+
+[[plugins]]
 repo = 'hecal3/vim-leader-guide'
 lazy = 1
 hook_post_source = '''
@@ -74,6 +79,11 @@ repo = 'HerringtonDarkholme/yats.vim'
 
 [[plugins]]
 repo = 'itchyny/lightline.vim'
+hook_add = '''
+let g:lightline = {
+  \ 'colorscheme': 'Dracula',
+  \ }
+'''
 
 [[plugins]]
 repo = 'jakwings/vim-pony'
@@ -88,11 +98,6 @@ repo = 'jeroenbourgois/vim-actionscript'
 
 [[plugins]]
 repo = 'justinmk/vim-dirvish'
-hook_source = '''
-augroup MyAutoCmd
-    autocmd FileType dirvish call fugitive#detect(@%)
-augroup END
-'''
 
 # [[plugins]]
 # repo = 'kana/vim-repeat'
@@ -103,7 +108,7 @@ lazy = 1
 on_event = 'InsertCharPre'
 hook_source = '''
 augroup MyAutoCmd
-    autocmd FileType c,cpp inoremap <buffer> <expr> .
+    autocmd FileType c,cpp,perl inoremap <buffer> <expr> .
         \ smartchr#loop('.', '->', '...')
 augroup END
 '''
@@ -112,6 +117,9 @@ augroup END
 repo = 'katono/rogue.vim'
 lazy = 1
 on_cmd = ['Rogue', 'RogueScores', 'RogueResume']
+
+[[plugins]]
+repo = 'lambdalisue/gina.vim'
 
 [[plugins]]
 repo = 'lucidstack/hex.vim'
@@ -168,6 +176,9 @@ repo = 'Shougo/context_filetype.vim'
 [[plugins]]
 repo = 'Shougo/denite.nvim'
 lazy = 1
+hook_add = '''
+let g:webdevicons_enable_denite = 0
+'''
 hook_post_source = '''
 augroup deniteresize
     autocmd!
@@ -241,8 +252,33 @@ lazy = 1
 on_ft = 'elixir'
 
 [[plugins]]
+repo = 'tommcdo/vim-exchange'
+lazy = 1
+on_cmd = ['XchangeHighlightToggle', 'XchangeHighlightEnable', 'XchangeHighlightDisable', 'XchangeClear']
+hook_add = '''
+let g:exchange_no_mappings = 1
+
+nmap <silent> cx <Plug>(Exchange)
+xmap <silent> X <Plug>(Exchange)
+nmap <silent> cxc <Plug>(ExchangeClear)
+nmap <silent> cxx <Plug>(ExchangeLine)
+'''
+[plugins.on_map]
+n = ['<Plug>(Exchange)', '<Plug>(ExchangeClear)', '<Plug>(ExchangeLine)']
+x = ['<Plug>(Exchange)']
+
+[[plugins]]
 repo = 'tommcdo/vim-lion'
 lazy = 1
+hook_add = '''
+let g:lion_create_maps = 0
+let g:lion_squeeze_spaces = 1 " disable with b:lion_squeeze_spaces
+
+nmap <silent> gl <Plug>LionRight
+vmap <silent> gl <Plug>VLionRight
+nmap <silent> gL <Plug>LionLeft
+vmap <silent> gL <Plug>VLionLeft
+'''
 [plugins.on_map]
 n = ['<Plug>LionRepeat', '<Plug>LionRight', '<Plug>LionLeft']
 x = ['<Plug>VLionRight', '<Plug>VLionLeft']
@@ -265,17 +301,10 @@ nxo = ['gc']
 repo = 'tpope/vim-eunuch'
 
 [[plugins]]
-repo = 'tpope/vim-fugitive'
-
-[[plugins]]
 repo = 'tpope/vim-repeat'
 lazy = 1
 [plugins.on_map]
 nx = '.'
-
-[[plugins]]
-repo = 'tpope/vim-rhubarb'
-depends = 'vim-fugitive'
 
 [[plugins]]
 repo = 'tpope/vim-surround'
@@ -291,12 +320,20 @@ lazy = 1
 on_cmd = 'StartupTime'
 
 [[plugins]]
+repo = 'vim-scripts/info.vim'
+lazy = 1
+on_cmd = 'Info'
+
+[[plugins]]
 repo = 'w0rp/ale'
 hook_source = '''
 let g:ale_linters = {
-    \}
+\}
+let g:ale_linters_ignore = {
+\    'javascript': ['flow']
+\}
 let g:ale_fixers = {
-    \}
+\}
 '''
 
 [[plugins]]

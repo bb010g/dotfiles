@@ -1,6 +1,6 @@
 [user]
 	name = Brayden Banks
-	email = bb010g@gmail.com
+	email = me@bb010g.com
 [core]
 	excludesfile = /home/bb010g/.config/gitignore_global
 [diff]
@@ -15,3 +15,5 @@
 	recurseSubmodules = check
 [cola]
 	spellcheck = false
+[github]
+	user = bb010g

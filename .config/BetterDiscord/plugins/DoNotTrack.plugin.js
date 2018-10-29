@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/rauenzi/Plugins/DoNotTrack/DoNotTrack.plugin.js

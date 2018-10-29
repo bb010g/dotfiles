@@ -1,5 +1,6 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
 <preferences>
-	<pref name="ByteBuffer.TempDir" />
+	<pref name="ByteBuffer.TempDir"></pref>
 	<pref name="Default.NumberBase">Hexadecimal</pref>
 	<pref name="Undo.Actions">100</pref>
 	<pref name="View.Toolbar.Show">True</pref>
@@ -19,4 +20,5 @@
 	<pref name="Undo.KeepAfterSave">Memory</pref>
 	<pref name="Session.LoadPrevious">True</pref>
 	<pref name="View.Statusbar.Overwrite">True</pref>
-	<pref name="Default.Layout.File">/
+	<pref name="Default.Layout.File">/usr/share/bless/bless-default.layout</pref>
+</preferences>

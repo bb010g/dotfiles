@@ -1,0 +1,1 @@
+../../BetterDiscord-sources/Metalloriff/GuildAndFriendRemovalAlerts.plugin.js

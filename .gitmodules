@@ -1,7 +1,3 @@
-[submodule ".emacs.d"]
-	path = .emacs.d
-	url = git@github.com:syl20bnr/spacemacs
-	branch = develop
 [submodule ".config/BetterDiscord-sources/Inve1951"]
 	path = .config/BetterDiscord-sources/Inve1951
 	url = git@github.com:Inve1951/BetterDiscordStuff
@@ -43,3 +39,9 @@
 [submodule ".config/BetterDiscord-sources/Metalloriff"]
 	path = .config/BetterDiscord-sources/Metalloriff
 	url = git@github.com:Metalloriff/BetterDiscordPlugins.git
+[submodule ".config/BetterDiscord-sources/BetterDiscordPlugins"]
+	path = .config/BetterDiscord-sources/Mega-Mewthree
+	url = git@github.com:Mega-Mewthree/BetterDiscordPlugins
+[submodule "/home/bb010g/.emacs.d"]
+	path = /home/bb010g/.emacs.d
+	url = git@github.com:hlissner/doom-emacs

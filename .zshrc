@@ -109,7 +109,6 @@ TIMEFMT='%J   %U  user %S system %P cpu %*E total'$'\n'\
 'page faults from disk:     %F'$'\n'\
 'other page faults:         %R'
 
-EDITOR=emc
 eval "$(dircolors -b)"
 alias grep='grep --color=auto '
 alias ls='ls --color=auto -F '

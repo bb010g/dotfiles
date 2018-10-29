@@ -1,0 +1,9 @@
+[maintainer]
+dir = "~/aur/maint"
+
+[aur]
+username = "bb010g"
+
+[[package]]
+name = "python-mkdocs-ponylang"
+

@@ -7,8 +7,8 @@ augroup MyAutoCmd
     \ |   filetype detect
     \ | endif
 
-    " Reload .vimrc automatically.
-    autocmd BufWritePost .vimrc,vimrc,*.rc.vim,*.toml source $MYVIMRC | redraw
+    " " Reload .vimrc automatically.
+    " autocmd BufWritePost .vimrc,vimrc,*.rc.vim,*.toml source $MYVIMRC | redraw
 augroup END
 '''
 
