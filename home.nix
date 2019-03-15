@@ -3,13 +3,25 @@
 let
   # > nix-channel --list
   # nixos-unstable https://nixos.org/channels/nixos-unstable
+  #
+  # might also have some personal patches?
+  # if so, they'd be up at https://github.com/bb010g/nixpkgs, branch bb010g-*
 
-  private = if lib.pathExists ./private.nix then import ./private.nix else {};
+  private = if lib.pathExists ./private.nix then import ./private.nix else {
+    apis = { };
+  };
   # pkgs-unstable = pkgs;
   pkgs-unstable = import <nixos-unstable> { };
+  pkgs-bb010g-unstable = (
+    if lib.pathExists <bb010g-nixos-unstable> then
+      import <bb010g-nixos-unstable>
+    else
+      builtins.fetchTarball "https://github.com/bb010g/nixpkgs/archive/bb010g-nixos-unstable.tar.gz"
+  ) { };
 in
 {
-  fonts.fontconfig.enableProfileFonts = true;
+  home.sessionVariables.NIX_PATH = "${config.home.homeDirectory}/nix/channels:$NIX_PATH";
+
   xdg.configFile."fontconfig/fonts.conf".text = ''
     <?xml version="1.0"?>
     <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
@@ -37,14 +49,16 @@ in
     core = [
       pkgs.ed # ed is the STANDARD text editor
       pkgs.file
+      pkgs.moreutils
       pkgs.nvi
-      pkgs.ripgrep
+      pkgs-unstable.ripgrep
       pkgs.tree
+      pkgs.zsh-completions
     ];
 
     editors = [
       pkgs.kakoune
-      # emacs is a service
+      # emacs is at config.programs
       pkgs.emacs-all-the-icons-fonts
     ];
 
@@ -86,32 +100,77 @@ in
       pkgs.ubuntu_font_family
     ]; # ++ xorg-fonts-misc;
     fonts = fonts-extended-lt ++ [
+      pkgs.corefonts
       pkgs.raleway
+      pkgs.vistafonts
+    ];
+
+    media = [
+      pkgs.ffmpeg
+      pkgs.mpc_cli
     ];
 
     misc = [
+      pkgs-bb010g-unstable.bitwarden-cli
       pkgs.cowsay
-      # pkgs.edbrowse
+      pkgs-unstable.edbrowse
+      pkgs.elinks
       pkgs.fortune
+      pkgs.lynx
+      pkgs.megatools
       pkgs.ponysay
+      pkgs.smbclient
+      pkgs.units
     ];
 
     nix = [
       pkgs.cabal2nix
+      pkgs.cachix
       pkgs.nix-prefetch-scripts
       pkgs.yarn2nix
       # TODO figure out how to build nixpkgs manual
     ];
 
+    tex = [
+      pkgs.biber
+    ];
+
     tools = [
+      pkgs.androidenv.platformTools
+      pkgs.asciinema
+      # pkgs.asciinema-edit
+      pkgs.bind
+      pkgs.binutils
+      pkgs.colordiff
+      pkgs.diffstat
+      pkgs.git-lfs
       pkgs.gnumake
       pkgs.hecate
       pkgs.hyperfine
-      pkgs.jq
+      pkgs.icdiff
+      pkgs.ispell
+      pkgs.lzip
+      (pkgs.mosh.overrideAttrs (o: rec {
+        name = "mosh";
+        version = "1.3.2+${lib.substring 0 7 src.rev}";
+        src = pkgs.fetchFromGitHub {
+          owner = "mobile-shell";
+          repo = "mosh";
+          rev = "944fd6c796338235c4f3d8daf4959ff658f12760";
+          sha256 = "0fwrdqizwnn0kmf8bvlz334va526mlbm1kas9fif0jmvl1q11ayv";
+        };
+      }))
       pkgs.nur.repos.bb010g.just
-      pkgs.ponymix
-      pkgs.unzip
       pkgs.nur.repos.bb010g.dwdiff
+      pkgs.nur.repos.bb010g.ydiff
+      pkgs.nur.repos.mic92.inxi
+      pkgs.p7zip
+      pkgs.ponymix
+      pkgs.rclone
+      pkgs-unstable.rclone-browser
+      pkgs.sbcl
+      pkgs.tokei
+      pkgs.unzip
     ];
 
     gui = lib.concatLists [
@@ -148,16 +207,17 @@ in
 
     gui-games = [
       pkgs.scummvm
+      pkgs.steam
     ];
 
     gui-media = [
+      pkgs.evince
       pkgs.geeqie
       pkgs.gimp
-      pkgs.grafx2
+      pkgs-bb010g-unstable.grafx2
       pkgs.inkscape
       pkgs.kdeApplications.kolourpaint
       pkgs.krita
-      pkgs.mpc_cli
       pkgs.mpv
       pkgs.mtpaint
       pkgs.pinta
@@ -166,17 +226,22 @@ in
     ];
 
     gui-misc = [
-      pkgs.discord
+      pkgs-unstable.discord
+      pkgs.google-chrome
+      pkgs.keybase-gui
       pkgs.nur.repos.mozilla.latest.firefox-nightly-bin
-      pkgs.tdesktop
+      pkgs-unstable.tdesktop
+      pkgs-unstable.wire-desktop
     ];
 
     gui-tools = [
       pkgs.cantata
       pkgs.cmst
+      pkgs.dmenu
       pkgs.gnome3.gnome-system-monitor
       pkgs.ksysguard
       pkgs.notify-desktop
+      pkgs.nur.repos.bb010g.ipscan
       pkgs.nur.repos.bb010g.xcolor
       pkgs.pavucontrol
       pkgs.pcmanfm
@@ -189,6 +254,7 @@ in
     editors
     fonts
     gui
+    media
     misc
     nix
     tools
@@ -214,6 +280,92 @@ in
       home-docked.config = {
         laptop = { enable = false; };
         home = {};
+      };
+    };
+  };
+
+  programs.beets = {
+    enable = true;
+    package = pkgs.nur.repos.bb010g.beets;
+    settings = let
+      optionalPlugin = p: let cond = private.apis ? ${p}; in {
+        plugin = lib.optional cond p;
+        name = if cond then p else null;
+        value = private.apis.${p} or null;
+      };
+
+      acoustid = optionalPlugin "acoustid";
+      discogs = optionalPlugin "discogs";
+
+      hasPrivatePath = p: lib.hasAttrByPath p private;
+      googlePath = [ "google" "personal" "beetsKey" ];
+    in {
+      plugins = [
+        # autotagger
+        "chroma"
+        "fromfilename"
+        # metadata
+        # "absubmit" (needs streaming_music_extractor)
+        "acousticbrainz"
+        "fetchart"
+        "ftintitle"
+        "lastgenre"
+        "lyrics"
+        "mbsync"
+        "replaygain"
+        "scrub"
+        # path formats
+        "rewrite"
+        "the"
+        # interoperability
+        "badfiles"
+        "mpdupdate"
+        # miscellaneous
+        "convert"
+        "duplicates"
+        "export"
+        "fuzzy"
+        "info"
+        "mbsubmit"
+        "missing"
+      ] ++ builtins.concatLists [
+        # autotagger
+        discogs.plugin
+      ];
+
+      ${acoustid.name} = {
+        apikey = acoustid.value;
+      };
+      badfiles = {
+        commands = {
+        };
+      };
+      convert = {
+        embed = "no";
+        format = "opus";
+        formats = {
+          opus = {
+            command = "ffmpeg -i $source -y -map_metadata 0 -c:a libopus -b:a 256k $dest";
+          };
+        };
+      };
+      ${discogs.name} = {
+        user_token = discogs.value;
+      };
+      lyrics = {
+        ${if hasPrivatePath googlePath then "google_API_key" else null} =
+          lib.getAttrByPath googlePath private;
+      };
+      paths = {
+        "default" = "%the{$albumartist}/%the{$album}%aunique{}/$track $title";
+        "singleton" = "Non-Album/%the{$artist}/$title";
+        "comp" = "Compilations/%the{$album}%aunique{}/$track $title";
+      };
+      replaygain = {
+        backend = "bs1770gain";
+      };
+      mpd = {
+        port = 6600;
       };
     };
   };
@@ -267,6 +419,11 @@ in
     enable = true;
   };
 
+  programs.jq = {
+    enable = true;
+    package = pkgs-unstable.jq;
+  };
+
   programs.mercurial = {
     enable = true;
     userName = "Brayden Banks";
@@ -275,6 +432,11 @@ in
 
   programs.neovim = {
     enable = true;
+    configure = {
+      customRC = ''
+set scrolloff=5
+      '';
+    };
   };
 
   programs.obs-studio = {
@@ -294,20 +456,176 @@ in
     ];
   };
 
-  # programs.texlive = {
-  #   enable = true;
-  #   extraPackages = tpkgs: { inherit (tpkgs) ; }
-  # };
+  programs.texlive = {
+    enable = true;
+    extraPackages = tpkgs: { inherit (tpkgs)
+      collection-bibtexextra
+      collection-context
+      collection-fontsextra
+      collection-formatsextra
+      collection-games
+      collection-humanities
+      collection-latexextra
+      collection-luatex
+      collection-mathscience
+      collection-music
+      collection-pictures
+      collection-pstricks
+      collection-publishers
+      scheme-small
+      scheme-tetex
+    ; };
+  };
 
   programs.tmux = {
     enable = true;
   };
 
-  programs.zsh = {
+  programs.zsh = let
+    zshAutoFunctions = [
+      "zargs"
+      "zcalc"
+      "zed"
+      "zmathfunc"
+      "zmv"
+    ];
+    zshOptions = [
+      "AUTO_PUSHD"
+      "EXTENDED_GLOB"
+      "HIST_IGNORE_SPACE"
+      "HIST_REDUCE_BLANKS"
+      "HIST_SUBST_PATTERN"
+      "HIST_VERIFY"
+      "LONG_LIST_JOBS"
+      "NULL_GLOB"
+      "PROMPT_SP"
+    ];
+  in {
     enable = true;
     enableAutosuggestions = true;
     enableCompletion = true;
-    initExtra = "setopt promptsp";
+    completionInit = ''
+      setopt EXTENDED_GLOB
+      autoload -U compinit
+      for dump in ''${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+1); do
+        compinit
+        if [[ -s "$dump" && (! -s "$dump.zwc" || "$dump" -nt "$dump.zwc") ]]; then
+          touch "$dump"
+          zcompile "$dump"
+        else
+          touch "$dump"
+          touch "$dump.zwc"
+        fi
+      done
+      compinit -C
+    '';
+    history = {
+      expireDuplicatesFirst = true;
+      extended = true;
+      ignoreDups = true;
+      share = true;
+    };
+    initExtra = ''
+      setopt ${lib.concatStringsSep " " zshOptions}
+
+      autoload -U ${lib.concatStringsSep " " zshAutoFunctions}
+
+      zmathfunc
+      zmodload zsh/mathfunc
+
+      alias sudo='sudo '
+
+      # for fast-syntax-highlighting
+      zstyle :plugin:history-search-multi-word reset-prompt-protect 1
+    '';
+    localVariables = {
+      AGKOZAK_MULTILINE = "0";
+      GENCOMPL_FPATH = "${config.xdg.cacheHome}/zsh-completion-generator";
+      GENCOMPL_PY = "${pkgs.python3}/bin/python";
+      TIMEFMT = ''
+        %J   %U  user %S system %P cpu %*E total
+        avg shared (code):         %X KB
+        avg unshared (data/stack): %D KB
+        total (sum):               %K KB
+        max memory:                %M MB
+        page faults from disk:     %F
+        other page faults:         %R'';
+    };
+    plugins = [
+      # ordered
+      rec {
+        name = "history-search-multi-word";
+        src = pkgs.fetchFromGitHub {
+          owner = "zdharma";
+          repo = name;
+          rev = "159aaa5e723ab05b4fe930bb232835d98a0e745d";
+          sha256 = "007h248zvw6vnwg2kcybxcr49y7xxxysdxhpw9hja8zp2yk45vr3";
+        };
+        file = "${name}.plugin.zsh";
+      }
+      rec {
+        name = "zsh-autosuggestions";
+        src = pkgs.fetchFromGitHub {
+          owner = "zsh-users";
+          repo = name;
+          rev = "70f36c007db30a5fe1edf2b63664088b502a729c";
+          sha256 = "1j8pnd19f0cr91hxwj3cc8vzysc4hzbiwgv5sqbd5gw160mfg3g3";
+        };
+        file = "${name}.plugin.zsh";
+      }
+      # unordered
+      rec {
+        name = "autoenv";
+        src = pkgs.fetchFromGitHub {
+          owner = "Tarrasch";
+          repo = "zsh-${name}";
+          rev = "e9809c1bd28496e025ca05576f574e08e93e12e8";
+          sha256 = "1vcfk9g26zqn6l7pxjqidw8ay3yijx95ij0d7mns8ypxvaax242b";
+        };
+        file = "${name}.plugin.zsh";
+      }
+      rec {
+        name = "zsh-completion-generator";
+        src = pkgs.fetchFromGitHub {
+          owner = "RobSis";
+          repo = name;
+          rev = "6eb6392026f3f4b9c2d3d34a05be288246144d2c";
+          sha256 = "1lmy3fqy3dj0b1nysrcr8y1v9sb8kmdqmxf7cj6yp82pn3cz8b3q";
+        };
+        file = "${name}.plugin.zsh";
+      }
+      rec {
+        name = "zsh-nix-shell";
+        src = pkgs.fetchFromGitHub {
+          owner = "chisui";
+          repo = name;
+          rev = "dceed031a54e4420e33f22a6b8e642f45cc829e2";
+          sha256 = "10g8m632s4ibbgs8ify8n4h9r4x48l95gvb57lhw4khxs6m8j30q";
+        };
+        file = "${name}.plugin.zsh";
+      }
+      # ordered
+      rec {
+        name = "fast-syntax-highlighting";
+        src = pkgs.fetchFromGitHub {
+          owner = "zdharma";
+          repo = name;
+          rev = "ee4f7c76362f40d905f9c45a59b365abebb213ae";
+          sha256 = "115y77m8xab7cap75hb1yagdb6b4fld0nhxqszrj38hnr7hxbsbn";
+        };
+        file = "${name}.plugin.zsh";
+      }
+      rec {
+        name = "agkozak-zsh-prompt";
+        src = pkgs.fetchFromGitHub {
+          owner = "agkozak";
+          repo = name;
+          rev = "13014b7fbf54b9f6214bff44ba4d522da4fd1ec3";
+          sha256 = "1cgza63pm9vhkak98lcysg357xrxzcn7pwdsm9lkblq36sqgqpr4";
+        };
+        file = "${name}.plugin.zsh";
+      }
+    ];
   };
 
   services.compton.enable = true;
@@ -329,13 +647,29 @@ in
 
   services.mpd = {
     enable = true;
-    musicDirectory = "${config.home.homeDirectory}/Music";
-    extraConfig = ''
-      audio_output {
-        type "pulse"
-	name "PulseAudio"
-      }
-    '';
+    daemons = let
+      extraConfig = ''
+        audio_output {
+          type "pulse"
+          name "PulseAudio"
+        }
+      '';
+    in rec {
+      default = {
+        inherit extraConfig;
+        musicDirectory = "${config.home.homeDirectory}/Music";
+      };
+      external = {
+        inherit extraConfig;
+        autoStart = false;
+        musicDirectory = "/run/media/${config.home.username}/music";
+        network.port = 6601;
+      };
+      external-beets = external // {
+        musicDirectory = "${external.musicDirectory}/beets";
+        network.port = 6602;
+      };
+    };
   };
 
   services.redshift = if private ? redshift then with private.redshift; {
