@@ -1,5 +1,6 @@
 {
   allowUnfree = true;
+  extraOptions = "keep-outputs = true";
   packageOverrides = pkgs: {
 
     # hyperfine 1.4.0

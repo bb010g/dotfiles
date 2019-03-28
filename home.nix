@@ -10,6 +10,7 @@ let
   private = if lib.pathExists ./private.nix then import ./private.nix else {
     apis = { };
   };
+  versions = builtins.fromJSON (lib.readFile ./versions.json);
   # pkgs-unstable = pkgs;
   pkgs-unstable = import <nixos-unstable> { };
   pkgs-bb010g-unstable = (
@@ -192,15 +193,19 @@ in
       pkgs.nur.repos.nexromancers.shotgun
       ((pkgs.st.overrideAttrs (o: rec {
         name = "st";
-        version = "0.8.1+${lib.substring 0 7 src.rev}";
+        version = "0.8.2+${lib.substring 0 7 src.rev}";
         src = pkgs.fetchgit {
           url = "https://git.suckless.org/st";
-          rev = "d7bf023b2f2d41cb6983bb3ce2c6d1bf049150b3";
-          sha256 = "1vi1flpdp3y78ch1mz4vrnjlwwdif1hk3mm8kbxsg22m2sn9p895";
+          rev = "21367a040f056f6a207fafa066bd1cb2d9cae586";
+          sha256 = "11w5zcxn2gsd0x6a7maff7bwyl71wb3ydgvs7msifmwn1d3cmqby";
         };
       })).override {
         conf = lib.readFile st/config.h;
-        patches = [ st/st-scrollback.diff st/st-vertcenter.diff ];
+        patches = [
+	  st/bold-is-not-bright.diff
+	  st/scrollback.diff
+	  st/vertcenter.diff
+	];
       })
       pkgs.xsel
     ];
@@ -229,7 +234,22 @@ in
       pkgs-unstable.discord
       pkgs.google-chrome
       pkgs.keybase-gui
-      pkgs.nur.repos.mozilla.latest.firefox-nightly-bin
+      ((pkgs.nur.repos.mozilla.lib.firefoxOverlay.firefoxVersion {
+        name = "Firefox Nightly";
+        # https://product-details.mozilla.org/1.0/firefox_versions.json
+        #  : FIREFOX_NIGHTLY
+        inherit (versions.firefox.nightly) version;
+        # system: ? arch (if stdenv.system == "i686-linux" then "linux-i686" else "linux-x86_64")
+        # https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/firefox-${version}.en-US.${system}.buildhub.json
+        #  : download -> url -> (parse)
+        inherit (versions.firefox.nightly) timestamp;
+        release = false;
+      }).overrideAttrs (o: { buildCommand = lib.replaceStrings [ ''
+        --set MOZ_SYSTEM_DIR "$out/lib/mozilla" \
+      '' ] [ ''
+        --set MOZ_SYSTEM_DIR "$out/lib/mozilla" \
+        --set SNAP_NAME firefox \
+      '' ] o.buildCommand; }))
       pkgs-unstable.tdesktop
       pkgs-unstable.wire-desktop
     ];
@@ -238,6 +258,7 @@ in
       pkgs.cantata
       pkgs.cmst
       pkgs.dmenu
+      pkgs.freerdp
       pkgs.gnome3.gnome-system-monitor
       pkgs.ksysguard
       pkgs.notify-desktop
@@ -246,6 +267,7 @@ in
       pkgs.pavucontrol
       pkgs.pcmanfm
       pkgs.qdirstat
+      pkgs.remmina
       pkgs.surf
       pkgs.xorg.xbacklight
     ];
@@ -328,7 +350,7 @@ in
         "info"
         "mbsubmit"
         "missing"
-      ] ++ builtins.concatLists [
+      ] ++ lib.concatLists [
         # autotagger
         discogs.plugin
       ];
@@ -432,9 +454,18 @@ in
 
   programs.neovim = {
     enable = true;
+    package = pkgs-unstable.neovim-unwrapped;
     configure = {
       customRC = ''
-set scrolloff=5
+"" window management
+" don't unload buffers when abandoned (hid)
+set hidden
+" more natural new splits (sb spr)
+set splitbelow splitright
+
+"" window viewport
+" cursor line margin (so siso)
+set scrolloff=5 sidescrolloff=4
       '';
     };
   };
@@ -576,24 +607,25 @@ set scrolloff=5
       # unordered
       rec {
         name = "autoenv";
-        src = pkgs.fetchFromGitHub {
-          owner = "Tarrasch";
-          repo = "zsh-${name}";
-          rev = "e9809c1bd28496e025ca05576f574e08e93e12e8";
-          sha256 = "1vcfk9g26zqn6l7pxjqidw8ay3yijx95ij0d7mns8ypxvaax242b";
-        };
+        src = builtins.toPath "${config.home.homeDirectory}/Documents/zsh-${name}";
+        # src = pkgs.fetchFromGitHub {
+        #   owner = "Tarrasch";
+        #   repo = "zsh-${name}";
+        #   rev = "e9809c1bd28496e025ca05576f574e08e93e12e8";
+        #   sha256 = "1vcfk9g26zqn6l7pxjqidw8ay3yijx95ij0d7mns8ypxvaax242b";
+        # };
         file = "${name}.plugin.zsh";
       }
-      rec {
-        name = "zsh-completion-generator";
-        src = pkgs.fetchFromGitHub {
-          owner = "RobSis";
-          repo = name;
-          rev = "6eb6392026f3f4b9c2d3d34a05be288246144d2c";
-          sha256 = "1lmy3fqy3dj0b1nysrcr8y1v9sb8kmdqmxf7cj6yp82pn3cz8b3q";
-        };
-        file = "${name}.plugin.zsh";
-      }
+      # rec {
+      #   name = "zsh-completion-generator";
+      #   src = pkgs.fetchFromGitHub {
+      #     owner = "RobSis";
+      #     repo = name;
+      #     rev = "6eb6392026f3f4b9c2d3d34a05be288246144d2c";
+      #     sha256 = "1lmy3fqy3dj0b1nysrcr8y1v9sb8kmdqmxf7cj6yp82pn3cz8b3q";
+      #   };
+      #   file = "${name}.plugin.zsh";
+      # }
       rec {
         name = "zsh-nix-shell";
         src = pkgs.fetchFromGitHub {
