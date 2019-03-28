@@ -29,17 +29,25 @@
  
  enum term_mode {
  	MODE_WRAP        = 1 << 0,
-@@ -117,6 +121,9 @@ typedef struct {
+@@ -117,10 +121,17 @@ typedef struct {
  	int col;      /* nb col */
  	Line *line;   /* screen */
  	Line *alt;    /* alternate screen */
-+	Line hist[HISTSIZE]; /* history buffer */
++	Line *hist;   /* history buffer */
++	Line *althist; /* alternate history buffer */
 +	int histi;    /* history index */
++	int althisti; /* alternate history index */
 +	int scr;      /* scroll back */
++	int altscr;   /* alternate scroll back */
  	int *dirty;   /* dirtyness of lines */
  	TCursor c;    /* cursor */
  	int ocx;      /* old cursor col */
-@@ -184,8 +191,8 @@ static void tnewline(int);
+ 	int ocy;      /* old cursor row */
++	Glyph altattr; /* old alternate character attributes */
+ 	int top;      /* top    scroll limit */
+ 	int bot;      /* bottom scroll limit */
+ 	int mode;     /* terminal mode flags */
+@@ -184,8 +195,8 @@ static void tnewline(int);
  static void tputtab(int);
  static void tputc(Rune);
  static void treset(void);
@@ -50,7 +58,7 @@
  static void tsetattr(int *, int);
  static void tsetchar(Rune, Glyph *, int, int);
  static void tsetdirt(int, int);
-@@ -409,10 +416,11 @@ tlinelen(int y)
+@@ -409,10 +420,11 @@ tlinelen(int y)
  {
  	int i = term.col;
  
@@ -64,7 +72,7 @@
  		--i;
  
  	return i;
-@@ -521,7 +529,7 @@ selsnap(int *x, int *y, int direction)
+@@ -521,7 +533,7 @@ selsnap(int *x, int *y, int direction)
  		 * Snap around if the word wraps around at the end or
  		 * beginning of a line.
  		 */
@@ -73,7 +81,7 @@
  		prevdelim = ISDELIM(prevgp->u);
  		for (;;) {
  			newx = *x + direction;
-@@ -536,14 +544,14 @@ selsnap(int *x, int *y, int direction)
+@@ -536,14 +548,14 @@ selsnap(int *x, int *y, int direction)
  					yt = *y, xt = *x;
  				else
  					yt = newy, xt = newx;
@@ -90,7 +98,7 @@
  			delim = ISDELIM(gp->u);
  			if (!(gp->mode & ATTR_WDUMMY) && (delim != prevdelim
  					|| (delim && gp->u != prevgp->u)))
-@@ -564,14 +572,14 @@ selsnap(int *x, int *y, int direction)
+@@ -564,14 +576,14 @@ selsnap(int *x, int *y, int direction)
  		*x = (direction < 0) ? 0 : term.col - 1;
  		if (direction < 0) {
  			for (; *y > 0; *y += direction) {
@@ -107,7 +115,8 @@
  						& ATTR_WRAP)) {
  					break;
  				}
-@@ -602,13 +610,14 @@ getsel(void)
+@@ -601,14 +613,15 @@ getsel(void)
+ 			continue;
  		}
  
 +		Line line = TLINE(y);
@@ -125,7 +134,7 @@
  		while (last >= gp && last->u == ' ')
  			--last;
  
-@@ -831,6 +840,9 @@ void
+@@ -831,6 +844,9 @@ void
  ttywrite(const char *s, size_t n, int may_echo)
  {
  	const char *next;
@@ -135,9 +144,41 @@
  
  	if (may_echo && IS_SET(MODE_ECHO))
  		twrite(s, n, 1);
-@@ -1042,13 +1054,54 @@ tswapscreen(void)
+@@ -1025,7 +1041,12 @@ treset(void)
+ void
+ tnew(int col, int row)
+ {
+-	term = (Term){ .c = { .attr = { .fg = defaultfg, .bg = defaultbg } } };
++	term = (Term){
++		.c = { .attr = { .fg = defaultfg, .bg = defaultbg } },
++		.hist = xmalloc(HISTSIZE * sizeof(Line)),
++		.althist = xmalloc(HISTSIZE * sizeof(Line)),
++	};
++	term.altattr = term.c.attr;
+ 	tresize(col, row);
+ 	treset();
  }
-+
+@@ -1034,21 +1055,71 @@ void
+ tswapscreen(void)
+ {
+ 	Line *tmp = term.line;
++	Line *tmphist = term.hist;
++	int tmphisti = term.histi;
++	int tmpscr = term.scr;
+ 
+ 	term.line = term.alt;
++	term.hist = term.althist;
++	term.histi = term.althisti;
++	term.scr = term.altscr;
+ 	term.alt = tmp;
++	term.althist = tmphist;
++	term.althisti = tmphisti;
++	term.altscr = tmpscr;
++	term.altattr = term.c.attr;
+ 	term.mode ^= MODE_ALTSCREEN;
+ 	tfulldirt();
+ }
+ 
 +void
 +kscrolldown(const Arg* a)
 +{
@@ -171,7 +212,6 @@
 +	}
 +}
 +
-
  void
 -tscrolldown(int orig, int n)
 +tscrolldown(int orig, int n, int copyhist)
@@ -191,7 +231,7 @@
  	tsetdirt(orig, term.bot-n);
  	tclearregion(0, term.bot-n+1, term.col-1, term.bot);
  
-@@ -1062,13 +1114,23 @@ tscrolldown(int orig, int n)
+@@ -1062,13 +1133,23 @@ tscrolldown(int orig, int n)
  }
  
  void
@@ -216,7 +256,7 @@
  	tclearregion(0, orig, term.col-1, orig+n-1);
  	tsetdirt(orig+n, term.bot);
  
-@@ -1117,7 +1179,7 @@ tnewline(int first_col)
+@@ -1117,7 +1198,7 @@ tnewline(int first_col)
  	int y = term.c.y;
  
  	if (y == term.bot) {
@@ -225,7 +265,17 @@
  	} else {
  		y++;
  	}
-@@ -1282,14 +1344,14 @@ void
+@@ -1209,7 +1290,8 @@ tsetchar(Rune u, Glyph *attr, int x, int y)
+ 		term.line[y][x-1].mode &= ~ATTR_WIDE;
+ 	}
+ 
+-	term.dirty[y] = 1;
++	if (term.scr == 0)
++		term.dirty[y] = 1;
+ 	term.line[y][x] = *attr;
+ 	term.line[y][x].u = u;
+ }
+@@ -1282,14 +1364,14 @@ void
  tinsertblankline(int n)
  {
  	if (BETWEEN(term.c.y, term.top, term.bot))
@@ -242,7 +292,7 @@
  }
  
  int32_t
-@@ -1720,11 +1782,11 @@ csihandle(void)
+@@ -1720,11 +1802,11 @@ csihandle(void)
  		break;
  	case 'S': /* SU -- Scroll <n> line up */
  		DEFAULT(csiescseq.arg[0], 1);
@@ -256,7 +306,7 @@
  		break;
  	case 'L': /* IL -- Insert <n> blank lines */
  		DEFAULT(csiescseq.arg[0], 1);
-@@ -2227,7 +2289,7 @@ eschandle(uchar ascii)
+@@ -2227,7 +2309,7 @@ eschandle(uchar ascii)
  		return 0;
  	case 'D': /* IND -- Linefeed */
  		if (term.c.y == term.bot) {
@@ -265,7 +315,7 @@
  		} else {
  			tmoveto(term.c.x, term.c.y+1);
  		}
-@@ -2240,7 +2302,7 @@ eschandle(uchar ascii)
+@@ -2240,7 +2322,7 @@ eschandle(uchar ascii)
  		break;
  	case 'M': /* RI -- Reverse index */
  		if (term.c.y == term.top) {
@@ -274,7 +324,7 @@
  		} else {
  			tmoveto(term.c.x, term.c.y-1);
  		}
-@@ -2458,7 +2520,7 @@ twrite(const char *buf, int buflen, int show_ctrl)
+@@ -2458,7 +2540,7 @@ twrite(const char *buf, int buflen, int show_ctrl)
  void
  tresize(int col, int row)
  {
@@ -283,22 +333,30 @@
  	int minrow = MIN(row, term.row);
  	int mincol = MIN(col, term.col);
  	int *bp;
-@@ -2495,6 +2557,14 @@ tresize(int col, int row)
+@@ -2495,6 +2577,22 @@ tresize(int col, int row)
  	term.dirty = xrealloc(term.dirty, row * sizeof(*term.dirty));
  	term.tabs = xrealloc(term.tabs, col * sizeof(*term.tabs));
  
 +	for (i = 0; i < HISTSIZE; i++) {
 +		term.hist[i] = xrealloc(term.hist[i], col * sizeof(Glyph));
++		term.althist[i] = xrealloc(term.althist[i], col * sizeof(Glyph));
 +		for (j = mincol; j < col; j++) {
-+			term.hist[i][j] = term.c.attr;
-+			term.hist[i][j].u = ' ';
++			Glyph *gp = &term.hist[i][j];
++			Glyph *altgp = &term.althist[i][j];
++
++			gp->fg = term.c.attr.fg;
++			altgp->fg = term.altattr.fg;
++			gp->bg = term.c.attr.bg;
++			altgp->bg = term.altattr.bg;
++			altgp->mode = gp->mode = 0;
++			altgp->u = gp->u = ' ';
 +		}
 +	}
 +
  	/* resize each row to new width, zero-pad if needed */
  	for (i = 0; i < minrow; i++) {
  		term.line[i] = xrealloc(term.line[i], col * sizeof(Glyph));
-@@ -2552,7 +2622,7 @@ drawregion(int x1, int y1, int x2, int y2)
+@@ -2552,7 +2650,7 @@ drawregion(int x1, int y1, int x2, int y2)
  			continue;
  
  		term.dirty[y] = 0;
@@ -307,7 +365,7 @@
  	}
  }
  
-@@ -2573,8 +2643,9 @@ draw(void)
+@@ -2573,8 +2671,9 @@ draw(void)
  		cx--;
  
  	drawregion(0, 0, term.col, term.row);
@@ -330,4 +388,3 @@
  void printscreen(const Arg *);
  void printsel(const Arg *);
  void sendbreak(const Arg *);
-

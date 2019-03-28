@@ -192,7 +192,7 @@ in
       pkgs.nur.repos.nexromancers.hacksaw
       pkgs.nur.repos.nexromancers.shotgun
       ((pkgs.st.overrideAttrs (o: rec {
-        name = "st";
+        name = "st-${version}";
         version = "0.8.2+${lib.substring 0 7 src.rev}";
         src = pkgs.fetchgit {
           url = "https://git.suckless.org/st";
@@ -202,10 +202,10 @@ in
       })).override {
         conf = lib.readFile st/config.h;
         patches = [
-	  st/bold-is-not-bright.diff
-	  st/scrollback.diff
-	  st/vertcenter.diff
-	];
+          st/bold-is-not-bright.diff
+          st/scrollback.diff
+          st/vertcenter.diff
+        ];
       })
       pkgs.xsel
     ];
@@ -281,6 +281,10 @@ in
     nix
     tools
   ];
+
+  home.sessionVariables.EDITOR = "ed";
+  home.sessionVariables.PAGER = "less -RF";
+  home.sessionVariables.VISUAL = "nvim";
 
   programs.autorandr = {
     enable = true;
@@ -415,6 +419,7 @@ in
     userEmail = "me@bb010g.com";
     extraConfig = {
       diff = {
+        algorithm = "histogram";
         submodule = "log";
       };
       status = {
@@ -513,13 +518,19 @@ set scrolloff=5 sidescrolloff=4
   };
 
   programs.zsh = let
-    zshAutoFunctions = [
-      "zargs"
-      "zcalc"
-      "zed"
-      "zmathfunc"
-      "zmv"
-    ];
+    filterAttrs = f: e: lib.filter (n: f n e.${n}) (lib.attrNames e);
+    trueAttrs = filterAttrs (n: v: v == true);
+    zshAutoFunctions = {
+      run-help = true;
+      zargs = true;
+      zcalc = true;
+      zed = true;
+      zmathfunc = true;
+      zmv = true;
+    };
+    zshModules = {
+      "zsh/mathfunc" = true;
+    };
     zshOptions = [
       "AUTO_PUSHD"
       "EXTENDED_GLOB"
@@ -559,10 +570,11 @@ set scrolloff=5 sidescrolloff=4
     initExtra = ''
       setopt ${lib.concatStringsSep " " zshOptions}
 
-      autoload -U ${lib.concatStringsSep " " zshAutoFunctions}
+      unalias run-help
+      zmodload ${lib.concatStringsSep " " (trueAttrs zshModules)}
+      autoload -Uz ${lib.concatStringsSep " " (trueAttrs zshAutoFunctions)}
 
       zmathfunc
-      zmodload zsh/mathfunc
 
       alias sudo='sudo '
 
