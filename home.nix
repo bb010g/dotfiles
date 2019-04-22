@@ -561,19 +561,32 @@ set scrolloff=5 sidescrolloff=4
       zmv = true;
     };
     zshModules = {
+      "zsh/complist" = true;
       "zsh/files" = ["-Fm" "b:zf_\*"];
       "zsh/mathfunc" = true;
+      "zsh/termcap" = true;
+      "zsh/terminfo" = true;
     };
     zshOptions = [
+      "APPEND_HISTORY"
       "AUTO_PUSHD"
+      "COMPLETE_IN_WORD"
+      "NO_BEEP"
       "EXTENDED_GLOB"
+      "GLOB_COMPLETE"
+      "GLOB_STAR_SHORT"
       "HIST_IGNORE_SPACE"
       "HIST_REDUCE_BLANKS"
       "HIST_SUBST_PATTERN"
       "HIST_VERIFY"
+      "INTERACTIVE_COMMENTS"
       "LONG_LIST_JOBS"
       "NULL_GLOB"
+      "PIPE_FAIL"
+      "PROMPT_CR"
       "PROMPT_SP"
+      "NO_RM_STAR_SILENT"
+      "RM_STAR_WAIT"
     ];
   in {
     enable = true;
@@ -597,7 +610,6 @@ set scrolloff=5 sidescrolloff=4
     history = {
       expireDuplicatesFirst = true;
       extended = true;
-      ignoreDups = true;
       share = true;
       size = 100000;
     };
@@ -615,9 +627,78 @@ set scrolloff=5 sidescrolloff=4
       zmathfunc
 
       alias sudo='sudo '
+      eval "$(dircolors -b)"
+      alias ls='ls --color=auto -F '
+      alias tree='tree -F '
 
       # for fast-syntax-highlighting
       zstyle :plugin:history-search-multi-word reset-prompt-protect 1
+
+      zstyle ':completion:*' menu yes select
+
+      # keyboard bindings
+      #
+      # if Zsh isn't working with your keyboard properly, try the following:
+      #   autoload -Uz zkbd; zkbd
+      # follow the prompts, and restart if necessary.
+      # the file name printed at the end should match the output of:
+      #   echo - "''${ZDOTDIR:-$HOME}/.zkbd/$TERM-$VENDOR-$OSTYPE"
+      # move the file if necessary.
+      typeset -g -A key
+      load-bindkeys() {
+        local zkbd_file="''${ZDOTDIR:-$HOME}/.zkbd/''${1:-$TERM-$VENDOR-$OSTYPE}"
+        if [[ -e "''$zkbd_file" ]]; then source "$zkbd_file"; fi
+
+        _key-set() {
+          local k="$1"; shift
+          if (( ''${+key[$k]} )); then return; fi
+          while (( ''${+1} )); do
+            1="$(cat -v <<< "$1")"
+            key[$k]="$1"
+            if [[ -n "$1" ]]; then break; else shift; fi
+          done
+        }
+
+        _key-set F1 "''${terminfo[kf1]}" "''${termcap[k1]}"
+        _key-set F2 "''${terminfo[kf2]}" "''${termcap[k2]}"
+        _key-set F3 "''${terminfo[kf3]}" "''${termcap[k3]}"
+        _key-set F4 "''${terminfo[kf4]}" "''${termcap[k4]}"
+        _key-set F5 "''${terminfo[kf5]}" "''${termcap[k5]}"
+        _key-set F6 "''${terminfo[kf6]}" "''${termcap[k6]}"
+        _key-set F7 "''${terminfo[kf7]}" "''${termcap[k7]}"
+        _key-set F8 "''${terminfo[kf8]}" "''${termcap[k8]}"
+        _key-set F9 "''${terminfo[kf9]}" "''${termcap[k9]}"
+        _key-set F10 "''${terminfo[kf10]}" "''${termcap[F1]}"
+        _key-set F11 "''${terminfo[kf11]}" "''${termcap[F2]}"
+        _key-set F12 "''${terminfo[kf12]}" "''${termcap[F3]}"
+        _key-set Backspace "''${terminfo[kbs]}" "''${termcap[kb]}"
+        _key-set Insert "''${terminfo[kich1]}" "''${termcap[kI]}"
+        _key-set Home "''${terminfo[khome]}" "''${termcap[kh]}"
+        _key-set PageUp "''${terminfo[kpp]}" "''${termcap[kP]}"
+        _key-set Delete "''${terminfo[kdch1]}" "''${termcap[kD]}"
+        _key-set End "''${terminfo[kend]}" "''${termcap[@7]}"
+        _key-set PageDown "''${terminfo[knp]}" "''${termcap[kN]}"
+        _key-set Up "''${terminfo[kcuu1]}" "''${termcap[ku]}"
+        _key-set Left "''${terminfo[kcub1]}" "''${termcap[kl]}"
+        _key-set Down "''${terminfo[kcud1]}" "''${termcap[kd]}"
+        _key-set Right "''${terminfo[kcuf1]}" "''${termcap[kr]}"
+        _key-set BackTab "''${terminfo[cbt]}" "''${termcap[bt]}"
+        _key-set Tab "''${terminfo[ht]}" "''${termcap[ta]}"
+
+        bindkey -M menuselect '/' history-incremental-search-backward
+        bindkey -M menuselect '?' history-incremental-search-forward
+        [[ -n "''${key[BackTab]}" ]] && bindkey -M menuselect "''${key[BackTab]}" reverse-menu-complete
+
+        unset -f _key-set
+      }
+      load-bindkeys
+
+      # make sure term is in application mode when zle is active (for terminfo)
+      # (thanks http://zshwiki.org/home/zle/bindkeys )
+      if (( ''${+terminfo[smkx]} )) && (( ''${+terminfo[rmkx]} )); then
+        zle-line-init() { echoti smkx }; zle -N zle-line-init
+        zle-line-finish() { echoti rmkx }; zle -N zle-line-finish
+      fi
     '';
     localVariables = {
       AGKOZAK_MULTILINE = "0";
