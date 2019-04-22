@@ -1,12 +1,8 @@
 {
   allowUnfree = true;
   extraOptions = "keep-outputs = true";
+  android_sdk.accept_license = true;
   packageOverrides = pkgs: {
-
-    # hyperfine 1.4.0
-    hyperfine = pkgs.callPackage <nixos-unstable/pkgs/tools/misc/hyperfine> {
-      inherit (pkgs.darwin.apple_sdk.frameworks) Security;
-    };
 
     nur = let
       inherit (pkgs) lib;

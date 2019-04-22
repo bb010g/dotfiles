@@ -1,8 +1,31 @@
 {
+  "pkgs": {
+    "stable": {
+      "remote": "https://github.com/NixOS/nixpkgs-channels",
+      "branch": "nixos-19.03",
+      "url": ["https://github.com/NixOS/nixpkgs/archive/", ".tar.gz"],
+      "rev": "7b36963e7a7363f1b40ac0a829c4644923dda909",
+      "sha256": "1s5nhkxclb2mfcjvy92asm2g10jv0pkwkkmmbbnqkdwcnn514i48"
+    },
+    "unstable": {
+      "remote": "https://github.com/NixOS/nixpkgs-channels",
+      "branch": "nixos-unstable",
+      "url": ["https://github.com/NixOS/nixpkgs/archive/", ".tar.gz"],
+      "rev": "1fc591f9a5bd1b016b5d66dfab29560073955a14",
+      "sha256": "1cwcyzyw9118rdzn6m481il1yxmp8mm32ik1yqk9gxhqxxn00qzs"
+    },
+    "unstable-bb010g": {
+      "remote": "https://github.com/bb010g/nixpkgs",
+      "branch": "bb010g-nixos-unstable",
+      "url": ["https://github.com/bb010g/nixpkgs/archive/", ".tar.gz"],
+      "rev": "ac02b341018f96dd796f30de4ec73a99e6427344",
+      "sha256": "1mx9sggk1hhyxhgn9vgx9g29kyvqnrjp8nk002ar6z1abf9wh8jq"
+    }
+  },
   "firefox": {
     "nightly": {
       "version": "68.0a1",
-      "timestamp": "2019-03-28-13-14-10"
+      "timestamp": "2019-04-22-09-42-40"
     }
   }
 }

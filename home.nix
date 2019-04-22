@@ -1,4 +1,5 @@
-{ config, lib, pkgs, ... }:
+{ config, lib, pkgs ? null, ... }:
+let argPkgs = pkgs; in
 
 let
   # > nix-channel --list
@@ -7,17 +8,31 @@ let
   # might also have some personal patches?
   # if so, they'd be up at https://github.com/bb010g/nixpkgs, branch bb010g-*
 
+  inherit (builtins) elemAt fetchTarball;
   private = if lib.pathExists ./private.nix then import ./private.nix else {
     apis = { };
   };
   versions = builtins.fromJSON (lib.readFile ./versions.json);
-  # pkgs-unstable = pkgs;
-  pkgs-unstable = import <nixos-unstable> { };
-  pkgs-bb010g-unstable = (
-    if lib.pathExists <bb010g-nixos-unstable> then
-      import <bb010g-nixos-unstable>
-    else
-      builtins.fetchTarball "https://github.com/bb010g/nixpkgs/archive/bb010g-nixos-unstable.tar.gz"
+  ppkgs = lib.mapAttrs (n: v: fetchTarball {
+    url = "${elemAt v.url 0}${v.rev}${elemAt v.url 1}";
+    inherit (v) sha256;
+  }) versions.pkgs;
+  pinned = false;
+  pkgs = if pinned || argPkgs == null then ppkgs.stable else argPkgs;
+  pkgs-stable = import (
+    if !pinned && lib.pathExists <nixos-19.03> then <nixos-19.03> else
+    if !pinned && lib.pathExists <nixos> then <nixos> else
+    if !pinned && lib.pathExists <nixpkgs> then <nixpkgs> else
+    ppkgs.stable
+  ) { };
+  pkgs-unstable = import (
+    if !pinned && lib.pathExists <nixos-unstable> then <nixos-unstable> else
+    ppkgs.unstable
+  ) { };
+  pkgs-unstable-bb010g = import (
+    if !pinned && lib.pathExists <bb010g-nixos-unstable> then
+      <bb010g-nixos-unstable> else
+    ppkgs.unstable-bb010g
   ) { };
 in
 {
@@ -50,6 +65,7 @@ in
     core = [
       pkgs.ed # ed is the STANDARD text editor
       pkgs.file
+      pkgs.manpages
       pkgs.moreutils
       pkgs.nvi
       pkgs-unstable.ripgrep
@@ -91,7 +107,7 @@ in
       pkgs.caladea
       pkgs.cantarell-fonts
       pkgs.carlito
-      pkgs.font-droid
+      # pkgs.font-droid (dropped in favor of noto?)
       # ttf-gelasio ( http://sorkintype.com/ )
       pkgs.google-fonts
       # gsfonts ( https://github.com/ArtifexSoftware/urw-base35-fonts )
@@ -112,7 +128,7 @@ in
     ];
 
     misc = [
-      pkgs-bb010g-unstable.bitwarden-cli
+      pkgs-unstable.bitwarden-cli
       pkgs.cowsay
       pkgs-unstable.edbrowse
       pkgs.elinks
@@ -127,6 +143,9 @@ in
     nix = [
       pkgs.cabal2nix
       pkgs.cachix
+      ((pkgs.diffoscope.override { enableBloat = true; }).overrideAttrs (o: {
+        pythonPath = o.pythonPath ++ [ pkgs.zip ];
+      }))
       pkgs.nix-prefetch-scripts
       pkgs.yarn2nix
       # TODO figure out how to build nixpkgs manual
@@ -137,19 +156,22 @@ in
     ];
 
     tools = [
-      pkgs.androidenv.platformTools
+      pkgs.androidenv.androidPkgs_9_0.platform-tools
       pkgs.asciinema
       # pkgs.asciinema-edit
       pkgs.bind
       pkgs.binutils
       pkgs.colordiff
       pkgs.diffstat
+      pkgs.nur.repos.bb010g.dwdiff
       pkgs.git-lfs
       pkgs.gnumake
       pkgs.hecate
-      pkgs.hyperfine
+      pkgs-unstable.hyperfine
       pkgs.icdiff
+      pkgs.nur.repos.mic92.inxi
       pkgs.ispell
+      pkgs.nur.repos.bb010g.just
       pkgs.lzip
       (pkgs.mosh.overrideAttrs (o: rec {
         name = "mosh";
@@ -161,17 +183,13 @@ in
           sha256 = "0fwrdqizwnn0kmf8bvlz334va526mlbm1kas9fif0jmvl1q11ayv";
         };
       }))
-      pkgs.nur.repos.bb010g.just
-      pkgs.nur.repos.bb010g.dwdiff
-      pkgs.nur.repos.bb010g.ydiff
-      pkgs.nur.repos.mic92.inxi
       pkgs.p7zip
       pkgs.ponymix
       pkgs.rclone
-      pkgs-unstable.rclone-browser
       pkgs.sbcl
       pkgs.tokei
       pkgs.unzip
+      pkgs.nur.repos.bb010g.ydiff
     ];
 
     gui = lib.concatLists [
@@ -188,8 +206,8 @@ in
       pkgs.breeze-qt5
       pkgs.glxinfo
       pkgs.gnome3.adwaita-icon-theme
-      pkgs.hicolor-icon-theme
       pkgs.nur.repos.nexromancers.hacksaw
+      pkgs.hicolor-icon-theme
       pkgs.nur.repos.nexromancers.shotgun
       ((pkgs.st.overrideAttrs (o: rec {
         name = "st-${version}";
@@ -219,11 +237,14 @@ in
       pkgs.evince
       pkgs.geeqie
       pkgs.gimp
-      pkgs-bb010g-unstable.grafx2
+      pkgs-unstable-bb010g.grafx2
       pkgs.inkscape
       pkgs.kdeApplications.kolourpaint
       pkgs.krita
-      pkgs.mpv
+      (pkgs-unstable-bb010g.mpv.override rec {
+        archiveSupport = true;
+        openalSupport = true;
+      })
       pkgs.mtpaint
       pkgs.pinta
       pkgs.sxiv
@@ -232,8 +253,6 @@ in
 
     gui-misc = [
       pkgs-unstable.discord
-      pkgs.google-chrome
-      pkgs.keybase-gui
       ((pkgs.nur.repos.mozilla.lib.firefoxOverlay.firefoxVersion {
         name = "Firefox Nightly";
         # https://product-details.mozilla.org/1.0/firefox_versions.json
@@ -242,6 +261,10 @@ in
         # system: ? arch (if stdenv.system == "i686-linux" then "linux-i686" else "linux-x86_64")
         # https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/firefox-${version}.en-US.${system}.buildhub.json
         #  : download -> url -> (parse)
+        #  - https://archive.mozilla.org/pub/firefox/nightly/%Y/%m/%Y-%m-%d-%H-%m-%s-mozilla-central/firefox-${version}.en-US.${system}.tar.bz2
+        #  : build -> date -> (parse) also works
+        #  - %Y-%m-%dT%H:%m:%sZ
+        #  need %Y-%m-%d-%H-%m-%s
         inherit (versions.firefox.nightly) timestamp;
         release = false;
       }).overrideAttrs (o: { buildCommand = lib.replaceStrings [ ''
@@ -250,6 +273,10 @@ in
         --set MOZ_SYSTEM_DIR "$out/lib/mozilla" \
         --set SNAP_NAME firefox \
       '' ] o.buildCommand; }))
+      pkgs.google-chrome
+      pkgs.keybase-gui
+      # for Firefox MozLz4a JSON files (.jsonlz4)
+      pkgs.nur.repos.bb010g.mozlz4-tool
       pkgs-unstable.tdesktop
       pkgs-unstable.wire-desktop
     ];
@@ -261,14 +288,15 @@ in
       pkgs.freerdp
       pkgs.gnome3.gnome-system-monitor
       pkgs.ksysguard
+      pkgs-unstable-bb010g.nur.repos.bb010g.ipscan
       pkgs.notify-desktop
-      pkgs.nur.repos.bb010g.ipscan
-      pkgs.nur.repos.bb010g.xcolor
       pkgs.pavucontrol
       pkgs.pcmanfm
       pkgs.qdirstat
       pkgs.remmina
+      pkgs.sqlitebrowser
       pkgs.surf
+      pkgs.nur.repos.bb010g.xcolor
       pkgs.xorg.xbacklight
     ];
   in lib.concatLists [
@@ -312,7 +340,7 @@ in
 
   programs.beets = {
     enable = true;
-    package = pkgs.nur.repos.bb010g.beets;
+    package = pkgs-unstable.beets;
     settings = let
       optionalPlugin = p: let cond = private.apis ? ${p}; in {
         plugin = lib.optional cond p;
@@ -415,9 +443,12 @@ in
   programs.git = {
     enable = true;
     package = pkgs.gitAndTools.gitFull;
-    userName = "Brayden Banks";
+    userName = "bb010g";
     userEmail = "me@bb010g.com";
     extraConfig = {
+      core = {
+        commentChar = "auto";
+      };
       diff = {
         algorithm = "histogram";
         submodule = "log";
@@ -518,6 +549,7 @@ set scrolloff=5 sidescrolloff=4
   };
 
   programs.zsh = let
+    inherit (lib) concatStringsSep;
     filterAttrs = f: e: lib.filter (n: f n e.${n}) (lib.attrNames e);
     trueAttrs = filterAttrs (n: v: v == true);
     zshAutoFunctions = {
@@ -529,6 +561,7 @@ set scrolloff=5 sidescrolloff=4
       zmv = true;
     };
     zshModules = {
+      "zsh/files" = ["-Fm" "b:zf_\*"];
       "zsh/mathfunc" = true;
     };
     zshOptions = [
@@ -566,13 +599,18 @@ set scrolloff=5 sidescrolloff=4
       extended = true;
       ignoreDups = true;
       share = true;
+      size = 100000;
     };
     initExtra = ''
-      setopt ${lib.concatStringsSep " " zshOptions}
+      setopt ${concatStringsSep " " zshOptions}
 
       unalias run-help
-      zmodload ${lib.concatStringsSep " " (trueAttrs zshModules)}
-      autoload -Uz ${lib.concatStringsSep " " (trueAttrs zshAutoFunctions)}
+      zmodload ${concatStringsSep " " (trueAttrs zshModules)}${
+      concatStringsSep "\n" ([""] ++ (map
+        (n: "zmodload ${lib.head zshModules.${n}} ${n} ${concatStringsSep " " (lib.tail zshModules.${n})}")
+        (filterAttrs (n: v: lib.isList v) zshModules)
+      ))}
+      autoload -Uz ${concatStringsSep " " (trueAttrs zshAutoFunctions)}
 
       zmathfunc
 
@@ -628,6 +666,16 @@ set scrolloff=5 sidescrolloff=4
         # };
         file = "${name}.plugin.zsh";
       }
+      rec {
+        name = "nix-shell";
+        src = pkgs.fetchFromGitHub {
+          owner = "chisui";
+          repo = "zsh-${name}";
+          rev = "dceed031a54e4420e33f22a6b8e642f45cc829e2";
+          sha256 = "10g8m632s4ibbgs8ify8n4h9r4x48l95gvb57lhw4khxs6m8j30q";
+        };
+        file = "${name}.plugin.zsh";
+      }
       # rec {
       #   name = "zsh-completion-generator";
       #   src = pkgs.fetchFromGitHub {
@@ -638,16 +686,6 @@ set scrolloff=5 sidescrolloff=4
       #   };
       #   file = "${name}.plugin.zsh";
       # }
-      rec {
-        name = "zsh-nix-shell";
-        src = pkgs.fetchFromGitHub {
-          owner = "chisui";
-          repo = name;
-          rev = "dceed031a54e4420e33f22a6b8e642f45cc829e2";
-          sha256 = "10g8m632s4ibbgs8ify8n4h9r4x48l95gvb57lhw4khxs6m8j30q";
-        };
-        file = "${name}.plugin.zsh";
-      }
       # ordered
       rec {
         name = "fast-syntax-highlighting";
@@ -691,20 +729,18 @@ set scrolloff=5 sidescrolloff=4
 
   services.mpd = {
     enable = true;
-    daemons = let
-      extraConfig = ''
-        audio_output {
-          type "pulse"
-          name "PulseAudio"
-        }
-      '';
-    in rec {
+    daemons = rec {
       default = {
-        inherit extraConfig;
+        extraConfig = ''
+          audio_output {
+            type "pulse"
+            name "PulseAudio"
+          }
+        '';
+        package = pkgs-unstable.mpd;
         musicDirectory = "${config.home.homeDirectory}/Music";
       };
-      external = {
-        inherit extraConfig;
+      external = default // {
         autoStart = false;
         musicDirectory = "/run/media/${config.home.username}/music";
         network.port = 6601;
@@ -775,6 +811,10 @@ set scrolloff=5 sidescrolloff=4
             "${modifier}+Shift+q" = "kill";
             "${modifier}+d" = "exec ${pkgs.dmenu}/bin/dmenu_run";
 
+            "${modifier}+a" = "focus parent";
+
+            "${modifier}+r" = "mode resize";
+
             "${modifier}+g" = "split h";
             "${modifier}+v" = "split v";
             "${modifier}+f" = "fullscreen toggle";
@@ -789,8 +829,6 @@ set scrolloff=5 sidescrolloff=4
             "${modifier}+Shift+c" = "reload";
             "${modifier}+Shift+r" = "restart";
             "${modifier}+Shift+e" = "exec i3-nagbar -t warning -m 'Do you want to exit i3?' -b 'Yes' 'i3-msg exit'";
-
-            "${modifier}+r" = "mode resize";
           }
         ];
         modes = {
@@ -814,3 +852,5 @@ set scrolloff=5 sidescrolloff=4
     path = if lib.pathExists ~/nix/home-manager then "$HOME/nix/home-manager" else <home-manager>;
   };
 }
+
+# vim:et:sw=2
