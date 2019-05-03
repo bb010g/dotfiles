@@ -68,12 +68,15 @@ in
       pkgs.manpages
       pkgs.moreutils
       pkgs.nvi
-      pkgs-unstable.ripgrep
+      (pkgs-unstable.ripgrep.override { withPCRE2 = true; })
       pkgs.tree
       pkgs.zsh-completions
     ];
 
     editors = [
+      pkgs.hunspell
+      pkgs.hunspellDicts.en-us
+      pkgs.hunspellDicts.es-any
       pkgs.kakoune
       # emacs is at config.programs
       pkgs.emacs-all-the-icons-fonts
@@ -146,6 +149,8 @@ in
       ((pkgs.diffoscope.override { enableBloat = true; }).overrideAttrs (o: {
         pythonPath = o.pythonPath ++ [ pkgs.zip ];
       }))
+      pkgs-unstable.nur.repos.bb010g.lorri
+      pkgs.nix-prefetch-github
       pkgs.nix-prefetch-scripts
       pkgs.yarn2nix
       # TODO figure out how to build nixpkgs manual
@@ -171,16 +176,16 @@ in
       pkgs.icdiff
       pkgs.nur.repos.mic92.inxi
       pkgs.ispell
-      pkgs.nur.repos.bb010g.just
+      pkgs-unstable.nur.repos.bb010g.just
       pkgs.lzip
-      (pkgs.mosh.overrideAttrs (o: rec {
+      (pkgs-unstable.mosh.overrideAttrs (o: rec {
         name = "mosh";
         version = "1.3.2+${lib.substring 0 7 src.rev}";
         src = pkgs.fetchFromGitHub {
           owner = "mobile-shell";
           repo = "mosh";
-          rev = "944fd6c796338235c4f3d8daf4959ff658f12760";
-          sha256 = "0fwrdqizwnn0kmf8bvlz334va526mlbm1kas9fif0jmvl1q11ayv";
+          rev = "c3a2756065a0fb04cfd2681280123b362d862a5e";
+          sha256 = "1g4ncphw0hkvswy4jw546prqg3kifc600zjzdlpxdbafa2yyq34v";
         };
       }))
       pkgs.p7zip
@@ -276,7 +281,8 @@ in
       pkgs.google-chrome
       pkgs.keybase-gui
       # for Firefox MozLz4a JSON files (.jsonlz4)
-      pkgs.nur.repos.bb010g.mozlz4-tool
+      pkgs-unstable.nur.repos.bb010g.mozlz4-tool
+      pkgs-unstable.riot-desktop
       pkgs-unstable.tdesktop
       pkgs-unstable.wire-desktop
     ];
@@ -296,7 +302,8 @@ in
       pkgs.remmina
       pkgs.sqlitebrowser
       pkgs.surf
-      pkgs.nur.repos.bb010g.xcolor
+      pkgs.wireshark
+      pkgs-unstable.nur.repos.bb010g.xcolor
       pkgs.xorg.xbacklight
     ];
   in lib.concatLists [
@@ -423,6 +430,8 @@ in
       };
     };
   };
+
+  programs.direnv.enable = true;
 
   programs.emacs.enable = true;
   # home.file.".emacs.d".source = pkgs.fetchFromGitHub {
@@ -580,6 +589,7 @@ set scrolloff=5 sidescrolloff=4
       "HIST_SUBST_PATTERN"
       "HIST_VERIFY"
       "INTERACTIVE_COMMENTS"
+      "KSH_GLOB"
       "LONG_LIST_JOBS"
       "NULL_GLOB"
       "PIPE_FAIL"
@@ -647,13 +657,14 @@ set scrolloff=5 sidescrolloff=4
       typeset -g -A key
       load-bindkeys() {
         local zkbd_file="''${ZDOTDIR:-$HOME}/.zkbd/''${1:-$TERM-$VENDOR-$OSTYPE}"
-        if [[ -e "''$zkbd_file" ]]; then source "$zkbd_file"; fi
+        if [[ -e "$zkbd_file" ]]; then source "$zkbd_file"; fi
 
         _key-set() {
           local k="$1"; shift
           if (( ''${+key[$k]} )); then return; fi
           while (( ''${+1} )); do
             1="$(cat -v <<< "$1")"
+            # print -r "key: changing $k from ''${(q+)key[$k]} to ''${(q+)1}"
             key[$k]="$1"
             if [[ -n "$1" ]]; then break; else shift; fi
           done
@@ -678,12 +689,12 @@ set scrolloff=5 sidescrolloff=4
         _key-set Delete "''${terminfo[kdch1]}" "''${termcap[kD]}"
         _key-set End "''${terminfo[kend]}" "''${termcap[@7]}"
         _key-set PageDown "''${terminfo[knp]}" "''${termcap[kN]}"
+        _key-set BackTab "''${terminfo[cbt]}" "''${termcap[bt]}"
+        _key-set Tab "''${terminfo[ht]}" "''${termcap[ta]}"
         _key-set Up "''${terminfo[kcuu1]}" "''${termcap[ku]}"
         _key-set Left "''${terminfo[kcub1]}" "''${termcap[kl]}"
         _key-set Down "''${terminfo[kcud1]}" "''${termcap[kd]}"
         _key-set Right "''${terminfo[kcuf1]}" "''${termcap[kr]}"
-        _key-set BackTab "''${terminfo[cbt]}" "''${termcap[bt]}"
-        _key-set Tab "''${terminfo[ht]}" "''${termcap[ta]}"
 
         bindkey -M menuselect '/' history-incremental-search-backward
         bindkey -M menuselect '?' history-incremental-search-forward
