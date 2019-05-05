@@ -132,14 +132,17 @@ in
 
     misc = [
       pkgs-unstable.bitwarden-cli
+      pkgs.nur.repos.bb010g.broca-unstable
       pkgs.cowsay
       pkgs-unstable.edbrowse
       pkgs.elinks
       pkgs.fortune
+      # pkgs-unstable.nur.repos.bb010g.html2json-unstable
       pkgs.lynx
       pkgs.megatools
       pkgs.ponysay
       pkgs.smbclient
+      pkgs-unstable.nur.repos.bb010g.synapse-bt
       pkgs.units
     ];
 
@@ -176,22 +179,14 @@ in
       pkgs.icdiff
       pkgs.nur.repos.mic92.inxi
       pkgs.ispell
-      pkgs-unstable.nur.repos.bb010g.just
+      pkgs-unstable.just
       pkgs.lzip
-      (pkgs-unstable.mosh.overrideAttrs (o: rec {
-        name = "mosh";
-        version = "1.3.2+${lib.substring 0 7 src.rev}";
-        src = pkgs.fetchFromGitHub {
-          owner = "mobile-shell";
-          repo = "mosh";
-          rev = "c3a2756065a0fb04cfd2681280123b362d862a5e";
-          sha256 = "1g4ncphw0hkvswy4jw546prqg3kifc600zjzdlpxdbafa2yyq34v";
-        };
-      }))
+      pkgs-unstable.nur.repos.bb010g.mosh-unstable
       pkgs.p7zip
       pkgs.ponymix
       pkgs.rclone
       pkgs.sbcl
+      pkgs-unstable.sublime-merge
       pkgs.tokei
       pkgs.unzip
       pkgs.nur.repos.bb010g.ydiff
@@ -214,22 +209,7 @@ in
       pkgs.nur.repos.nexromancers.hacksaw
       pkgs.hicolor-icon-theme
       pkgs.nur.repos.nexromancers.shotgun
-      ((pkgs.st.overrideAttrs (o: rec {
-        name = "st-${version}";
-        version = "0.8.2+${lib.substring 0 7 src.rev}";
-        src = pkgs.fetchgit {
-          url = "https://git.suckless.org/st";
-          rev = "21367a040f056f6a207fafa066bd1cb2d9cae586";
-          sha256 = "11w5zcxn2gsd0x6a7maff7bwyl71wb3ydgvs7msifmwn1d3cmqby";
-        };
-      })).override {
-        conf = lib.readFile st/config.h;
-        patches = [
-          st/bold-is-not-bright.diff
-          st/scrollback.diff
-          st/vertcenter.diff
-        ];
-      })
+      pkgs.nur.repos.bb010g.st-bb010g-unstable
       pkgs.xsel
     ];
 
@@ -864,6 +844,49 @@ set scrolloff=5 sidescrolloff=4
   services.unclutter = {
     enable = true;
     timeout = 5;
+  };
+
+  systemd.user.services.broca = {
+    Unit = {
+      Description = "Bittorrent RPC proxy between Transmission clients and " +
+        "Synapse servers";
+      After = [ "synapse.service" ];
+    };
+
+    Service = {
+      Type = "simple";
+      Environment = [ "RUST_BACKTRACE=1" ];
+      ExecStart = [
+        "${pkgs.nur.repos.bb010g.broca-unstable}/bin/broca-daemon"
+      ];
+      WorkingDirectory = "%h";
+      Restart = "always";
+    };
+
+    Install = {
+      WantedBy = [ "default.target" ];
+    };
+  };
+
+  systemd.user.services.synapse-bt = {
+    Unit = {
+      Description = "Flexible and fast BitTorrent daemon";
+      After = [ "network-online.target" ];
+    };
+
+    Service = {
+      Type = "simple";
+      Environment = [ "RUST_BACKTRACE=1" ];
+      ExecStart = [
+        "${pkgs-unstable.nur.repos.bb010g.synapse-bt}/bin/synapse"
+      ];
+      WorkingDirectory = "%h";
+      Restart = "always";
+    };
+
+    Install = {
+      WantedBy = [ "default.target" ];
+    };
   };
 
   xsession = {
