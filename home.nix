@@ -1,5 +1,16 @@
-{ config, lib, pkgs ? null, ... }:
-let argPkgs = pkgs; in
+{ config, lib ? null, pkgs ? null, ... } @ args:
+let
+  trace = _: x: x;
+  # trace = args.trace or builtins.trace;
+  argPkgs = trace "home argPkgs"
+    (if args.pkgs == null then
+      trace "home argPkgs null" null
+    else args.pkgs);
+  argLib = trace "home argLib"
+    (if args.lib == null then
+      trace "home argLib pkgs.lib" pkgs.lib
+    else args.lib);
+in
 
 let
   # > nix-channel --list
@@ -8,35 +19,75 @@ let
   # might also have some personal patches?
   # if so, they'd be up at https://github.com/bb010g/nixpkgs, branch bb010g-*
 
-  inherit (builtins) elemAt fetchTarball;
-  private = if lib.pathExists ./private.nix then import ./private.nix else {
-    apis = { };
-  };
-  versions = builtins.fromJSON (lib.readFile ./versions.json);
-  ppkgs = lib.mapAttrs (n: v: fetchTarball {
-    url = "${elemAt v.url 0}${v.rev}${elemAt v.url 1}";
-    inherit (v) sha256;
-  }) versions.pkgs;
-  pinned = false;
-  pkgs = if pinned || argPkgs == null then ppkgs.stable else argPkgs;
-  pkgs-stable = import (
-    if !pinned && lib.pathExists <nixos-19.03> then <nixos-19.03> else
-    if !pinned && lib.pathExists <nixos> then <nixos> else
-    if !pinned && lib.pathExists <nixpkgs> then <nixpkgs> else
-    ppkgs.stable
-  ) { };
-  pkgs-unstable = import (
-    if !pinned && lib.pathExists <nixos-unstable> then <nixos-unstable> else
-    ppkgs.unstable
-  ) { };
-  pkgs-unstable-bb010g = import (
+  private = trace "home private" (if lib.pathExists ./private.nix then
+    trace "home private imported" (import ./private.nix)
+  else
+    trace "home private default" {
+      apis = { };
+    });
+  sources = trace "home sources" (import ./nix/sources.nix);
+
+  pinned = trace "home pinned" (let p = if args ? "pinned" then
+    trace "pinned args" args.pinned
+  else
+    trace "pinned default" false; in
+  trace "pinned ${if p then "true" else "false"}" p);
+
+  nur = trace "home nur" (import ./config-nur.nix {
+    pkgs = trace "nur-bb010g pkgs null" null;
+    nur-local = trace "nur nur-local null" null;
+    nur-remote = trace "nur nur-remote sources.nur" sources.nur;
+    inherit trace;
+  });
+  nur-bb010g = trace "home nur-bb010g" (import ./config-nur.nix {
+    pkgs = trace "nur-bb010g pkgs null" null;
+    ${if pinned then "nur-local" else null} =
+      trace "nur-bb010g nur-local pinned null" null;
+    nur-remote =
+      trace "nur-bb010g nur-remote sources.nur-bb010g" sources.nur-bb010g;
+    inherit trace;
+  });
+
+  pkgs = trace "home pkgs" (if pinned || argPkgs == null then
+    trace "pkgs sources.nixpkgs" sources.nixpkgs
+  else
+    trace "pkgs argPkgs" argPkgs);
+  lib = trace "home lib pkgs.lib" pkgs.lib;
+  pkgs-stable = trace "home pkgs-stable" (import (
+    if !pinned && lib.pathExists <nixos-19.03> then
+      trace "pkgs-stable <nixos-19.03>" <nixos-19.03> else
+    if !pinned && lib.pathExists <nixos> then
+      trace "pkgs-stable <nixos>" <nixos> else
+    if !pinned && lib.pathExists <nixpkgs> then
+      trace "pkgs-stable <nixpkgs>" <nixpkgs> else
+    trace "pkgs-stable sources.nixpkgs-stable" sources.nixpkgs-stable
+  ) { });
+  lib-stable = trace "home lib-stable pkgs-stable.lib" pkgs-stable.lib;
+  pkgs-unstable = trace "home pkgs-unstable" (import (
+    if !pinned && lib.pathExists <nixos-unstable> then
+      trace "pkgs-unstable <nixos-unstable>" <nixos-unstable> else
+    trace "pkgs-stable sources.nixpkgs-unstable" sources.nixpkgs-unstable
+  ) { });
+  lib-unstable = trace "home lib-unstable pkgs-unstable.lib"
+    pkgs-unstable.lib;
+  pkgs-unstable-bb010g = trace "home pkgs-unstable-bb010g" (import (
     if !pinned && lib.pathExists <bb010g-nixos-unstable> then
-      <bb010g-nixos-unstable> else
-    ppkgs.unstable-bb010g
-  ) { };
+      trace "pkgs-unstable-bb010g <bb010g-nixos-unstable>"
+        <bb010g-nixos-unstable> else
+    trace "pkgs-unstable-bb010g sources.nixpkgs-unstable-bb010g"
+      sources.nixpkgs-unstable-bb010g
+  ) { });
+  lib-unstable-bb010g =
+    trace "home lib-unstable-bb010g pkgs-unstable-bb010g.lib"
+      pkgs-unstable-bb010g.lib;
 in
 {
-  home.sessionVariables.NIX_PATH = "${config.home.homeDirectory}/nix/channels:$NIX_PATH";
+  imports = let
+    bb010g = nur-bb010g.repos.bb010g.modules.home-manager;
+  in trace "home imports" [
+    bb010g.programs.pijul
+  ];
+
 
   xdg.configFile."fontconfig/fonts.conf".text = ''
     <?xml version="1.0"?>
@@ -51,7 +102,9 @@ in
     </fontconfig>
   '';
 
-  home.keyboard = {
+  # dconf. 24-hour time
+
+  home.keyboard = trace "home home.keyboard" {
     layout = "us,gr";
     options = [
       "compose:ralt"
@@ -61,13 +114,14 @@ in
     ];
   };
 
-  home.packages = let
+  home.packages = trace "home home.packages" (let
     core = [
       pkgs.ed # ed is the STANDARD text editor
       pkgs.file
       pkgs.manpages
       pkgs.moreutils
       pkgs.nvi
+      pkgs.posix_man_pages
       (pkgs-unstable.ripgrep.override { withPCRE2 = true; })
       pkgs.tree
       pkgs.zsh-completions
@@ -75,8 +129,7 @@ in
 
     editors = [
       pkgs.hunspell
-      pkgs.hunspellDicts.en-us
-      pkgs.hunspellDicts.es-any
+    ] ++ hunspellDicts ++ [
       pkgs.kakoune
       # emacs is at config.programs
       pkgs.emacs-all-the-icons-fonts
@@ -125,13 +178,18 @@ in
       pkgs.vistafonts
     ];
 
+    hunspellDicts = [
+      pkgs.hunspellDicts.en-us
+      pkgs.hunspellDicts.es-any
+    ];
+
     media = [
       pkgs.ffmpeg
       pkgs.mpc_cli
     ];
 
     misc = [
-      pkgs-unstable.bitwarden-cli
+      pkgs-unstable-bb010g.bitwarden-cli
       pkgs.nur.repos.bb010g.broca-unstable
       pkgs.cowsay
       pkgs-unstable.edbrowse
@@ -152,9 +210,15 @@ in
       ((pkgs.diffoscope.override { enableBloat = true; }).overrideAttrs (o: {
         pythonPath = o.pythonPath ++ [ pkgs.zip ];
       }))
-      pkgs-unstable.nur.repos.bb010g.lorri
-      pkgs.nix-prefetch-github
-      pkgs.nix-prefetch-scripts
+      pkgs-unstable.nur.repos.bb010g.lorri-rolling
+      pkgs.niv.niv
+      pkgs-unstable.nix-diff
+      pkgs-unstable.nix-index
+      pkgs-unstable.nix-prefetch-github
+      pkgs-unstable.nix-prefetch-scripts
+      pkgs-unstable.nix-top
+      pkgs-unstable.nix-universal-prefetch
+      pkgs-unstable.vulnix
       pkgs.yarn2nix
       # TODO figure out how to build nixpkgs manual
     ];
@@ -181,7 +245,7 @@ in
       pkgs.ispell
       pkgs-unstable.just
       pkgs.lzip
-      pkgs-unstable.nur.repos.bb010g.mosh-unstable
+      pkgs-unstable-bb010g.nur.repos.bb010g.mosh-unstable
       pkgs.p7zip
       pkgs.ponymix
       pkgs.rclone
@@ -206,9 +270,9 @@ in
       pkgs.breeze-qt5
       pkgs.glxinfo
       pkgs.gnome3.adwaita-icon-theme
-      pkgs.nur.repos.nexromancers.hacksaw
+      pkgs-unstable.nur.repos.nexromancers.hacksaw
       pkgs.hicolor-icon-theme
-      pkgs.nur.repos.nexromancers.shotgun
+      pkgs-unstable.nur.repos.nexromancers.shotgun
       pkgs.nur.repos.bb010g.st-bb010g-unstable
       pkgs.xsel
     ];
@@ -226,7 +290,7 @@ in
       pkgs.inkscape
       pkgs.kdeApplications.kolourpaint
       pkgs.krita
-      (pkgs-unstable-bb010g.mpv.override rec {
+      (pkgs-unstable.mpv.override rec {
         archiveSupport = true;
         openalSupport = true;
       })
@@ -242,7 +306,7 @@ in
         name = "Firefox Nightly";
         # https://product-details.mozilla.org/1.0/firefox_versions.json
         #  : FIREFOX_NIGHTLY
-        inherit (versions.firefox.nightly) version;
+        inherit (sources.firefox-nightly) version;
         # system: ? arch (if stdenv.system == "i686-linux" then "linux-i686" else "linux-x86_64")
         # https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/firefox-${version}.en-US.${system}.buildhub.json
         #  : download -> url -> (parse)
@@ -250,7 +314,7 @@ in
         #  : build -> date -> (parse) also works
         #  - %Y-%m-%dT%H:%m:%sZ
         #  need %Y-%m-%d-%H-%m-%s
-        inherit (versions.firefox.nightly) timestamp;
+        inherit (sources.firefox-nightly) timestamp;
         release = false;
       }).overrideAttrs (o: { buildCommand = lib.replaceStrings [ ''
         --set MOZ_SYSTEM_DIR "$out/lib/mozilla" \
@@ -262,8 +326,12 @@ in
       pkgs.keybase-gui
       # for Firefox MozLz4a JSON files (.jsonlz4)
       pkgs-unstable.nur.repos.bb010g.mozlz4-tool
+      (pkgs-unstable.qutebrowser.overrideAttrs (o: {
+        buildInputs = o.buildInputs ++ hunspellDicts;
+      }))
       pkgs-unstable.riot-desktop
       pkgs-unstable.tdesktop
+      pkgs.texstudio
       pkgs-unstable.wire-desktop
     ];
 
@@ -295,13 +363,18 @@ in
     misc
     nix
     tools
-  ];
+  ]);
 
-  home.sessionVariables.EDITOR = "ed";
-  home.sessionVariables.PAGER = "less -RF";
-  home.sessionVariables.VISUAL = "nvim";
+  home.sessionVariables = {
+    EDITOR = "ed";
+    ${if lib.hasAttrByPath [ "apis" "github" "env-token" ] private
+      then "GITHUB_TOKEN" else null} = private.apis.github.env-token;
+    NIX_PATH = "${config.home.homeDirectory}/nix/channels:$NIX_PATH";
+    PAGER = "less -RF";
+    VISUAL = "nvim";
+  };
 
-  programs.autorandr = {
+  programs.autorandr = trace "home programs.autorandr" {
     enable = true;
     profiles = let
       genProfiles = displays: lib.mapAttrs (name: value: value // {
@@ -325,7 +398,7 @@ in
     };
   };
 
-  programs.beets = {
+  programs.beets = trace "home programs.beets" {
     enable = true;
     package = pkgs-unstable.beets;
     settings = let
@@ -411,29 +484,20 @@ in
     };
   };
 
-  programs.direnv.enable = true;
+  programs.direnv = trace "programs.direnv" { enable = true; };
 
-  programs.emacs.enable = true;
-  # home.file.".emacs.d".source = pkgs.fetchFromGitHub {
-  #   owner = "hlissner";
-  #   repo = "doom-emacs";
-  #   rev = "abc7ca84d8719487113581111079a60ef6588c43"; # develop
-  #   sha256 = "1vf3c83my7dm4yxdjkk6y42z8rwdn55v5hqymfgqcggxg0l2wrqv";
-  # };
+  programs.emacs = trace "programs.emacs" { enable = true; };
 
-  programs.feh.enable = true;
+  programs.feh = trace "home programs.feh" { enable = true; };
 
-  # programs.firefox = {
+  # programs.firefox = trace "home programs.firefox" {
   #   enable = true;
   #   package = moz_nixpkgs.latest.firefox-nightly-bin;
   #   enableAdobeFlash = true;
   # };
 
-  programs.git = {
+  programs.git = trace "home programs.git" {
     enable = true;
-    package = pkgs.gitAndTools.gitFull;
-    userName = "bb010g";
-    userEmail = "me@bb010g.com";
     extraConfig = {
       core = {
         commentChar = "auto";
@@ -453,53 +517,130 @@ in
         user = "bb010g";
       };
     };
+    lfs = {
+      enable = true;
+    };
+    package = pkgs.gitAndTools.gitFull;
+    userEmail = "me@bb010g.com";
+    userName = "bb010g";
   };
 
+  xdg.enable = true;
   xdg.configFile."git/ignore".text = lib.readFile ./gitignore_global;
 
-  manual = {
+  manual = trace "home manual" {
     html.enable = true;
     manpages.enable = true;
   };
 
-  programs.htop = {
+  programs.htop = trace "home programs.htop" {
     enable = true;
   };
 
-  programs.jq = {
+  programs.jq = trace "home programs.jq" {
     enable = true;
     package = pkgs-unstable.jq;
   };
 
-  programs.mercurial = {
+  programs.mercurial = trace "home programs.mercurial" {
     enable = true;
     userName = "Brayden Banks";
     userEmail = "me@bb010g.com";
   };
 
-  programs.neovim = {
+  programs.neovim = trace "home programs.neovim" (let
+    pkgsNvim = pkgs-unstable;
+    nvimUnwrapped = pkgsNvim.neovim-unwrapped;
+    nvim = pkgsNvim.wrapNeovim nvimUnwrapped {
+      vimAlias = true;
+    };
+  in {
     enable = true;
-    package = pkgs-unstable.neovim-unwrapped;
+    package = nvimUnwrapped;
     configure = {
       customRC = ''
+"" diff output
+" patience algorithm
+if has("patch-8.1.0360")
+  set diffopt+=internal,algorithm:patience
+endif
+
 "" window management
 " don't unload buffers when abandoned (hid)
 set hidden
 " more natural new splits (sb spr)
 set splitbelow splitright
+" suckless.vim: use Alt (<M-) shortcuts in terminals
+let g:suckless_tmap = 1
+" termopen.vim: easy terminal splits
+nmap <silent> <M-Return> :call TermOpen()<CR>
 
 "" window viewport
 " cursor line margin (so siso)
 set scrolloff=5 sidescrolloff=4
-      '';
-    };
-  };
 
-  programs.obs-studio = {
+      '';
+      packages."plugins-bb010g" = let
+        inherit (pkgsNvim.vimUtils.override { vim = nvim; }) buildVimPluginFrom2Nix;
+        basicVimPlugin = pname: version: src:
+          buildVimPluginFrom2Nix {
+            pname = lib.removePrefix "vim-" pname;
+            inherit version src;
+          };
+        sourcesVimPlugin = pname: let
+            src = sources.${pname};
+          in basicVimPlugin pname src.date src;
+      in {
+        start = map sourcesVimPlugin [
+          "vim-ale"
+          "vim-caw"
+          "vim-characterize"
+          "vim-context-filetype"
+          "vim-diffchar"
+          "vim-dirdiff"
+          "vim-dirvish"
+          "vim-editorconfig"
+          "vim-exchange"
+          "vim-gina"
+          "vim-gundo"
+          "vim-linediff"
+          "vim-lion"
+          "vim-magnum"
+          "vim-operator-user"
+          "vim-polyglot"
+          "vim-radical"
+          "vim-remote-viewer"
+          "vim-repeat"
+          "vim-sandwich"
+          "vim-startuptime"
+          "vim-suckless"
+          "vim-suda"
+          "vim-table-mode"
+          "vim-targets"
+          "vim-termopen"
+          "vim-visualrepeat"
+        ];
+        opt = map sourcesVimPlugin [
+        ];
+      };
+    };
+  });
+
+  programs.obs-studio = trace "home programs.obs-studio" {
     enable = true;
   };
 
-  programs.ssh = {
+  #programs.pijul = trace "home programs.pijul" {
+  #  enable = true;
+  #  # configDir = "${config.xdg.configHome}/pijul";
+  #  package = pkgs-unstable.pijul;
+  #  global = {
+  #    author = "bb010g <me@bb010g.com>";
+  #    signing_key = "/home/bb010g/.config/pijul/config/signing_secret_key";
+  #  };
+  #};
+
+  programs.ssh = trace "home programs.ssh" {
     enable = true;
     matchBlocks = [
       { host = "aur.archlinux.org";
@@ -512,7 +653,7 @@ set scrolloff=5 sidescrolloff=4
     ];
   };
 
-  programs.texlive = {
+  programs.texlive = trace "home programs.texlive" {
     enable = true;
     extraPackages = tpkgs: { inherit (tpkgs)
       collection-bibtexextra
@@ -533,11 +674,11 @@ set scrolloff=5 sidescrolloff=4
     ; };
   };
 
-  programs.tmux = {
+  programs.tmux = trace "home programs.tmux" {
     enable = true;
   };
 
-  programs.zsh = let
+  programs.zsh = trace "home programs.zsh" (let
     inherit (lib) concatStringsSep;
     filterAttrs = f: e: lib.filter (n: f n e.${n}) (lib.attrNames e);
     trueAttrs = filterAttrs (n: v: v == true);
@@ -708,98 +849,66 @@ set scrolloff=5 sidescrolloff=4
       # ordered
       rec {
         name = "history-search-multi-word";
-        src = pkgs.fetchFromGitHub {
-          owner = "zdharma";
-          repo = name;
-          rev = "159aaa5e723ab05b4fe930bb232835d98a0e745d";
-          sha256 = "007h248zvw6vnwg2kcybxcr49y7xxxysdxhpw9hja8zp2yk45vr3";
-        };
+        src = sources.zsh-history-search-multi-word;
         file = "${name}.plugin.zsh";
       }
       rec {
-        name = "zsh-autosuggestions";
-        src = pkgs.fetchFromGitHub {
-          owner = "zsh-users";
-          repo = name;
-          rev = "70f36c007db30a5fe1edf2b63664088b502a729c";
-          sha256 = "1j8pnd19f0cr91hxwj3cc8vzysc4hzbiwgv5sqbd5gw160mfg3g3";
-        };
-        file = "${name}.plugin.zsh";
+        name = "autosuggestions";
+        src = sources.zsh-autosuggestions;
+        file = "zsh-${name}.plugin.zsh";
       }
       # unordered
       rec {
         name = "autoenv";
         src = builtins.toPath "${config.home.homeDirectory}/Documents/zsh-${name}";
-        # src = pkgs.fetchFromGitHub {
-        #   owner = "Tarrasch";
-        #   repo = "zsh-${name}";
-        #   rev = "e9809c1bd28496e025ca05576f574e08e93e12e8";
-        #   sha256 = "1vcfk9g26zqn6l7pxjqidw8ay3yijx95ij0d7mns8ypxvaax242b";
-        # };
+        # src = sources.zsh-autoenv;
         file = "${name}.plugin.zsh";
       }
       rec {
         name = "nix-shell";
-        src = pkgs.fetchFromGitHub {
-          owner = "chisui";
-          repo = "zsh-${name}";
-          rev = "dceed031a54e4420e33f22a6b8e642f45cc829e2";
-          sha256 = "10g8m632s4ibbgs8ify8n4h9r4x48l95gvb57lhw4khxs6m8j30q";
-        };
+        src = sources.zsh-nix-shell;
         file = "${name}.plugin.zsh";
       }
       # rec {
-      #   name = "zsh-completion-generator";
-      #   src = pkgs.fetchFromGitHub {
-      #     owner = "RobSis";
-      #     repo = name;
-      #     rev = "6eb6392026f3f4b9c2d3d34a05be288246144d2c";
-      #     sha256 = "1lmy3fqy3dj0b1nysrcr8y1v9sb8kmdqmxf7cj6yp82pn3cz8b3q";
-      #   };
-      #   file = "${name}.plugin.zsh";
+      #   name = "completion-generator";
+      #   src = sources.zsh-completion-generator;
+      #   file = "zsh-${name}.plugin.zsh";
       # }
       # ordered
       rec {
         name = "fast-syntax-highlighting";
-        src = pkgs.fetchFromGitHub {
-          owner = "zdharma";
-          repo = name;
-          rev = "ee4f7c76362f40d905f9c45a59b365abebb213ae";
-          sha256 = "115y77m8xab7cap75hb1yagdb6b4fld0nhxqszrj38hnr7hxbsbn";
-        };
+        src = sources.zsh-fast-syntax-highlighting;
         file = "${name}.plugin.zsh";
       }
       rec {
         name = "agkozak-zsh-prompt";
-        src = pkgs.fetchFromGitHub {
-          owner = "agkozak";
-          repo = name;
-          rev = "13014b7fbf54b9f6214bff44ba4d522da4fd1ec3";
-          sha256 = "1cgza63pm9vhkak98lcysg357xrxzcn7pwdsm9lkblq36sqgqpr4";
-        };
+        src = sources.zsh-agkozak-zsh-prompt;
         file = "${name}.plugin.zsh";
       }
     ];
+  });
+
+  services.compton = trace "home services.compton" {
+    enable = true;
+    package = pkgs.compton-git;
   };
 
-  services.compton.enable = true;
-
-  services.dunst = {
+  services.dunst = trace "home services.dunst" {
     enable = true;
     # settings = {
     #   global =
     # };
   };
 
-  services.kdeconnect = {
+  services.kdeconnect = trace "home services.kdeconnect" {
     enable = true;
     indicator = true;
   };
 
-  services.keybase.enable = true;
-  services.kbfs.enable = true;
+  services.keybase = trace "home services.keybase" { enable = true; };
+  services.kbfs = trace "home services.kbfs" { enable = true; };
 
-  services.mpd = {
+  services.mpd = trace "home services.mpd" {
     enable = true;
     daemons = rec {
       default = {
@@ -824,29 +933,32 @@ set scrolloff=5 sidescrolloff=4
     };
   };
 
-  services.redshift = if private ? redshift then with private.redshift; {
-    enable = true;
-    tray = true;
-    inherit latitude;
-    inherit longitude;
-    temperature = {
-      day = 6500;
-      night = 3700;
-    };
-  } else { };
+  services.redshift = trace "home services.redshift"
+    (if private ? redshift then trace "redshift private"
+      (with private.redshift; {
+        enable = true;
+        tray = true;
+        inherit latitude;
+        inherit longitude;
+        temperature = {
+          day = 6500;
+          night = 3700;
+        };
+      })
+    else "redshift default" { });
 
-  services.screen-locker = {
+  services.screen-locker = trace "home services.screen-locker" {
     enable = true;
     inactiveInterval = 10;
     lockCmd = "${pkgs.i3lock}/bin/i3lock -f -c 131736";
   };
 
-  services.unclutter = {
+  services.unclutter = trace "home services.unclutter" {
     enable = true;
     timeout = 5;
   };
 
-  systemd.user.services.broca = {
+  systemd.user.services.broca = trace "home systemd.user.services.broca" {
     Unit = {
       Description = "Bittorrent RPC proxy between Transmission clients and " +
         "Synapse servers";
@@ -863,12 +975,12 @@ set scrolloff=5 sidescrolloff=4
       Restart = "always";
     };
 
-    Install = {
-      WantedBy = [ "default.target" ];
-    };
+    # Install = {
+    #   WantedBy = [ "default.target" ];
+    # };
   };
 
-  systemd.user.services.synapse-bt = {
+  systemd.user.services.synapse-bt = trace "home systemd.user.services.synapse-bt" {
     Unit = {
       Description = "Flexible and fast BitTorrent daemon";
       After = [ "network-online.target" ];
@@ -884,12 +996,12 @@ set scrolloff=5 sidescrolloff=4
       Restart = "always";
     };
 
-    Install = {
-      WantedBy = [ "default.target" ];
-    };
+    # Install = {
+    #   WantedBy = [ "default.target" ];
+    # };
   };
 
-  xsession = {
+  xsession = trace "home xsession" {
     enable = true;
     # pointerCursor = {
     #   package = pkgs.capitaine-cursors;
@@ -962,10 +1074,10 @@ set scrolloff=5 sidescrolloff=4
 
   # Home Manager config
 
-  programs.home-manager = {
+  programs.home-manager = trace "home programs.home-manager" {
     enable = true;
     path = if lib.pathExists ~/nix/home-manager then "$HOME/nix/home-manager" else <home-manager>;
   };
 }
 
-# vim:et:sw=2
+# vim:et:sw=2:tw=78

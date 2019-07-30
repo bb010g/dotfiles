@@ -54,7 +54,8 @@ flycheck_*.el
 
 *~
 
-# temporary files which can be created if a process still has a handle open of a deleted file
+# temporary files which can be created if a process still has a handle open of
+# a deleted file
 .fuse_hidden*
 
 # KDE directory preferences
@@ -63,7 +64,8 @@ flycheck_*.el
 # Linux trash folder which might appear on any partition or disk
 .Trash-*
 
-# .nfs files are created when an open file is removed but is still being accessed
+# .nfs files are created when an open file is removed but is still being
+# accessed
 .nfs*
 
 ## Vim
@@ -81,6 +83,14 @@ Session.vim
 # auto-generated tag files
 tags
 
+## VS Code
+
+.vscode/*
+!.vscode/settings.json
+!.vscode/tasks.json
+!.vscode/launch.json
+!.vscode/extensions.json
+
 ## Zsh
 
 .autoenv.zsh
@@ -89,3 +99,5 @@ tags
 
 # cargo fmt
 *.rs.bk
+
+# vim:ft=gitignore:tw=78
