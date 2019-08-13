@@ -2,9 +2,12 @@
     "firefox-nightly": {
         "buildhub_url_template": "https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/firefox-<version>.en-US.<system>.buildhub.json",
         "download_url_template": "https://archive.mozilla.org/pub/firefox/nightly/%Y/%m/%Y-%m-%d-%H-%m-%s-mozilla-central/firefox-<version>.en-US.<system>.tar.bz2",
+        "sha256": "08y4734bm2zahw75b16bcmcg587vvyvh0n11gwiyir70divwp1rm",
         "system": "linux-x86_64",
         "timestamp": "2019-07-27-09-31-08",
         "type": "firefox-nightly",
+        "url": "https://example.com/index.html",
+        "url_template": "https://example.com/index.html",
         "version": "70.0a1"
     },
     "gitignore": {
@@ -25,10 +28,10 @@
         "homepage": "",
         "owner": "rycee",
         "repo": "home-manager",
-        "rev": "4f13f06b016d59420cafe34915abdd6b795d3416",
-        "sha256": "1chl04jimba1n1r4cqaq66kry4fy2xgsdgbqcl3rkw4ykd5yfcsc",
+        "rev": "a85f22164d56052f027e71718c99ec0a1c3d25d1",
+        "sha256": "0piyy36rdpzfc594v3xyzj46p53mrz90w9ksrg0pjj1srp9yx38f",
         "type": "tarball",
-        "url": "https://github.com/rycee/home-manager/archive/4f13f06b016d59420cafe34915abdd6b795d3416.tar.gz",
+        "url": "https://github.com/rycee/home-manager/archive/a85f22164d56052f027e71718c99ec0a1c3d25d1.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "home-manager-stable-bb010g": {
@@ -49,10 +52,10 @@
         "homepage": "https://github.com/nmattia/niv",
         "owner": "nmattia",
         "repo": "niv",
-        "rev": "6822e75b2a7e0b051571c8ba461e9c9f2fdc2e93",
-        "sha256": "0x0yxvz1yb69paqb0nzpkvzdmlvy12ldcg92g2pdkrcddqpbkh9j",
+        "rev": "8b7b70465c130d8d7a98fba1396ad1481daee518",
+        "sha256": "0fgdrxn2vzpnzr6pxaiyn5zzbd812c6f7xjjhfir0kpzamjnxwwl",
         "type": "tarball",
-        "url": "https://github.com/nmattia/niv/archive/6822e75b2a7e0b051571c8ba461e9c9f2fdc2e93.tar.gz",
+        "url": "https://github.com/nmattia/niv/archive/8b7b70465c130d8d7a98fba1396ad1481daee518.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs": {
@@ -61,10 +64,10 @@
         "homepage": null,
         "owner": "NixOS",
         "repo": "nixpkgs-channels",
-        "rev": "e6fe2df74ff30df952f418453ad046cb0126df38",
-        "sha256": "08k9xy7vchvm1xps4hmsik62l9xyqqpxvpv7rqvks2k0ldngjsh5",
+        "rev": "defa89ffaefc6425543089b81eb4c1053853ba37",
+        "sha256": "1jvcisg73bz0hg81yy48pcm34zv8vv8f2856c9azqi7q2n0f9sw2",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs-channels/archive/e6fe2df74ff30df952f418453ad046cb0126df38.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs-channels/archive/defa89ffaefc6425543089b81eb4c1053853ba37.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-unstable": {
@@ -73,10 +76,10 @@
         "homepage": null,
         "owner": "NixOS",
         "repo": "nixpkgs-channels",
-        "rev": "73392e79aa62e406683d6a732eb4f4101f4732be",
-        "sha256": "049fq37sxdn5iis7ni407j2jsfrxbb41pgv5zawi02qj47f74az9",
+        "rev": "239fffc90d792b5362a20ec1a009978de7b8f91a",
+        "sha256": "0z0c438b5q1066x6p9qfriym5cipw8f52a456f91qzg6q1r296f8",
         "type": "tarball",
-        "url": "https://github.com/NixOS/nixpkgs-channels/archive/73392e79aa62e406683d6a732eb4f4101f4732be.tar.gz",
+        "url": "https://github.com/NixOS/nixpkgs-channels/archive/239fffc90d792b5362a20ec1a009978de7b8f91a.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nixpkgs-unstable-bb010g": {
@@ -97,10 +100,10 @@
         "homepage": "",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "c3d06c7214a234bb720ef6d9a42e2873637ca28e",
-        "sha256": "19wff989wmyfkz88vlqyaz9kx06in78mffc7qmn51983hh800crv",
+        "rev": "bb4da65a3a52d5545b54cd0860828f68b50c8458",
+        "sha256": "1rch2sqnklsbq6km3dgaf49smbz96wi35xb2qqipqq84sdhq2h42",
         "type": "tarball",
-        "url": "https://github.com/nix-community/NUR/archive/c3d06c7214a234bb720ef6d9a42e2873637ca28e.tar.gz",
+        "url": "https://github.com/nix-community/NUR/archive/bb4da65a3a52d5545b54cd0860828f68b50c8458.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "nur-bb010g": {
@@ -472,10 +475,10 @@
         "homepage": "",
         "owner": "agkozak",
         "repo": "agkozak-zsh-prompt",
-        "rev": "4888bb170f203f45e5820625bde3a6d04cd3e0ba",
-        "sha256": "0f8v1ih4205lgghcssbvb3clpymjj2f134cab5vrggdaapcs10xq",
+        "rev": "bb4ae9eb1f30443933320d30a59a86eed7638da5",
+        "sha256": "1dshpgm2sfilzinmjink6mh56pjfv1379qkqmsksrqd7fgx1n4hb",
         "type": "tarball",
-        "url": "https://github.com/agkozak/agkozak-zsh-prompt/archive/4888bb170f203f45e5820625bde3a6d04cd3e0ba.tar.gz",
+        "url": "https://github.com/agkozak/agkozak-zsh-prompt/archive/bb4ae9eb1f30443933320d30a59a86eed7638da5.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "zsh-autoenv": {
@@ -496,10 +499,10 @@
         "homepage": null,
         "owner": "zsh-users",
         "repo": "zsh-autosuggestions",
-        "rev": "ac4f0b241853565d8033dbd2d1661e179dc47e3f",
-        "sha256": "1z3wr01hdf7ff14zc43i3gayd3zdhivaqmylq6l2q2b6mcm2kj10",
+        "rev": "43f3bc4010b2c697d2252fdd8b36a577ea125881",
+        "sha256": "12g6xkmllkxd4sbmp6kjyy4qdwm8jsqz9gpf6kia5wpqay970ss6",
         "type": "tarball",
-        "url": "https://github.com/zsh-users/zsh-autosuggestions/archive/ac4f0b241853565d8033dbd2d1661e179dc47e3f.tar.gz",
+        "url": "https://github.com/zsh-users/zsh-autosuggestions/archive/43f3bc4010b2c697d2252fdd8b36a577ea125881.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "zsh-completion-generator": {
@@ -520,10 +523,10 @@
         "homepage": "http://zdharma.org",
         "owner": "zdharma",
         "repo": "fast-syntax-highlighting",
-        "rev": "03e341235fa1b4910da04c9598a5f979d38b52d8",
-        "sha256": "1y0xwh4zhjgvslv1bmv2lqicdmxr6g1p62lnz3p3wj24z277hi6m",
+        "rev": "785abb5d3af66dc7048bb16a0bf4b7869e0a586e",
+        "sha256": "16s0p1v63i9ia7icqs6dws3ibbx65vivh4aaqf549zxzn51w2vjq",
         "type": "tarball",
-        "url": "https://github.com/zdharma/fast-syntax-highlighting/archive/03e341235fa1b4910da04c9598a5f979d38b52d8.tar.gz",
+        "url": "https://github.com/zdharma/fast-syntax-highlighting/archive/785abb5d3af66dc7048bb16a0bf4b7869e0a586e.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "zsh-history-search-multi-word": {
@@ -532,10 +535,10 @@
         "homepage": "",
         "owner": "zdharma",
         "repo": "history-search-multi-word",
-        "rev": "7997c62697da73b9adfb660079f07fc7d9a8b112",
-        "sha256": "1acib4lsv3wchsm6zy239iqdrm26432aa7ffgh7wdxsnx6x9g0gv",
+        "rev": "ab2cb3444b543bd1f0f983956f9dbad4620368b8",
+        "sha256": "1r1kyy1w2g2jhal4zjj2zp5i2giya6j4v7a7vk32g4vjg12q8hv0",
         "type": "tarball",
-        "url": "https://github.com/zdharma/history-search-multi-word/archive/7997c62697da73b9adfb660079f07fc7d9a8b112.tar.gz",
+        "url": "https://github.com/zdharma/history-search-multi-word/archive/ab2cb3444b543bd1f0f983956f9dbad4620368b8.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "zsh-nix-shell": {

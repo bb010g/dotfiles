@@ -200,7 +200,7 @@ in
       pkgs.megatools
       pkgs.ponysay
       pkgs.smbclient
-      pkgs-unstable.nur.repos.bb010g.synapse-bt
+      pkgs-unstable.synapse-bt
       pkgs.units
     ];
 
@@ -236,7 +236,7 @@ in
       pkgs.colordiff
       pkgs.diffstat
       pkgs.nur.repos.bb010g.dwdiff
-      pkgs.git-lfs
+      pkgs.gitAndTools.git-imerge
       pkgs.gnumake
       pkgs.hecate
       pkgs-unstable.hyperfine
@@ -246,12 +246,14 @@ in
       pkgs-unstable.just
       pkgs.lzip
       pkgs-unstable-bb010g.nur.repos.bb010g.mosh-unstable
+      pkgs.ngrok
       pkgs.p7zip
       pkgs.ponymix
       pkgs.rclone
       pkgs.sbcl
       pkgs-unstable.sublime-merge
       pkgs.tokei
+      pkgs.nur.repos.bb010g.ttyd
       pkgs.unzip
       pkgs.nur.repos.bb010g.ydiff
     ];
@@ -559,6 +561,10 @@ in
     package = nvimUnwrapped;
     configure = {
       customRC = ''
+"" general mappings
+" <Leader> 
+let mapleader = "\<Space>"
+
 "" diff output
 " patience algorithm
 if has("patch-8.1.0360")
@@ -570,6 +576,21 @@ endif
 set hidden
 " more natural new splits (sb spr)
 set splitbelow splitright
+" suckless.vim: mappings
+" - divid[e]d (default): all windows share available vertical space in column
+" - [s]tacked: in col, active window maximizes and others collapse to one row
+" - [f]ullscreen: active window maximizes height & width and others collapse
+let g:suckless_mappings = {
+\ '<M-[esf]>' : 'SetTilingMode("[dsf]")',
+\ '<M-[hjkl]>' : 'SelectWindow("[hjkl]")',
+\ '<M-[HJKL]>' : 'MoveWindow("[hjkl]")',
+\ '<C-M-[hjkl]>' : 'ResizeWindow("[hjkl]")',
+\ '<M-[gv]>' : 'CreateWindow("[sv]")',
+\ '<M-q>' : 'CloseWindow()',
+\ '<Leader>[123456789]' : 'SelectTab([123456789])',
+\ '<Leader>t[123456789]' : 'MoveWindowToTab([123456789])',
+\ '<Leader>T[123456789]' : 'CopyWindowToTab([123456789])',
+\}
 " suckless.vim: use Alt (<M-) shortcuts in terminals
 let g:suckless_tmap = 1
 " termopen.vim: easy terminal splits
@@ -990,7 +1011,7 @@ set scrolloff=5 sidescrolloff=4
       Type = "simple";
       Environment = [ "RUST_BACKTRACE=1" ];
       ExecStart = [
-        "${pkgs-unstable.nur.repos.bb010g.synapse-bt}/bin/synapse"
+        "${pkgs-unstable.synapse-bt}/bin/synapse"
       ];
       WorkingDirectory = "%h";
       Restart = "always";
