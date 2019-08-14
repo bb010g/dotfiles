@@ -8,4 +8,4 @@ curl 'https://api.github.com/graphql' \
     --slurpfile sources nix/sources.json | \
   sponge nix/sources.json
 
-# vim:et:sw=2:tw=78
+# vim:et:ft=sh:sw=2:tw=78
