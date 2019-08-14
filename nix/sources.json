@@ -12,6 +12,7 @@
     },
     "gitignore": {
         "branch": "master",
+        "date": "2019-05-22T14:51:26Z",
         "description": "Nix function for filtering local git sources",
         "homepage": "",
         "owner": "hercules-ci",
@@ -24,6 +25,7 @@
     },
     "home-manager-stable": {
         "branch": "release-19.03",
+        "date": "2019-07-28T13:03:42Z",
         "description": "Manage a user environment using Nix",
         "homepage": "",
         "owner": "rycee",
@@ -36,6 +38,7 @@
     },
     "home-manager-stable-bb010g": {
         "branch": "release-19.03",
+        "date": "2019-05-20T22:10:55Z",
         "description": "Manage a user environment using Nix",
         "homepage": "",
         "owner": "bb010g",
@@ -48,6 +51,7 @@
     },
     "niv": {
         "branch": "master",
+        "date": "2019-07-03T14:45:31Z",
         "description": "Easy dependency management for Nix projects",
         "homepage": "https://github.com/nmattia/niv",
         "owner": "nmattia",
@@ -60,6 +64,7 @@
     },
     "nixpkgs": {
         "branch": "nixos-19.03",
+        "date": "2019-07-29T07:18:43Z",
         "description": "Nixpkgs/NixOS branches that track the Nixpkgs/NixOS channels",
         "homepage": null,
         "owner": "NixOS",
@@ -72,6 +77,7 @@
     },
     "nixpkgs-unstable": {
         "branch": "nixos-unstable",
+        "date": "2019-07-28T21:39:33Z",
         "description": "Nixpkgs/NixOS branches that track the Nixpkgs/NixOS channels",
         "homepage": null,
         "owner": "NixOS",
@@ -84,6 +90,7 @@
     },
     "nixpkgs-unstable-bb010g": {
         "branch": "bb010g-nixos-unstable",
+        "date": "2019-06-01T17:51:45Z",
         "description": "Nix Packages collection",
         "homepage": null,
         "owner": "bb010g",
@@ -96,6 +103,7 @@
     },
     "nur": {
         "branch": "master",
+        "date": "2019-07-29T19:20:42Z",
         "description": "Nix User Repository: User contributed nix packages [maintainer=@Mic92]",
         "homepage": "",
         "owner": "nix-community",
@@ -108,6 +116,7 @@
     },
     "nur-bb010g": {
         "branch": "master",
+        "date": "2019-06-01T02:46:46Z",
         "description": "Nix User Repository: User contributed nix packages [maintainer=@Mic92]",
         "homepage": "",
         "owner": "bb010g",
@@ -120,7 +129,7 @@
     },
     "vim-ale": {
         "branch": "master",
-        "date": "2019-07-29",
+        "date": "2019-07-29T21:08:33Z",
         "description": "Check syntax in Vim asynchronously and fix files, with Language Server Protocol (LSP) support",
         "homepage": "",
         "owner": "dense-analysis",
@@ -133,7 +142,7 @@
     },
     "vim-caw": {
         "branch": "master",
-        "date": "2019-07-11",
+        "date": "2019-07-11T12:48:04Z",
         "description": "Vim comment plugin: supported operator/non-operator mappings, repeatable by dot-command, 300+ filetypes",
         "homepage": "",
         "owner": "tyru",
@@ -146,7 +155,7 @@
     },
     "vim-characterize": {
         "branch": "master",
-        "date": "2016-06-25",
+        "date": "2016-06-25T04:22:55Z",
         "description": "characterize.vim: Unicode character metadata",
         "homepage": "http://www.vim.org/scripts/script.php?script_id=4410",
         "owner": "tpope",
@@ -159,7 +168,7 @@
     },
     "vim-context-filetype": {
         "branch": "master",
-        "date": "2019-02-25",
+        "date": "2019-02-25T12:19:04Z",
         "description": "Context filetype library for Vim script",
         "homepage": null,
         "owner": "Shougo",
@@ -172,7 +181,7 @@
     },
     "vim-diffchar": {
         "branch": "master",
-        "date": "2019-03-22",
+        "date": "2019-03-22T15:17:53Z",
         "description": "Highlight the exact differences, based on characters and words",
         "homepage": "http://www.vim.org/scripts/script.php?script_id=4932",
         "owner": "rickhowe",
@@ -185,7 +194,7 @@
     },
     "vim-dirdiff": {
         "branch": "master",
-        "date": "2019-05-14",
+        "date": "2019-05-14T04:28:02Z",
         "description": "Vim plugin to diff two directories",
         "homepage": "",
         "owner": "will133",
@@ -198,7 +207,7 @@
     },
     "vim-dirvish": {
         "branch": "master",
-        "date": "2019-07-20",
+        "date": "2019-07-20T13:24:09Z",
         "description": "Directory viewer for Vim :zap:",
         "homepage": "",
         "owner": "justinmk",
@@ -211,7 +220,7 @@
     },
     "vim-editorconfig": {
         "branch": "master",
-        "date": "2019-05-13",
+        "date": "2019-05-13T01:42:50Z",
         "description": "Yet another EditorConfig (http://editorconfig.org) plugin for vim written in vimscript only",
         "homepage": null,
         "owner": "sgur",
@@ -224,7 +233,7 @@
     },
     "vim-exchange": {
         "branch": "master",
-        "date": "2017-01-27",
+        "date": "2017-01-27T18:12:02Z",
         "description": "Easy text exchange operator for Vim",
         "homepage": null,
         "owner": "tommcdo",
@@ -237,7 +246,7 @@
     },
     "vim-gina": {
         "branch": "master",
-        "date": "2019-07-02",
+        "date": "2019-07-02T02:57:40Z",
         "description": "Asynchronously control git repositories in Neovim/Vim 8",
         "homepage": "http://www.vim.org/scripts/script.php?script_id=5531",
         "owner": "lambdalisue",
@@ -250,7 +259,7 @@
     },
     "vim-gundo": {
         "branch": "master",
-        "date": "2017-05-09",
+        "date": "2017-05-09T13:50:38Z",
         "description": "A git mirror of gundo.vim",
         "homepage": "http://sjl.bitbucket.org/gundo.vim/",
         "owner": "sjl",
@@ -263,7 +272,7 @@
     },
     "vim-linediff": {
         "branch": "master",
-        "date": "2019-06-23",
+        "date": "2019-06-23T09:13:58Z",
         "description": "A vim plugin to perform diffs on blocks of code",
         "homepage": "http://www.vim.org/scripts/script.php?script_id=3745",
         "owner": "AndrewRadev",
@@ -276,7 +285,7 @@
     },
     "vim-lion": {
         "branch": "master",
-        "date": "2017-11-02",
+        "date": "2018-02-05T16:58:46Z",
         "description": "A simple alignment operator for Vim text editor",
         "homepage": null,
         "owner": "tommcdo",
@@ -289,7 +298,7 @@
     },
     "vim-magnum": {
         "branch": "master",
-        "date": "2016-07-10",
+        "date": "2016-07-10T07:55:26Z",
         "description": "magnum.vim – Pure Vim script big integer library",
         "homepage": "http://www.vim.org/scripts/script.php?script_id=4877",
         "owner": "glts",
@@ -302,7 +311,7 @@
     },
     "vim-operator-user": {
         "branch": "master",
-        "date": "2015-02-17",
+        "date": "2015-02-17T12:42:12Z",
         "description": "Vim plugin: Define your own operator easily",
         "homepage": "http://www.vim.org/scripts/script.php?script_id=2692",
         "owner": "kana",
@@ -315,7 +324,7 @@
     },
     "vim-polyglot": {
         "branch": "master",
-        "date": "2019-07-01",
+        "date": "2019-07-01T14:26:25Z",
         "description": "A solid language pack for Vim.",
         "homepage": "",
         "owner": "sheerun",
@@ -328,7 +337,7 @@
     },
     "vim-radical": {
         "branch": "master",
-        "date": "2016-06-22",
+        "date": "2016-06-22T16:43:29Z",
         "description": "radical.vim ✊ Convert decimal, hex, octal, binary number representations",
         "homepage": "http://www.vim.org/scripts/script.php?script_id=5409",
         "owner": "glts",
@@ -341,7 +350,7 @@
     },
     "vim-remote-viewer": {
         "branch": "master",
-        "date": "2019-04-06",
+        "date": "2019-04-06T17:02:59Z",
         "description": "vim-dirvish & cURL",
         "homepage": null,
         "owner": "bounceme",
@@ -354,7 +363,7 @@
     },
     "vim-repeat": {
         "branch": "master",
-        "date": "2019-07-29",
+        "date": "2019-07-29T16:17:59Z",
         "description": "repeat.vim: enable repeating supported plugin maps with \".\"",
         "homepage": "http://www.vim.org/scripts/script.php?script_id=2136",
         "owner": "tpope",
@@ -367,7 +376,7 @@
     },
     "vim-sandwich": {
         "branch": "master",
-        "date": "2019-06-11",
+        "date": "2019-06-11T13:31:38Z",
         "description": "The set of operator and textobject plugins to search/select/edit sandwiched textobjects.",
         "homepage": "",
         "owner": "machakann",
@@ -380,7 +389,7 @@
     },
     "vim-startuptime": {
         "branch": "master",
-        "date": "2017-03-15",
+        "date": "2017-03-15T21:56:37Z",
         "description": "Breakdown Vim's --startuptime output",
         "homepage": "",
         "owner": "tweekmonster",
@@ -393,7 +402,7 @@
     },
     "vim-suckless": {
         "branch": "master",
-        "date": "2018-12-19",
+        "date": "2018-12-19T13:02:54Z",
         "description": "Tiling window management that sucks less. Inpired by wmii and i3.",
         "homepage": "",
         "owner": "fabi1cazenave",
@@ -406,7 +415,7 @@
     },
     "vim-suda": {
         "branch": "master",
-        "date": "2019-05-31",
+        "date": "2019-05-31T01:49:52Z",
         "description": "An alternative sudo.vim for Vim and Neovim, limited support sudo in Windows",
         "homepage": "",
         "owner": "lambdalisue",
@@ -419,7 +428,7 @@
     },
     "vim-table-mode": {
         "branch": "master",
-        "date": "2019-04-25",
+        "date": "2019-04-25T17:44:05Z",
         "description": "VIM Table Mode for instant table creation.",
         "homepage": "",
         "owner": "dhruvasagar",
@@ -432,7 +441,7 @@
     },
     "vim-targets": {
         "branch": "master",
-        "date": "2019-05-21",
+        "date": "2019-05-21T21:00:03Z",
         "description": "Vim plugin that provides additional text objects",
         "homepage": null,
         "owner": "wellle",
@@ -445,7 +454,7 @@
     },
     "vim-termopen": {
         "branch": "master",
-        "date": "2018-12-18",
+        "date": "2018-12-18T16:16:21Z",
         "description": "Easy integration of TUI apps in Neovim: Ranger, LF, Tig… Tetris…",
         "homepage": "",
         "owner": "fabi1cazenave",
@@ -458,7 +467,7 @@
     },
     "vim-visualrepeat": {
         "branch": "master",
-        "date": "2019-06-18",
+        "date": "2019-06-18T07:49:12Z",
         "description": "Repeat command extended to visual mode.",
         "homepage": null,
         "owner": "inkarkat",
@@ -471,6 +480,7 @@
     },
     "zsh-agkozak-zsh-prompt": {
         "branch": "master",
+        "date": "2019-07-24T01:45:52Z",
         "description": "A fast, asynchronous ZSH prompt with color ASCII indicators of Git, exit, SSH, and vi mode status. Framework-agnostic and customizable.",
         "homepage": "",
         "owner": "agkozak",
@@ -483,6 +493,7 @@
     },
     "zsh-autoenv": {
         "branch": "master",
+        "date": "2018-09-14T02:01:21Z",
         "description": "Autoenv for zsh",
         "homepage": null,
         "owner": "Tarrasch",
@@ -495,6 +506,7 @@
     },
     "zsh-autosuggestions": {
         "branch": "master",
+        "date": "2019-07-15T17:39:10Z",
         "description": "Fish-like autosuggestions for zsh",
         "homepage": null,
         "owner": "zsh-users",
@@ -507,6 +519,7 @@
     },
     "zsh-completion-generator": {
         "branch": "master",
+        "date": "2018-06-04T14:25:04Z",
         "description": "Plugin that generates completion functions automatically from getopt-style help texts",
         "homepage": "",
         "owner": "RobSiS",
@@ -519,6 +532,7 @@
     },
     "zsh-fast-syntax-highlighting": {
         "branch": "master",
+        "date": "2019-07-26T11:41:50Z",
         "description": "(Short name F-Sy-H). Syntax-highlighting for Zshell – fine granularity, number of features, 40 work hours themes",
         "homepage": "http://zdharma.org",
         "owner": "zdharma",
@@ -531,6 +545,7 @@
     },
     "zsh-history-search-multi-word": {
         "branch": "master",
+        "date": "2019-07-07T08:53:28Z",
         "description": "Multi-word, syntax highlighted history searching for Zsh",
         "homepage": "",
         "owner": "zdharma",
@@ -543,6 +558,7 @@
     },
     "zsh-nix-shell": {
         "branch": "master",
+        "date": "2019-04-22T20:00:26Z",
         "description": "zsh plugin that lets you use zsh in nix-shell shell.",
         "homepage": "",
         "owner": "chisui",
