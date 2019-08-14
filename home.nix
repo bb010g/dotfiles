@@ -88,20 +88,6 @@ in
     bb010g.programs.pijul
   ];
 
-
-  xdg.configFile."fontconfig/fonts.conf".text = ''
-    <?xml version="1.0"?>
-    <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
-    <fontconfig>
-      <alias>
-        <family>monospace</family>
-        <prefer>
-          <family>Ubuntu Mono</family>
-        </prefer>
-      </alias>
-    </fontconfig>
-  '';
-
   # dconf. 24-hour time
 
   home.keyboard = trace "home home.keyboard" {
@@ -376,6 +362,11 @@ in
     VISUAL = "nvim";
   };
 
+  manual = trace "home manual" {
+    html.enable = true;
+    manpages.enable = true;
+  };
+
   programs.autorandr = trace "home programs.autorandr" {
     enable = true;
     profiles = let
@@ -527,12 +518,10 @@ in
     userName = "bb010g";
   };
 
-  xdg.enable = true;
-  xdg.configFile."git/ignore".text = lib.readFile ./gitignore_global;
-
-  manual = trace "home manual" {
-    html.enable = true;
-    manpages.enable = true;
+  # Home Manager config
+  programs.home-manager = trace "home programs.home-manager" {
+    enable = true;
+    path = if lib.pathExists ~/nix/home-manager then "$HOME/nix/home-manager" else <home-manager>;
   };
 
   programs.htop = trace "home programs.htop" {
@@ -921,13 +910,14 @@ set scrolloff=5 sidescrolloff=4
     # };
   };
 
+  services.kbfs = trace "home services.kbfs" { enable = true; };
+
   services.kdeconnect = trace "home services.kdeconnect" {
     enable = true;
     indicator = true;
   };
 
   services.keybase = trace "home services.keybase" { enable = true; };
-  services.kbfs = trace "home services.kbfs" { enable = true; };
 
   services.mpd = trace "home services.mpd" {
     enable = true;
@@ -1022,6 +1012,23 @@ set scrolloff=5 sidescrolloff=4
     # };
   };
 
+  xdg.enable = true;
+
+  xdg.configFile."fontconfig/fonts.conf".text = ''
+    <?xml version="1.0"?>
+    <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+    <fontconfig>
+      <alias>
+        <family>monospace</family>
+        <prefer>
+          <family>Ubuntu Mono</family>
+        </prefer>
+      </alias>
+    </fontconfig>
+  '';
+
+  xdg.configFile."git/ignore".text = lib.readFile ./gitignore_global;
+
   xsession = trace "home xsession" {
     enable = true;
     # pointerCursor = {
@@ -1091,13 +1098,6 @@ set scrolloff=5 sidescrolloff=4
         inherit modifier;
       };
     };
-  };
-
-  # Home Manager config
-
-  programs.home-manager = trace "home programs.home-manager" {
-    enable = true;
-    path = if lib.pathExists ~/nix/home-manager then "$HOME/nix/home-manager" else <home-manager>;
   };
 }
 
