@@ -5,7 +5,7 @@
         "sha256": "08y4734bm2zahw75b16bcmcg587vvyvh0n11gwiyir70divwp1rm",
         "system": "linux-x86_64",
         "timestamp": "2019-08-13-21-52-12",
-        "type": "firefox-nightly",
+        "type": "builtin-url",
         "url": "https://example.com/index.html",
         "url_template": "https://example.com/index.html",
         "version": "70.0a1"
