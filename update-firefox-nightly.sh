@@ -1,7 +1,18 @@
 #!/usr/bin/env nix-shell
-#! nix-shell -i zsh -p curl jq moreutils zsh
+#! nix-shell -i bash -p curl jq moreutils
 
-local buildhub_file= buildhub_url= system= version= versions_url= timestamp=
+set -o errexit -o errtrace -o nounset -o pipefail
+shopt -s inherit_errexit
+
+# variables
+typeset \
+  buildhub_filename='' \
+  buildhub_url='' \
+  system='' \
+  timestamp='' \
+  version='' \
+  versions_url='' \
+
 
 # fetch major version
 versions_url='https://product-details.mozilla.org/1.0/firefox_versions.json'
@@ -23,4 +34,4 @@ jq -S --indent 4 '.["firefox-nightly"] *= $ARGS.named' \
   --arg version "$version" --arg timestamp "$timestamp" \
   nix/sources.json | sponge nix/sources.json
 
-# vim:et:ft=zsh:sw=2:tw=78
+# vim:et:ft=sh:sw=2:tw=78
