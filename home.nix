@@ -305,12 +305,14 @@ in
         #  need %Y-%m-%d-%H-%m-%s
         inherit (sources.firefox-nightly) timestamp;
         release = false;
-      }).overrideAttrs (o: { buildCommand = lib.replaceStrings [ ''
-        --set MOZ_SYSTEM_DIR "$out/lib/mozilla" \
-      '' ] [ ''
-        --set MOZ_SYSTEM_DIR "$out/lib/mozilla" \
-        --set SNAP_NAME firefox \
-      '' ] o.buildCommand; }))
+      }).overrideAttrs (o: {
+        buildCommand = lib.replaceStrings [ ''
+          --set MOZ_SYSTEM_DIR "$out/lib/mozilla" \
+        '' ] [ ''
+          --set MOZ_SYSTEM_DIR "$out/lib/mozilla" \
+          --set SNAP_NAME firefox \
+        '' ] o.buildCommand;
+      }))
       pkgs.google-chrome
       pkgs.keybase-gui
       # for Firefox MozLz4a JSON files (.jsonlz4)
