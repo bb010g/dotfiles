@@ -1,10 +1,6 @@
 let sources = import ./nix/sources.nix; in
 {
   allowUnfree = true;
-  extraOptions = ''
-    keep-derivations = true
-    keep-outputs = true
-  '';
   android_sdk.accept_license = true;
   packageOverrides = pkgs: {
     gitignore = import sources.gitignore { inherit (pkgs) lib; };

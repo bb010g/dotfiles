@@ -4,7 +4,7 @@
         "download_url_template": "https://archive.mozilla.org/pub/firefox/nightly/%Y/%m/%Y-%m-%d-%H-%m-%s-mozilla-central/firefox-<version>.en-US.<system>.tar.bz2",
         "sha256": "08y4734bm2zahw75b16bcmcg587vvyvh0n11gwiyir70divwp1rm",
         "system": "linux-x86_64",
-        "timestamp": "2019-08-13-21-52-12",
+        "timestamp": "2019-08-15-19-35-05",
         "type": "builtin-url",
         "url": "https://example.com/index.html",
         "url_template": "https://example.com/index.html",
@@ -257,19 +257,6 @@
         "url": "https://github.com/lambdalisue/gina.vim/archive/b5af8bcd9e117e13fd9ead2940c434692be00ad9.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
-    "vim-gundo": {
-        "branch": "master",
-        "date": "2017-05-09T13:50:38Z",
-        "description": "A git mirror of gundo.vim",
-        "homepage": "http://sjl.bitbucket.org/gundo.vim/",
-        "owner": "sjl",
-        "repo": "gundo.vim",
-        "rev": "46c443ee9d5854320eb965a1fdee781ba83a070e",
-        "sha256": "0adk7agzmbfv342zw6lc8jad6yjs1wap4c0ca98s0qm2bs0r1hl2",
-        "type": "tarball",
-        "url": "https://github.com/sjl/gundo.vim/archive/46c443ee9d5854320eb965a1fdee781ba83a070e.tar.gz",
-        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
-    },
     "vim-linediff": {
         "branch": "master",
         "date": "2019-06-23T09:13:58Z",
@@ -335,6 +322,19 @@
         "url": "https://github.com/sheerun/vim-polyglot/archive/3ddca5da461ebfaa82104f82e3cbf19d1c326ade.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "vim-precious": {
+        "branch": "master",
+        "date": "2019-08-02T12:15:31Z",
+        "description": "Vim constext filetype",
+        "homepage": "",
+        "owner": "osyo-manga",
+        "repo": "vim-precious",
+        "rev": "01aaf030cbd2e374ca5659148e395aab2d35bffc",
+        "sha256": "1d7q7hhljavy3f1iybmrdxdimi2mpxqbjny80ywk47gsrj5ily6l",
+        "type": "tarball",
+        "url": "https://github.com/osyo-manga/vim-precious/archive/01aaf030cbd2e374ca5659148e395aab2d35bffc.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "vim-radical": {
         "branch": "master",
         "date": "2016-06-22T16:43:29Z",
@@ -346,6 +346,19 @@
         "sha256": "0qjjis28142035djrn2ahm4dfxgrxi7gs6r19za009hmllbamag8",
         "type": "tarball",
         "url": "https://github.com/glts/vim-radical/archive/d3f1d33c53c8b1b378b5c1ef3e078452025f46b0.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "vim-recover": {
+        "branch": "master",
+        "date": "2019-06-04T14:10:26Z",
+        "description": "A Plugin to show a diff, whenever recovering a buffer",
+        "homepage": "http://www.vim.org/scripts/script.php?script_id=3068",
+        "owner": "chrisbra",
+        "repo": "Recover.vim",
+        "rev": "491c7bab1632029318d682df927d62b298856db5",
+        "sha256": "18bdsa6y9cdf92qafp4mlc2f6ny3qx8wl8p3i9x7q46i89bn7cxc",
+        "type": "tarball",
+        "url": "https://github.com/chrisbra/Recover.vim/archive/491c7bab1632029318d682df927d62b298856db5.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "vim-remote-viewer": {
@@ -463,6 +476,19 @@
         "sha256": "0qq4spa2wb15pdx51aixgc4z2hvy844qpiaccwxdp3h6ncpfbg12",
         "type": "tarball",
         "url": "https://github.com/fabi1cazenave/termopen.vim/archive/3194a991a18a9be2fd9fcf8c4c55fe990c04b2bd.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "vim-undotree": {
+        "branch": "master",
+        "date": "2019-03-13T07:37:59Z",
+        "description": "The undo history visualizer for VIM",
+        "homepage": "http://www.vim.org/scripts/script.php?script_id=4177",
+        "owner": "mbbill",
+        "repo": "undotree",
+        "rev": "be23eacb2a63380bd79e207a738c728214ecc9d3",
+        "sha256": "00zyvff32zp7pyjzkq8da9xhr378mlpi8gj717yfr9wbwwarwfd7",
+        "type": "tarball",
+        "url": "https://github.com/mbbill/undotree/archive/be23eacb2a63380bd79e207a738c728214ecc9d3.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "vim-visualrepeat": {

@@ -175,7 +175,7 @@ in
     ];
 
     misc = [
-      pkgs-unstable-bb010g.bitwarden-cli
+      pkgs-unstable.bitwarden-cli
       pkgs.nur.repos.bb010g.broca-unstable
       pkgs.cowsay
       pkgs-unstable.edbrowse
@@ -223,6 +223,7 @@ in
       pkgs.diffstat
       pkgs.nur.repos.bb010g.dwdiff
       pkgs.gitAndTools.git-imerge
+      pkgs.nur.repos.bb010g.git-revise
       pkgs.gnumake
       pkgs.hecate
       pkgs-unstable.hyperfine
@@ -231,7 +232,7 @@ in
       pkgs.ispell
       pkgs-unstable.just
       pkgs.lzip
-      pkgs-unstable-bb010g.nur.repos.bb010g.mosh-unstable
+      pkgs-unstable.nur.repos.bb010g.mosh-unstable
       pkgs.ngrok
       pkgs.p7zip
       pkgs.ponymix
@@ -549,16 +550,40 @@ in
     enable = true;
     package = nvimUnwrapped;
     configure = {
-      customRC = ''
-"" general mappings
+      customRC = /*vim*/''
+"" general mappings (set before other uses)
 " <Leader> 
 let mapleader = "\<Space>"
+
+"" context_filetype
+" language support
+if !exists('g:context_filetype#filetypes')
+  let g:context_filetype#filetypes = {}
+endif
+let g:context_filetype#filetypes.nix = [
+\ {
+\   'start': '/\*\(\h\w*\)\*/'."'"."'",
+\   'end': "'"."'".'\%($\|[^$'."'".']\|.\@!$\)',
+\   'filetype': '\1',
+\ }
+\]
+let g:context_filetype#filetypes.sh = [
+\ {
+\   'start': '<<\s*\(['."'".'"]\)\(\h\w*\)\1\s*#\s*vim:\s*ft=\(\h\w*\)\n',
+\   'end': '\n\zs\2',
+\   'filetype': '\3',
+\ }
+\]
 
 "" diff output
 " patience algorithm
 if has("patch-8.1.0360")
   set diffopt+=internal,algorithm:patience
 endif
+
+"" swapfiles
+" don't bother with unmodified, detached swapfiles
+let g:RecoverPlugin_Delete_Unmodified_Swapfile = 1
 
 "" window management
 " don't unload buffers when abandoned (hid)
@@ -599,7 +624,8 @@ set scrolloff=5 sidescrolloff=4
           };
         sourcesVimPlugin = pname: let
             src = sources.${pname};
-          in basicVimPlugin pname src.date src;
+            date = lib.elemAt (builtins.split "T" src.date) 0;
+          in basicVimPlugin pname date src;
       in {
         start = map sourcesVimPlugin [
           "vim-ale"
@@ -612,13 +638,14 @@ set scrolloff=5 sidescrolloff=4
           "vim-editorconfig"
           "vim-exchange"
           "vim-gina"
-          "vim-gundo"
           "vim-linediff"
           "vim-lion"
           "vim-magnum"
           "vim-operator-user"
           "vim-polyglot"
+          "vim-precious"
           "vim-radical"
+          "vim-recover"
           "vim-remote-viewer"
           "vim-repeat"
           "vim-sandwich"
@@ -628,6 +655,7 @@ set scrolloff=5 sidescrolloff=4
           "vim-table-mode"
           "vim-targets"
           "vim-termopen"
+          "vim-undotree"
           "vim-visualrepeat"
         ];
         opt = map sourcesVimPlugin [
@@ -702,7 +730,7 @@ set scrolloff=5 sidescrolloff=4
     };
     zshModules = {
       "zsh/complist" = true;
-      "zsh/files" = ["-Fm" "b:zf_\*"];
+      "zsh/files" = ["-Fm" "b:zf_\\*"];
       "zsh/mathfunc" = true;
       "zsh/termcap" = true;
       "zsh/terminfo" = true;
@@ -733,7 +761,7 @@ set scrolloff=5 sidescrolloff=4
     enable = true;
     enableAutosuggestions = true;
     enableCompletion = true;
-    completionInit = ''
+    completionInit = /*zsh*/''
       setopt EXTENDED_GLOB
       autoload -U compinit
       for dump in ''${ZDOTDIR:-$HOME}/.zcompdump(#qN.mh+1); do
@@ -754,7 +782,7 @@ set scrolloff=5 sidescrolloff=4
       share = true;
       size = 100000;
     };
-    initExtra = ''
+    initExtra = /*zsh*/''
       setopt ${concatStringsSep " " zshOptions}
 
       unalias run-help
@@ -1012,20 +1040,30 @@ set scrolloff=5 sidescrolloff=4
     # };
   };
 
-  xdg.enable = true;
+  xdg = {
+    enable = true;
 
-  xdg.configFile."fontconfig/fonts.conf".text = ''
-    <?xml version="1.0"?>
-    <!DOCTYPE fontconfig SYSTEM "fonts.dtd">
-    <fontconfig>
-      <alias>
-        <family>monospace</family>
-        <prefer>
-          <family>Ubuntu Mono</family>
-        </prefer>
-      </alias>
-    </fontconfig>
-  '';
+    configFile = {
+      "fontconfig/fonts.conf".text = /*xml*/''
+<?xml version="1.0"?>
+<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
+<fontconfig>
+  <alias>
+    <family>monospace</family>
+    <prefer>
+      <family>Ubuntu Mono</family>
+    </prefer>
+  </alias>
+</fontconfig>
+'';
+
+      "nix/nix.conf".text = /*conf*/''
+auto-optimise-store = true
+keep-derivations = true
+keep-outputs = true
+'';
+    };
+  };
 
   xdg.configFile."git/ignore".text = lib.readFile ./gitignore_global;
 
