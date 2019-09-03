@@ -4,11 +4,11 @@
         "download_url_template": "https://archive.mozilla.org/pub/firefox/nightly/%Y/%m/%Y-%m-%d-%H-%m-%s-mozilla-central/firefox-<version>.en-US.<system>.tar.bz2",
         "sha256": "08y4734bm2zahw75b16bcmcg587vvyvh0n11gwiyir70divwp1rm",
         "system": "linux-x86_64",
-        "timestamp": "2019-08-28-21-44-52",
+        "timestamp": "2019-09-03-09-48-47",
         "type": "builtin-url",
         "url": "https://example.com/index.html",
         "url_template": "https://example.com/index.html",
-        "version": "70.0a1"
+        "version": "71.0a1"
     },
     "gitignore": {
         "branch": "master",
