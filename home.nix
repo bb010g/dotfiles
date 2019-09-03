@@ -196,7 +196,7 @@ in
       ((pkgs.diffoscope.override { enableBloat = true; }).overrideAttrs (o: {
         pythonPath = o.pythonPath ++ [ pkgs.zip ];
       }))
-      pkgs-unstable.nur.repos.bb010g.lorri-rolling
+      # pkgs-unstable.nur.repos.bb010g.lorri
       pkgs.niv.niv
       pkgs-unstable.nix-diff
       pkgs-unstable.nix-index
