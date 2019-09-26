@@ -95,6 +95,13 @@ tags
 
 .autoenv.zsh
 
+## Python
+
+__pycache__/
+
+# mypy
+.mypy_cache/
+
 ## Rust
 
 # cargo fmt

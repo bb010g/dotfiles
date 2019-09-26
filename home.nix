@@ -1,6 +1,6 @@
 { config, lib ? null, pkgs ? null, ... } @ args:
 let
-  trace = _: x: x;
+  trace = args.trace or (_: x: x);
   # trace = args.trace or builtins.trace;
   argPkgs = trace "home argPkgs"
     (if args.pkgs == null then
