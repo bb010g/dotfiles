@@ -121,6 +121,20 @@ in
       pkgs.emacs-all-the-icons-fonts
     ];
 
+    filesystem = [
+      pkgs.bcachefs-tools
+      pkgs.cifs-utils
+      pkgs.dosfstools
+      # pkgs.e2fsprogs
+      pkgs.e2tools
+      pkgs.exfat-utils
+      pkgs.f2fs-tools
+      pkgs.hfsprogs
+      pkgs.mtdutils
+      pkgs.nfs-utils
+      pkgs.squashfsTools
+    ];
+
     fonts-base = [
       # ttf-courier-prime
       pkgs.dejavu_fonts
@@ -196,7 +210,7 @@ in
       ((pkgs.diffoscope.override { enableBloat = true; }).overrideAttrs (o: {
         pythonPath = o.pythonPath ++ [ pkgs.zip ];
       }))
-      # pkgs-unstable.nur.repos.bb010g.lorri
+      pkgs.lorri
       pkgs.niv.niv
       pkgs-unstable.nix-diff
       pkgs-unstable.nix-index
@@ -214,6 +228,7 @@ in
     ];
 
     tools = [
+      pkgs.acpi
       pkgs.androidenv.androidPkgs_9_0.platform-tools
       pkgs.asciinema
       # pkgs.asciinema-edit
@@ -247,6 +262,7 @@ in
 
     gui = lib.concatLists [
       gui-core
+      gui-editors
       gui-games
       gui-media
       gui-misc
@@ -266,12 +282,18 @@ in
       pkgs.xsel
     ];
 
+    gui-editors = [
+      pkgs.texstudio
+      pkgs.wxhexeditor
+    ];
+
     gui-games = [
       pkgs.scummvm
       pkgs.steam
     ];
 
     gui-media = [
+      pkgs.aseprite-unfree
       pkgs.evince
       pkgs.geeqie
       pkgs.gimp
@@ -314,6 +336,7 @@ in
         '' ] o.buildCommand;
       }))
       pkgs.google-chrome
+      pkgs.gucharmap
       pkgs.keybase-gui
       # for Firefox MozLz4a JSON files (.jsonlz4)
       pkgs-unstable.nur.repos.bb010g.mozlz4-tool
@@ -322,7 +345,6 @@ in
       }))
       pkgs-unstable.riot-desktop
       pkgs-unstable.tdesktop
-      pkgs.texstudio
       pkgs-unstable.wire-desktop
     ];
 
@@ -348,6 +370,7 @@ in
   in lib.concatLists [
     core
     editors
+    filesystem
     fonts
     gui
     media
