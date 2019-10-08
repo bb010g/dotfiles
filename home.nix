@@ -39,14 +39,6 @@ let
     nur-remote = trace "nur nur-remote sources.nur" sources.nur;
     inherit trace;
   });
-  nur-bb010g = trace "home nur-bb010g" (import ./config-nur.nix {
-    pkgs = trace "nur-bb010g pkgs null" null;
-    ${if pinned then "nur-local" else null} =
-      trace "nur-bb010g nur-local pinned null" null;
-    nur-remote =
-      trace "nur-bb010g nur-remote sources.nur-bb010g" sources.nur-bb010g;
-    inherit trace;
-  });
 
   pkgs = trace "home pkgs" (if pinned || argPkgs == null then
     trace "pkgs sources.nixpkgs" sources.nixpkgs
@@ -83,7 +75,7 @@ let
 in
 {
   imports = let
-    bb010g = nur-bb010g.repos.bb010g.modules.home-manager;
+    bb010g = nur.repos.bb010g.modules.home-manager;
   in trace "home imports" [
     bb010g.programs.pijul
   ];
@@ -235,9 +227,11 @@ in
       pkgs.bind
       pkgs.binutils
       pkgs.colordiff
+      pkgs.cv
       pkgs.diffstat
       pkgs.nur.repos.bb010g.dwdiff
       pkgs.gitAndTools.git-imerge
+      pkgs.nur.repos.bb010g.git-my
       pkgs.nur.repos.bb010g.git-revise
       pkgs.gnumake
       pkgs.hecate
@@ -595,7 +589,7 @@ let g:context_filetype#filetypes.nix = [
 let g:context_filetype#filetypes.sh = [
 \ {
 \   'start': '<<\s*\(['."'".'"]\)\(\h\w*\)\1\s*#\s*vim:\s*ft=\(\h\w*\)\n',
-\   'end': '\n\zs\2',
+\   'end': '\n\2',
 \   'filetype': '\3',
 \ }
 \]
