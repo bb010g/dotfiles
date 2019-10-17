@@ -23,6 +23,19 @@
         "version": "71.0a1",
         "versions_url": "https://product-details.mozilla.org/1.0/firefox_versions.json"
     },
+    "fontconfig-emoji": {
+        "branch": "master",
+        "date": "2018-10-20T23:00:38Z",
+        "description": "Emoji prioritization rules",
+        "homepage": null,
+        "owner": "stove-panini",
+        "repo": "fontconfig-emoji",
+        "rev": "ced17584da00fec0307b25dc175635a9ade6907d",
+        "sha256": "17iaa7pmw224l84qzgda8irraincaf7qf03lh7cl99dp73ahz7d0",
+        "type": "tarball",
+        "url": "https://github.com/stove-panini/fontconfig-emoji/archive/ced17584da00fec0307b25dc175635a9ade6907d.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "gitignore": {
         "branch": "master",
         "date": "2019-09-18T13:15:15Z",

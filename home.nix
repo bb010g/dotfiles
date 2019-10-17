@@ -127,6 +127,26 @@ in
       pkgs.squashfsTools
     ];
 
+    fontconfig-emoji = pkgs.runCommand "fontconfig-emoji" {
+      src = sources.fontconfig-emoji;
+    } ''
+      mkdir -p "$out"/etc/fonts/conf.d
+      cp -t "$out"/etc/fonts/conf.d/ \
+        "$src"/69-emoji.conf \
+        "$src"/70-no-mozilla-emoji.conf
+      # cp -t "$out/etc/fonts/conf.d/ "$src"/69-emoji-monospace.conf
+    '';
+
+    fontconfig-user = pkgs.runCommand "fontconfig-user" {
+      src = ./fontconfig;
+    } ''
+      mkdir -p "$out"/etc/fonts/conf.d
+      cp -t "$out"/etc/fonts/conf.d/ \
+        "$src"/49-zonk-sansserif.conf \
+        "$src"/50-user.conf \
+        "$src"/70-no-adobe-blank.conf
+    '';
+
     fonts-base = [
       # ttf-courier-prime
       pkgs.dejavu_fonts
@@ -164,11 +184,20 @@ in
       # ttf-signika ( https://fonts.google.com/specimen/Signika )
       pkgs.ubuntu_font_family
     ]; # ++ xorg-fonts-misc;
+
+    fonts-emoji = [
+      # fontconfig-emoji # needs global installation
+      pkgs.nur.repos.bb010g.mutant-standard
+      pkgs-unstable.noto-fonts-emoji
+      pkgs-unstable.twitter-color-emoji
+    ];
+
     fonts = fonts-extended-lt ++ [
       pkgs.corefonts
+      fontconfig-user
       pkgs.raleway
       pkgs.vistafonts
-    ];
+    ] ++ fonts-emoji;
 
     hunspellDicts = [
       pkgs.hunspellDicts.en-us
@@ -1063,18 +1092,10 @@ set scrolloff=5 sidescrolloff=4
     enable = true;
 
     configFile = {
-      "fontconfig/fonts.conf".text = /*xml*/''
-<?xml version="1.0"?>
-<!DOCTYPE fontconfig SYSTEM "fonts.dtd">
-<fontconfig>
-  <alias>
-    <family>monospace</family>
-    <prefer>
-      <family>Ubuntu Mono</family>
-    </prefer>
-  </alias>
-</fontconfig>
-'';
+      "git/ignore".source = ./gitignore_global;
+
+      # "fontconfig/conf.d".source =
+      #   "${config.home.homeDirectory}/.nix-profile/etc/fonts/conf.d";
 
       "nix/nix.conf".text = /*conf*/''
 auto-optimise-store = true
@@ -1084,7 +1105,6 @@ keep-outputs = true
     };
   };
 
-  xdg.configFile."git/ignore".text = lib.readFile ./gitignore_global;
 
   xsession = trace "home xsession" {
     enable = true;
