@@ -863,6 +863,16 @@ set scrolloff=5 sidescrolloff=4
       alias ls='ls --color=auto -F '
       alias tree='tree -F '
 
+      nix-find-deriver() {
+        local p=("''${@:P}");
+        nix show-derivation "''${p[@]}" | \
+          ${config.programs.jq.package}/bin/jq -r \
+'. as $drvs | $ARGS.positional[] |
+first((. as $p | $drvs | keys_unsorted[] | . as $k |
+  select($p | startswith($drvs[$k].outputs[].path))
+), "unknown-deriver")' --args "''${p[@]}"
+      }
+
       # for fast-syntax-highlighting
       zstyle :plugin:history-search-multi-word reset-prompt-protect 1
 
