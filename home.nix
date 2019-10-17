@@ -213,7 +213,7 @@ in
       pkgs-unstable.bitwarden-cli
       pkgs.nur.repos.bb010g.broca-unstable
       pkgs.cowsay
-      pkgs-unstable.edbrowse
+      pkgs-unstable.nur.repos.bb010g.edbrowse
       pkgs.elinks
       pkgs.fortune
       # pkgs-unstable.nur.repos.bb010g.html2json-unstable
