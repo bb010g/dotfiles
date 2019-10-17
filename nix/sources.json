@@ -478,6 +478,19 @@
         "url": "https://github.com/lambdalisue/suda.vim/archive/c91b897237ffb82e78c8536b7320373fbb5875d7.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "vim-sved": {
+        "branch": "master",
+        "date": "2019-01-25T12:56:33Z",
+        "description": "Synctex support for Vim and Evince through DBus",
+        "homepage": "",
+        "owner": "peterbjorgensen",
+        "repo": "sved",
+        "rev": "3362db72447e8ac812c7299c15ecfc9f41341713",
+        "sha256": "1r2nv069d6r2q6gbiz795x94mfjm9hnv05zka085hhq9a3yf1pgx",
+        "type": "tarball",
+        "url": "https://github.com/peterbjorgensen/sved/archive/3362db72447e8ac812c7299c15ecfc9f41341713.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "vim-table-mode": {
         "branch": "master",
         "date": "2019-09-28T19:03:33Z",

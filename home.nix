@@ -674,6 +674,19 @@ set scrolloff=5 sidescrolloff=4
             src = sources.${pname};
             date = lib.elemAt (builtins.split "T" src.date) 0;
           in basicVimPlugin pname date src;
+
+        vim-sved = (sourcesVimPlugin "vim-sved").overrideAttrs(o: {
+          patches = sources.vim-sved.patches or [] ++ [
+            (builtins.toFile "nvim-host-python.patch" /*diff*/''
+--- a/ftplugin/tex_evinceSync.vim
++++ b/ftplugin/tex_evinceSync.vim
+@@ -39,2 +39,2 @@
+ if has("nvim")
+-	let g:evinceSyncDaemonJob = jobstart([s:pycmd, "1"],
++	let g:evinceSyncDaemonJob = jobstart([g:python_host_prog, s:pycmd, "1"],
+            '')
+          ];
+        });
       in {
         start = map sourcesVimPlugin [
           "vim-ale"
@@ -705,6 +718,8 @@ set scrolloff=5 sidescrolloff=4
           "vim-termopen"
           "vim-undotree"
           "vim-visualrepeat"
+        ] ++ [
+          vim-sved
         ];
         opt = map sourcesVimPlugin [
         ];
