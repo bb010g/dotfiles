@@ -82,7 +82,7 @@ in
 
   # dconf. 24-hour time
 
-  home.keyboard = trace "home home.keyboard" {
+  home.keyboard = {
     layout = "us,gr";
     options = [
       "compose:ralt"
@@ -92,7 +92,7 @@ in
     ];
   };
 
-  home.packages = trace "home home.packages" (let
+  home.packages = let
     core = [
       pkgs.ed # ed is the STANDARD text editor
       pkgs.file
@@ -400,7 +400,7 @@ in
     misc
     nix
     tools
-  ]);
+  ];
 
   home.sessionVariables = {
     EDITOR = "ed";
@@ -411,12 +411,12 @@ in
     VISUAL = "nvim";
   };
 
-  manual = trace "home manual" {
+  manual = {
     html.enable = true;
     manpages.enable = true;
   };
 
-  programs.autorandr = trace "home programs.autorandr" {
+  programs.autorandr = {
     enable = true;
     profiles = let
       genProfiles = displays: lib.mapAttrs (name: value: value // {
@@ -431,16 +431,20 @@ in
       displays = import ./displays.nix;
     in genProfiles displays {
       mobile.config = {
-        laptop = {};
+        laptop = { };
+      };
+      home.config = {
+        laptop = { };
+        home = { };
       };
       home-docked.config = {
         laptop = { enable = false; };
-        home = {};
+        home = { };
       };
     };
   };
 
-  programs.beets = trace "home programs.beets" {
+  programs.beets = {
     enable = true;
     package = pkgs-unstable.beets;
     settings = let
@@ -526,19 +530,19 @@ in
     };
   };
 
-  programs.direnv = trace "programs.direnv" { enable = true; };
+  programs.direnv = { enable = true; };
 
-  programs.emacs = trace "programs.emacs" { enable = true; };
+  programs.emacs = { enable = true; };
 
-  programs.feh = trace "home programs.feh" { enable = true; };
+  programs.feh = { enable = true; };
 
-  # programs.firefox = trace "home programs.firefox" {
+  # programs.firefox = {
   #   enable = true;
   #   package = moz_nixpkgs.latest.firefox-nightly-bin;
   #   enableAdobeFlash = true;
   # };
 
-  programs.git = trace "home programs.git" {
+  programs.git = {
     enable = true;
     extraConfig = {
       core = {
@@ -568,27 +572,27 @@ in
   };
 
   # Home Manager config
-  programs.home-manager = trace "home programs.home-manager" {
+  programs.home-manager = {
     enable = true;
     path = if lib.pathExists ~/nix/home-manager then "$HOME/nix/home-manager" else <home-manager>;
   };
 
-  programs.htop = trace "home programs.htop" {
+  programs.htop = {
     enable = true;
   };
 
-  programs.jq = trace "home programs.jq" {
+  programs.jq = {
     enable = true;
     package = pkgs-unstable.jq;
   };
 
-  programs.mercurial = trace "home programs.mercurial" {
+  programs.mercurial = {
     enable = true;
     userName = "Brayden Banks";
     userEmail = "me@bb010g.com";
   };
 
-  programs.neovim = trace "home programs.neovim" (let
+  programs.neovim = let
     pkgsNvim = pkgs-unstable;
     nvimUnwrapped = pkgsNvim.neovim-unwrapped;
     nvim = pkgsNvim.wrapNeovim nvimUnwrapped {
@@ -725,13 +729,13 @@ set scrolloff=5 sidescrolloff=4
         ];
       };
     };
-  });
+  };
 
-  programs.obs-studio = trace "home programs.obs-studio" {
+  programs.obs-studio = {
     enable = true;
   };
 
-  #programs.pijul = trace "home programs.pijul" {
+  #programs.pijul = {
   #  enable = true;
   #  # configDir = "${config.xdg.configHome}/pijul";
   #  package = pkgs-unstable.pijul;
@@ -741,7 +745,7 @@ set scrolloff=5 sidescrolloff=4
   #  };
   #};
 
-  programs.ssh = trace "home programs.ssh" {
+  programs.ssh = {
     enable = true;
     matchBlocks = [
       { host = "aur.archlinux.org";
@@ -754,7 +758,7 @@ set scrolloff=5 sidescrolloff=4
     ];
   };
 
-  programs.texlive = trace "home programs.texlive" {
+  programs.texlive = {
     enable = true;
     extraPackages = tpkgs: { inherit (tpkgs)
       collection-bibtexextra
@@ -775,11 +779,11 @@ set scrolloff=5 sidescrolloff=4
     ; };
   };
 
-  programs.tmux = trace "home programs.tmux" {
+  programs.tmux = {
     enable = true;
   };
 
-  programs.zsh = trace "home programs.zsh" (let
+  programs.zsh = let
     inherit (lib) concatStringsSep;
     filterAttrs = f: e: lib.filter (n: f n e.${n}) (lib.attrNames e);
     trueAttrs = filterAttrs (n: v: v == true);
@@ -997,30 +1001,30 @@ first((. as $p | $drvs | keys_unsorted[] | . as $k |
         file = "${name}.plugin.zsh";
       }
     ];
-  });
+  };
 
-  services.compton = trace "home services.compton" {
+  services.compton = {
     enable = true;
     package = pkgs.compton-git;
   };
 
-  services.dunst = trace "home services.dunst" {
+  services.dunst = {
     enable = true;
     # settings = {
     #   global =
     # };
   };
 
-  services.kbfs = trace "home services.kbfs" { enable = true; };
+  services.kbfs = { enable = true; };
 
-  services.kdeconnect = trace "home services.kdeconnect" {
+  services.kdeconnect = {
     enable = true;
     indicator = true;
   };
 
-  services.keybase = trace "home services.keybase" { enable = true; };
+  services.keybase = { enable = true; };
 
-  services.mpd = trace "home services.mpd" {
+  services.mpd = {
     enable = true;
     daemons = rec {
       default = {
@@ -1045,8 +1049,8 @@ first((. as $p | $drvs | keys_unsorted[] | . as $k |
     };
   };
 
-  services.redshift = trace "home services.redshift"
-    (if private ? redshift then trace "redshift private"
+  services.redshift = 
+    if private ? redshift then trace "redshift private"
       (with private.redshift; {
         enable = true;
         tray = true;
@@ -1057,20 +1061,20 @@ first((. as $p | $drvs | keys_unsorted[] | . as $k |
           night = 3700;
         };
       })
-    else "redshift default" { });
+    else "redshift default" { };
 
-  services.screen-locker = trace "home services.screen-locker" {
+  services.screen-locker = {
     enable = true;
     inactiveInterval = 10;
     lockCmd = "${pkgs.i3lock}/bin/i3lock -f -c 131736";
   };
 
-  services.unclutter = trace "home services.unclutter" {
+  services.unclutter = {
     enable = true;
     timeout = 5;
   };
 
-  systemd.user.services.broca = trace "home systemd.user.services.broca" {
+  systemd.user.services.broca = {
     Unit = {
       Description = "Bittorrent RPC proxy between Transmission clients and " +
         "Synapse servers";
@@ -1092,7 +1096,7 @@ first((. as $p | $drvs | keys_unsorted[] | . as $k |
     # };
   };
 
-  systemd.user.services.synapse-bt = trace "home systemd.user.services.synapse-bt" {
+  systemd.user.services.synapse-bt = {
     Unit = {
       Description = "Flexible and fast BitTorrent daemon";
       After = [ "network-online.target" ];
@@ -1131,7 +1135,7 @@ keep-outputs = true
   };
 
 
-  xsession = trace "home xsession" {
+  xsession = {
     enable = true;
     # pointerCursor = {
     #   package = pkgs.capitaine-cursors;
