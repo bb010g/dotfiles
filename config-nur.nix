@@ -1,32 +1,32 @@
 { pkgs
-, nur-local ? trace "config-nur nur-local default" ~/nix/nur
-, nur-remote ? trace "config-nur nur-remote fetch default"
-    (builtins.fetchTarball
-      "https://github.com/nix-community/NUR/archive/master.tar.gz")
-, repoOverrides' ? trace "config-nur tryRepoOverrides default" [
+, nur-local ? ~/nix/nur
+, nur-remote ? builtins.fetchTarball
+    "https://github.com/nix-community/NUR/archive/master.tar.gz"
+, repoOverrides' ? [
     "bb010g"
     "mozilla"
     "nexromancers"
   ]
-, repoOverrides ? trace "config-nur repoOverrides default" {
+, repoOverrides ? {
   }
 , trace ? _: e2: e2
 }:
 
 let
-  inherit (builtins) pathExists;
+  inherit (builtins) mapAttrs pathExists;
   mapAttrs' = builtins.mapAttrs' or (f: set:
     builtins.listToAttrs
       (builtins.map (attr: f attr set.${attr}) (builtins.attrNames set)));
-  traceMsg' = sep: msg1: msg2: trace (toString msg1 + sep + toString msg2);
-  traceMsg = traceMsg' " ";
-  traceVal = msg: e: traceMsg msg e e;
 
   nur-path = if nur-local != null && pathExists nur-local then
-    trace "nur-local ${toString nur-local}" nur-local
+    nur-local
   else
-    trace "nur-remote" nur-remote;
-  passedArgs = { inherit pkgs; inherit trace; };
+    nur-remote;
+  passedArgs = {
+    inherit pkgs;
+    inherit trace;
+    enablePkgsCompat = false;
+  };
 
   nur-manifest =
     (builtins.fromJSON (builtins.readFile (nur-path + "/repos.json"))).repos;
@@ -36,19 +36,23 @@ let
       (builtins.map
         (repo: { name = repo; value = ~/nix + "/nur-${repo}"; })
         repoOverrides')) // repoOverrides;
-in trace "importing nur" (import nur-path ({
-  pkgs = trace "nur arg pkgs" pkgs;
-  repoOverrides = mapAttrs' (n: v: traceMsg "override" n (let
-      p = traceVal "override path"
-        (v + ("/" + ((nur-manifest.${n} or { }).file or "")));
+in let nur = import nur-path ({
+  inherit pkgs;
+  repoOverrides = mapAttrs'
+    (n: v: let
+      p = v + ("/" + ((nur-manifest.${n} or { }).file or ""));
     in {
-      name = traceMsg "override pathExists" p
-        (if pathExists p then n else null);
+      name = if pathExists p then n else null;
       value = let
-        e = traceMsg "override imported" p (import p);
+        e = import p;
       in e (builtins.intersectAttrs (builtins.functionArgs e) passedArgs);
-    }))
+    })
     repoOverrides'';
-}))
+}); in nur // {
+  lib = mapAttrs (_: r: r.lib) nur.repos;
+  modules = mapAttrs (_: r: r.modules) nur.repos;
+  overlays = mapAttrs (_: r: r.overlays) nur.repos;
+  pkgs = mapAttrs (_: r: r.pkgs) nur.repos;
+}
 
 # vim:et:sw=2:tw=78

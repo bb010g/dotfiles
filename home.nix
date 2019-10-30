@@ -19,12 +19,6 @@ let
   # might also have some personal patches?
   # if so, they'd be up at https://github.com/bb010g/nixpkgs, branch bb010g-*
 
-  private = trace "home private" (if lib.pathExists ./private.nix then
-    trace "home private imported" (import ./private.nix)
-  else
-    trace "home private default" {
-      apis = { };
-    });
   sources = trace "home sources" (import ./nix/sources.nix);
 
   pinned = trace "home pinned" (let p = if args ? "pinned" then
@@ -75,8 +69,9 @@ let
 in
 {
   imports = let
-    bb010g = nur.repos.bb010g.modules.home-manager;
+    bb010g = nur.modules.bb010g.home-manager;
   in trace "home imports" [
+    ./private-home.nix
     bb010g.programs.pijul
   ];
 
@@ -187,7 +182,7 @@ in
 
     fonts-emoji = [
       # fontconfig-emoji # needs global installation
-      pkgs.nur.repos.bb010g.mutant-standard
+      pkgs.nur.pkgs.bb010g.mutant-standard
       pkgs-unstable.noto-fonts-emoji
       pkgs-unstable.twitter-color-emoji
     ];
@@ -211,12 +206,12 @@ in
 
     misc = [
       pkgs-unstable.bitwarden-cli
-      pkgs.nur.repos.bb010g.broca-unstable
+      pkgs.nur.pkgs.bb010g.broca-unstable
       pkgs.cowsay
-      pkgs-unstable.nur.repos.bb010g.edbrowse
+      pkgs-unstable.nur.pkgs.bb010g.edbrowse
       pkgs.elinks
       pkgs.fortune
-      # pkgs-unstable.nur.repos.bb010g.html2json-unstable
+      # pkgs-unstable.nur.bb010g.html2json-unstable
       pkgs.lynx
       pkgs.megatools
       pkgs.ponysay
@@ -231,7 +226,7 @@ in
       ((pkgs.diffoscope.override { enableBloat = true; }).overrideAttrs (o: {
         pythonPath = o.pythonPath ++ [ pkgs.zip ];
       }))
-      pkgs.lorri
+      pkgs.lorri-unstable
       pkgs.niv.niv
       pkgs-unstable.nix-diff
       pkgs-unstable.nix-index
@@ -240,7 +235,7 @@ in
       pkgs-unstable.nix-top
       pkgs-unstable.nix-universal-prefetch
       pkgs-unstable.vulnix
-      pkgs.yarn2nix
+      pkgs.yarn2nix-moretea.yarn2nix
       # TODO figure out how to build nixpkgs manual
     ];
 
@@ -258,10 +253,10 @@ in
       pkgs.colordiff
       pkgs.cv
       pkgs.diffstat
-      pkgs.nur.repos.bb010g.dwdiff
+      pkgs.nur.pkgs.bb010g.dwdiff
       pkgs.gitAndTools.git-imerge
-      pkgs.nur.repos.bb010g.git-my
-      pkgs.nur.repos.bb010g.git-revise
+      pkgs.nur.pkgs.bb010g.gitAndTools.git-my
+      pkgs.nur.pkgs.bb010g.gitAndTools.git-revise
       pkgs.gnumake
       pkgs.hecate
       pkgs-unstable.hyperfine
@@ -270,7 +265,7 @@ in
       pkgs.ispell
       pkgs-unstable.just
       pkgs.lzip
-      pkgs-unstable.nur.repos.bb010g.mosh-unstable
+      pkgs-unstable.nur.pkgs.bb010g.mosh-unstable
       pkgs.ngrok
       pkgs.p7zip
       pkgs.ponymix
@@ -278,9 +273,9 @@ in
       pkgs.sbcl
       pkgs-unstable.sublime-merge
       pkgs.tokei
-      pkgs.nur.repos.bb010g.ttyd
+      pkgs.nur.pkgs.bb010g.ttyd
       pkgs.unzip
-      pkgs.nur.repos.bb010g.ydiff
+      pkgs.nur.pkgs.bb010g.ydiff
     ];
 
     gui = lib.concatLists [
@@ -301,7 +296,7 @@ in
       pkgs-unstable.nur.repos.nexromancers.hacksaw
       pkgs.hicolor-icon-theme
       pkgs-unstable.nur.repos.nexromancers.shotgun
-      pkgs.nur.repos.bb010g.st-bb010g-unstable
+      pkgs.nur.pkgs.bb010g.st-bb010g-unstable
       pkgs.xsel
     ];
 
@@ -320,7 +315,7 @@ in
       pkgs.evince
       pkgs.geeqie
       pkgs.gimp
-      pkgs-unstable-bb010g.grafx2
+      pkgs-unstable-bb010g.pkgs.grafx2
       pkgs.inkscape
       pkgs.kdeApplications.kolourpaint
       pkgs.krita
@@ -336,33 +331,11 @@ in
 
     gui-misc = [
       pkgs-unstable.discord
-      ((pkgs.nur.repos.mozilla.lib.firefoxOverlay.firefoxVersion {
-        name = "Firefox Nightly";
-        # https://product-details.mozilla.org/1.0/firefox_versions.json
-        #  : FIREFOX_NIGHTLY
-        inherit (sources.firefox-nightly) version;
-        # system: ? arch (if stdenv.system == "i686-linux" then "linux-i686" else "linux-x86_64")
-        # https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/firefox-${version}.en-US.${system}.buildhub.json
-        #  : download -> url -> (parse)
-        #  - https://archive.mozilla.org/pub/firefox/nightly/%Y/%m/%Y-%m-%d-%H-%m-%s-mozilla-central/firefox-${version}.en-US.${system}.tar.bz2
-        #  : build -> date -> (parse) also works
-        #  - %Y-%m-%dT%H:%m:%sZ
-        #  need %Y-%m-%d-%H-%m-%s
-        inherit (sources.firefox-nightly) timestamp;
-        release = false;
-      }).overrideAttrs (o: {
-        buildCommand = lib.replaceStrings [ ''
-          --set MOZ_SYSTEM_DIR "$out/lib/mozilla" \
-        '' ] [ ''
-          --set MOZ_SYSTEM_DIR "$out/lib/mozilla" \
-          --set SNAP_NAME firefox \
-        '' ] o.buildCommand;
-      }))
       pkgs.google-chrome
       pkgs.gucharmap
       pkgs.keybase-gui
       # for Firefox MozLz4a JSON files (.jsonlz4)
-      pkgs-unstable.nur.repos.bb010g.mozlz4-tool
+      pkgs-unstable.nur.pkgs.bb010g.mozlz4-tool
       (pkgs-unstable.qutebrowser.overrideAttrs (o: {
         buildInputs = o.buildInputs ++ hunspellDicts;
       }))
@@ -378,7 +351,7 @@ in
       pkgs.freerdp
       pkgs.gnome3.gnome-system-monitor
       pkgs.ksysguard
-      pkgs-unstable-bb010g.nur.repos.bb010g.ipscan
+      # pkgs-unstable-bb010g.nur.pkgs.bb010g.ipscan
       pkgs.notify-desktop
       pkgs.pavucontrol
       pkgs.pcmanfm
@@ -387,7 +360,7 @@ in
       pkgs.sqlitebrowser
       pkgs.surf
       pkgs.wireshark
-      pkgs-unstable.nur.repos.bb010g.xcolor
+      pkgs-unstable.nur.pkgs.bb010g.xcolor
       pkgs.xorg.xbacklight
     ];
   in lib.concatLists [
@@ -404,12 +377,13 @@ in
 
   home.sessionVariables = {
     EDITOR = "ed";
-    ${if lib.hasAttrByPath [ "apis" "github" "env-token" ] private
-      then "GITHUB_TOKEN" else null} = private.apis.github.env-token;
+    # GITHUB_TOKEN = in ./private-home.nix
     NIX_PATH = "${config.home.homeDirectory}/nix/channels:$NIX_PATH";
     PAGER = "less -RF";
     VISUAL = "nvim";
   };
+
+  home.stateVersion = "19.09";
 
   manual = {
     html.enable = true;
@@ -419,6 +393,7 @@ in
   programs.autorandr = {
     enable = true;
     profiles = let
+      # TODO: refactor to use modules and `config`
       genProfiles = displays: lib.mapAttrs (name: value: value // {
         fingerprint = lib.mapAttrs' (n: _: {
           name = displays.${n}.output; value = displays.${n}.fingerprint;
@@ -428,7 +403,7 @@ in
         }) value.config;
       });
       # { <profile> = { output = "<name>"; fingerprint = "…"; config = {…}; … }; … }
-      displays = import ./displays.nix;
+      displays = import ./private-displays.nix;
     in genProfiles displays {
       mobile.config = {
         laptop = { };
@@ -447,22 +422,11 @@ in
   programs.beets = {
     enable = true;
     package = pkgs-unstable.beets;
-    settings = let
-      optionalPlugin = p: let cond = private.apis ? ${p}; in {
-        plugin = lib.optional cond p;
-        name = if cond then p else null;
-        value = private.apis.${p} or null;
-      };
-
-      acoustid = optionalPlugin "acoustid";
-      discogs = optionalPlugin "discogs";
-
-      hasPrivatePath = p: lib.hasAttrByPath p private;
-      googlePath = [ "google" "personal" "beetsKey" ];
-    in {
+    settings = {
       plugins = [
         # autotagger
         "chroma"
+        "discogs"
         "fromfilename"
         # metadata
         # "absubmit" (needs streaming_music_extractor)
@@ -488,14 +452,9 @@ in
         "info"
         "mbsubmit"
         "missing"
-      ] ++ lib.concatLists [
-        # autotagger
-        discogs.plugin
       ];
 
-      ${acoustid.name} = {
-        apikey = acoustid.value;
-      };
+      # acoustid.apikey = in ./private-home.nix;
       badfiles = {
         commands = {
         };
@@ -509,13 +468,8 @@ in
           };
         };
       };
-      ${discogs.name} = {
-        user_token = discogs.value;
-      };
-      lyrics = {
-        ${if hasPrivatePath googlePath then "google_API_key" else null} =
-          lib.getAttrByPath googlePath private;
-      };
+      # discogs.user_token = in ./private-home.nix;
+      # lyrics.google_API_key = in ./private-home.nix;
       paths = {
         "default" = "%the{$albumartist}/%the{$album}%aunique{}/$track $title";
         "singleton" = "Non-Album/%the{$artist}/$title";
@@ -536,11 +490,32 @@ in
 
   programs.feh = { enable = true; };
 
-  # programs.firefox = {
-  #   enable = true;
-  #   package = moz_nixpkgs.latest.firefox-nightly-bin;
-  #   enableAdobeFlash = true;
-  # };
+  programs.firefox = {
+    enable = true;
+    package = ((pkgs.nur.lib.mozilla.firefoxOverlay.firefoxVersion {
+      name = "Firefox Nightly";
+      # https://product-details.mozilla.org/1.0/firefox_versions.json
+      #  : FIREFOX_NIGHTLY
+      inherit (sources.firefox-nightly) version;
+      # system: ? arch (if stdenv.system == "i686-linux" then "linux-i686" else "linux-x86_64")
+      # https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/firefox-${version}.en-US.${system}.buildhub.json
+      #  : download -> url -> (parse)
+      #  - https://archive.mozilla.org/pub/firefox/nightly/%Y/%m/%Y-%m-%d-%H-%m-%s-mozilla-central/firefox-${version}.en-US.${system}.tar.bz2
+      #  : build -> date -> (parse) also works
+      #  - %Y-%m-%dT%H:%m:%sZ
+      #  need %Y-%m-%d-%H-%m-%s
+      inherit (sources.firefox-nightly) timestamp;
+      release = false;
+    }).overrideAttrs (o: {
+      buildCommand = lib.replaceStrings [ ''
+        --set MOZ_SYSTEM_DIR "$out/lib/mozilla" \
+      '' ] [ ''
+        --set MOZ_SYSTEM_DIR "$out/lib/mozilla" \
+        --set SNAP_NAME firefox \
+      '' ] o.buildCommand;
+    }));
+    enableAdobeFlash = true;
+  };
 
   programs.git = {
     enable = true;
@@ -601,8 +576,7 @@ in
   in {
     enable = true;
     package = nvimUnwrapped;
-    configure = {
-      customRC = /*vim*/''
+    extraConfig = /*vim*/''
 "" general mappings (set before other uses)
 " <Leader> 
 let mapleader = "\<Space>"
@@ -666,69 +640,64 @@ nmap <silent> <M-Return> :call TermOpen()<CR>
 " cursor line margin (so siso)
 set scrolloff=5 sidescrolloff=4
 
-      '';
-      packages."plugins-bb010g" = let
-        inherit (pkgsNvim.vimUtils.override { vim = nvim; }) buildVimPluginFrom2Nix;
-        basicVimPlugin = pname: version: src:
-          buildVimPluginFrom2Nix {
-            pname = lib.removePrefix "vim-" pname;
-            inherit version src;
-          };
-        sourcesVimPlugin = pname: let
-            src = sources.${pname};
-            date = lib.elemAt (builtins.split "T" src.date) 0;
-          in basicVimPlugin pname date src;
+    '';
+    plugins = let
+      inherit (pkgsNvim.vimUtils.override { vim = nvim; }) buildVimPluginFrom2Nix;
+      basicVimPlugin = pname: version: src:
+        buildVimPluginFrom2Nix {
+          pname = lib.removePrefix "vim-" pname;
+          inherit version src;
+        };
+      sourcesVimPlugin = pname: let
+          src = sources.${pname};
+          date = lib.elemAt (builtins.split "T" src.date) 0;
+        in basicVimPlugin pname date src;
 
-        vim-sved = (sourcesVimPlugin "vim-sved").overrideAttrs(o: {
-          patches = sources.vim-sved.patches or [] ++ [
-            (builtins.toFile "nvim-host-python.patch" /*diff*/''
+      vim-sved = (sourcesVimPlugin "vim-sved").overrideAttrs(o: {
+        patches = sources.vim-sved.patches or [] ++ [
+          (builtins.toFile "nvim-host-python.patch" /*diff*/''
 --- a/ftplugin/tex_evinceSync.vim
 +++ b/ftplugin/tex_evinceSync.vim
 @@ -39,2 +39,2 @@
  if has("nvim")
 -	let g:evinceSyncDaemonJob = jobstart([s:pycmd, "1"],
 +	let g:evinceSyncDaemonJob = jobstart([g:python_host_prog, s:pycmd, "1"],
-            '')
-          ];
-        });
-      in {
-        start = map sourcesVimPlugin [
-          "vim-ale"
-          "vim-caw"
-          "vim-characterize"
-          "vim-context-filetype"
-          "vim-diffchar"
-          "vim-dirdiff"
-          "vim-dirvish"
-          "vim-editorconfig"
-          "vim-exchange"
-          "vim-gina"
-          "vim-linediff"
-          "vim-lion"
-          "vim-magnum"
-          "vim-operator-user"
-          "vim-polyglot"
-          "vim-precious"
-          "vim-radical"
-          "vim-recover"
-          "vim-remote-viewer"
-          "vim-repeat"
-          "vim-sandwich"
-          "vim-startuptime"
-          "vim-suckless"
-          "vim-suda"
-          "vim-table-mode"
-          "vim-targets"
-          "vim-termopen"
-          "vim-undotree"
-          "vim-visualrepeat"
-        ] ++ [
-          vim-sved
+          '')
         ];
-        opt = map sourcesVimPlugin [
-        ];
-      };
-    };
+      });
+    in map sourcesVimPlugin [
+      "vim-ale"
+      "vim-caw"
+      "vim-characterize"
+      "vim-context-filetype"
+      "vim-diffchar"
+      "vim-dirdiff"
+      "vim-dirvish"
+      "vim-editorconfig"
+      "vim-exchange"
+      "vim-gina"
+      "vim-linediff"
+      "vim-lion"
+      "vim-magnum"
+      "vim-operator-user"
+      "vim-polyglot"
+      "vim-precious"
+      "vim-radical"
+      "vim-recover"
+      "vim-remote-viewer"
+      "vim-repeat"
+      "vim-sandwich"
+      "vim-startuptime"
+      "vim-suckless"
+      "vim-suda"
+      "vim-table-mode"
+      "vim-targets"
+      "vim-termopen"
+      "vim-undotree"
+      "vim-visualrepeat"
+    ] ++ [
+      vim-sved
+    ];
   };
 
   programs.obs-studio = {
@@ -1049,19 +1018,16 @@ first((. as $p | $drvs | keys_unsorted[] | . as $k |
     };
   };
 
-  services.redshift = 
-    if private ? redshift then trace "redshift private"
-      (with private.redshift; {
-        enable = true;
-        tray = true;
-        inherit latitude;
-        inherit longitude;
-        temperature = {
-          day = 6500;
-          night = 3700;
-        };
-      })
-    else "redshift default" { };
+  services.redshift = {
+    enable = true;
+    tray = true;
+    # latitude = in ./private-home.nix;
+    # longitude = in ./private-home.nix;
+    temperature = {
+      day = 6500;
+      night = 3700;
+    };
+  };
 
   services.screen-locker = {
     enable = true;
@@ -1085,7 +1051,7 @@ first((. as $p | $drvs | keys_unsorted[] | . as $k |
       Type = "simple";
       Environment = [ "RUST_BACKTRACE=1" ];
       ExecStart = [
-        "${pkgs.nur.repos.bb010g.broca-unstable}/bin/broca-daemon"
+        "${pkgs.nur.pkgs.bb010g.broca-unstable}/bin/broca-daemon"
       ];
       WorkingDirectory = "%h";
       Restart = "always";
@@ -1207,4 +1173,4 @@ keep-outputs = true
   };
 }
 
-# vim:et:sw=2:tw=78
+# vim:ft=nix:et:sw=2:tw=78

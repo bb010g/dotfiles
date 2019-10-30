@@ -1,3 +1,8 @@
+#!/usr/bin/env bash
+# Copyright 2019 bb010g \
+exec jq -nr --slurpfile orig <(git show HEAD:nix/sources.json) --slurpfile new nix/sources.json -f "$0"
+# SPDX-License-Identifier: ISC OR Apache-2.0
+
 def zip(f; g; default):
   . as $xs |
   to_entries as $xs_entries |
@@ -83,4 +88,4 @@ $new[0] as $new |
   )
 ))
 
-# vim:et:sw=2:tw=78
+# vim:ft=jq:et:sw=2:tw=78
