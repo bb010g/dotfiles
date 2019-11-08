@@ -301,6 +301,7 @@ in
     ];
 
     gui-editors = [
+      pkgs-unstable.standardnotes
       pkgs.texstudio
       pkgs.wxhexeditor
     ];
