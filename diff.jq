@@ -5,35 +5,37 @@ exec jq -nr --slurpfile orig <(git show HEAD:nix/sources.json) --slurpfile new n
 
 def zip(f; g; default):
   . as $xs |
-  to_entries as $xs_entries |
   if type != "array" then
     .
-  elif all(type == "object") then
-    reduce (add | keys_unsorted[]) as $key (
-      {};
-      .[$key] |= ($xs_entries | map(
-        if .value | has($key) then
-          .value[$key]
-        else
-          .value |= $key | default
-        end
-      ) | f)
-    ) |
-    g
-  elif all(type == "array") then
-    $xs_entries | map([., (.value | length), true]) |
-    [foreach range(map(.[1]) | max) as $i (
-      .;
-      map(if .[2] and .[1] <= $i then
-        [[.[0] | .value |= $i | default][0:1], .[1], false]
-      else
-        .
-      end);
-      map(.[2] as $c | .[0] | if $c then .value[$i] else .[] end | f)
-    )] |
-    g
   else
-    .
+    to_entries as $xs_entries |
+    if all(type == "object") then
+      reduce (add | keys_unsorted[]) as $key (
+        {};
+        .[$key] |= ($xs_entries | map(
+          if .value | has($key) then
+            .value[$key]
+          else
+            .value |= $key | default
+          end
+        ) | f)
+      ) |
+      g
+    elif all(type == "array") then
+      $xs_entries | map([., (.value | length), true]) |
+      [foreach range(map(.[1]) | max) as $i (
+        .;
+        map(if .[2] and .[1] <= $i then
+          [[.[0] | .value |= $i | default][0:1], .[1], false]
+        else
+          .
+        end);
+        map(.[2] as $c | .[0] | if $c then .value[$i] else .[] end | f)
+      )] |
+      g
+    else
+      .
+    end
   end;
 def zip(f; default): zip(f; .; default);
 def zip(f): zip(f; empty);
