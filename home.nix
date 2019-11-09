@@ -28,7 +28,7 @@ let
   trace "pinned ${if p then "true" else "false"}" p);
 
   nur = trace "home nur" (import ./config-nur.nix {
-    pkgs = trace "nur-bb010g pkgs null" null;
+    inherit pkgs;
     nur-local = trace "nur nur-local null" null;
     nur-remote = trace "nur nur-remote sources.nur" sources.nur;
     inherit trace;
@@ -359,7 +359,7 @@ in
       pkgs.qdirstat
       pkgs.remmina
       pkgs.sqlitebrowser
-      pkgs.surf
+      pkgs.nur.pkgs.bb010g.surf-unstable
       pkgs.wireshark
       pkgs-unstable.nur.pkgs.bb010g.xcolor
       pkgs.xorg.xbacklight
