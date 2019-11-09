@@ -642,6 +642,11 @@ nmap <silent> <M-Return> :call TermOpen()<CR>
 set scrolloff=5 sidescrolloff=4
 
     '';
+    extraPython3Packages = pyPs: [
+      # for vim-sved
+      pyPs.dbus-python
+      pyPs.pygobject3
+    ];
     plugins = let
       inherit (pkgsNvim.vimUtils.override { vim = nvim; }) buildVimPluginFrom2Nix;
       basicVimPlugin = pname: version: src:
