@@ -578,7 +578,7 @@ in
     package = nvimUnwrapped;
     extraConfig = /*vim*/''
 "" general mappings (set before other uses)
-" <Leader> 
+" <Leader>
 let mapleader = "\<Space>"
 
 "" context_filetype
@@ -677,6 +677,7 @@ set scrolloff=5 sidescrolloff=4
       "vim-context-filetype"
       "vim-diffchar"
       "vim-dirdiff"
+      "vim-direnv"
       "vim-dirvish"
       "vim-editorconfig"
       "vim-exchange"

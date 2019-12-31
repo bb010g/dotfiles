@@ -216,6 +216,19 @@
         "url": "https://github.com/will133/vim-dirdiff/archive/7049f5061ee48301fc00ea69f2473325d43bf5cb.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
+    "vim-direnv": {
+        "branch": "master",
+        "date": "2019-04-30T08:43:04Z",
+        "description": "vim plugin for direnv support",
+        "homepage": "",
+        "owner": "direnv",
+        "repo": "direnv.vim",
+        "rev": "5e75084465ad37dd0a4d4b1198b5ffa8978ae4e1",
+        "sha256": "0vabsv98vwdjns3dliplg7x8ssyrin44af9jl248kdzkqw5fx445",
+        "type": "tarball",
+        "url": "https://github.com/direnv/direnv.vim/archive/5e75084465ad37dd0a4d4b1198b5ffa8978ae4e1.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
     "vim-dirvish": {
         "branch": "master",
         "date": "2019-08-27T22:47:14Z",

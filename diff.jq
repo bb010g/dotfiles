@@ -71,7 +71,10 @@ $new[0] as $new |
   else . end;
   MISSING;
   { filter_at: 0 }
-) | to_entries | "[sources] update (\(length))\n", (.[] | (
+) | to_entries | sort_by(.key) |
+
+"[sources] update (\(length))\n",
+(.[] | (
   .key as $key |
   .value | (
     if (type == "array") then
