@@ -1,13 +1,25 @@
 root = true
 
-[*.json]
-indent_style = space
-indent_size = 4
+[*]
+insert_final_newline = true
 
-[*.nix]
+[*.{jq,json,nix,sh}]
+charset = utf-8
+
+[*.{jq,json,nix}]
 indent_style = space
+
+[*.{jq,nix,sh}]
+max_line_length = 78
+trim_trailing_whitespace = true
+
+[*.{jq,nix,sh}]
 indent_size = 2
 
-[fontconfig/*.conf]
-indent_style = space
+[*.json]
 indent_size = 4
+
+[fontconfig/*.conf]
+indent_size = 4
+max_line_length = 78
+trim_trailing_whitespace = true
