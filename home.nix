@@ -114,7 +114,7 @@ in
       pkgs.dosfstools
       # pkgs.e2fsprogs
       pkgs.e2tools
-      pkgs.exfat-utils
+      # pkgs.exfat-utils
       pkgs.f2fs-tools
       pkgs.hfsprogs
       pkgs.mtdutils
