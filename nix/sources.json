@@ -73,32 +73,6 @@
         "url": "https://github.com/bb010g/home-manager/archive/08915a32c1ddc22382112a3a305a5b78e5aec390.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
-    "lorri": {
-        "branch": "rolling-release",
-        "date": "2019-10-30T15:25:41Z",
-        "description": "Your project's nix-env",
-        "homepage": "",
-        "owner": "target",
-        "repo": "lorri",
-        "rev": "03f10395943449b1fc5026d3386ab8c94c520ee3",
-        "sha256": "0fcl79ndaziwd8d74mk1lsijz34p2inn64b4b4am3wsyk184brzq",
-        "type": "tarball",
-        "url": "https://github.com/target/lorri/archive/03f10395943449b1fc5026d3386ab8c94c520ee3.tar.gz",
-        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
-    },
-    "lorri-unstable": {
-        "branch": "master",
-        "date": "2019-10-30T13:50:19Z",
-        "description": "Your project's nix-env",
-        "homepage": "",
-        "owner": "target",
-        "repo": "lorri",
-        "rev": "3e57dcd58c337285f63bba2d6d181800206fb1f0",
-        "sha256": "1g1vbg5di2g7fzglz6xqlkl351p1s5ziciv4bwbigd7i0526l6my",
-        "type": "tarball",
-        "url": "https://github.com/target/lorri/archive/3e57dcd58c337285f63bba2d6d181800206fb1f0.tar.gz",
-        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
-    },
     "niv": {
         "branch": "master",
         "date": "2019-10-30T15:46:46Z",

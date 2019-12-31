@@ -226,7 +226,6 @@ in
       ((pkgs.diffoscope.override { enableBloat = true; }).overrideAttrs (o: {
         pythonPath = o.pythonPath ++ [ pkgs.zip ];
       }))
-      pkgs.lorri-unstable
       pkgs.niv.niv
       pkgs-unstable.nix-diff
       pkgs-unstable.nix-index
@@ -998,6 +997,8 @@ first((. as $p | $drvs | keys_unsorted[] | . as $k |
   };
 
   services.keybase = { enable = true; };
+
+  services.lorri = { enable = true; };
 
   services.mpd = {
     enable = true;
