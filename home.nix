@@ -543,7 +543,7 @@ in
     };
     package = pkgs.gitAndTools.gitFull;
     userEmail = "me@bb010g.com";
-    userName = "bb010g";
+    userName = "Dusk Banks";
   };
 
   # Home Manager config
@@ -563,8 +563,8 @@ in
 
   programs.mercurial = {
     enable = true;
-    userName = "Brayden Banks";
     userEmail = "me@bb010g.com";
+    userName = "Dusk Banks";
   };
 
   programs.neovim = let
