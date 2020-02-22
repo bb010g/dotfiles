@@ -262,7 +262,66 @@ in
       pkgs.icdiff
       pkgs.nur.repos.mic92.inxi
       pkgs.ispell
-      pkgs-unstable.just
+      (let p = pkgs-unstable; in p.just.overrideAttrs (o: rec {
+        version = "0.5.4";
+
+        src = p.fetchFromGitHub {
+          owner = "casey";
+          repo = o.pname;
+          rev = "v${version}";
+          sha256 = "0ag4wmixxxnli8ssb5pnxhfaywmx4k0mdxqgq7arll27i313ccvc";
+        };
+
+        cargoDeps = p.rustPlatform.fetchcargo {
+          cargoUpdateHook = "";
+          copyLockfile = false;
+          name = "${o.pname}-${version}";
+          patches = o.cargoDeps.patches;
+          sha256 = "0nj6fn3k41xd897yc149q5lasx4z1ipvl7lx5silw5mk1zl9x1hg";
+          sourceRoot = null;
+          src = src;
+          unpackPhase = o.cargoDeps.unpackPhase;
+        };
+
+        checkFHSUserEnv = p.buildFHSUserEnv {
+          name = "just-check-env";
+          runScript = "env";
+          targetPkgs = p: [
+            (p.callPackage passthru.check-wrapper-farm { })
+          ];
+        };
+
+        checkPhase = ''
+          runHook preCheck
+          echo "Running cargo cargo test -- ''${checkFlags} ''${checkFlagsArray+''${checkFlagsArray[@]}}"
+          "$checkFHSUserEnv/bin/just-check-env" -- \
+          cargo test -- ''${checkFlags} ''${checkFlagsArray+"''${checkFlagsArray[@]}"}
+          runHook postCheck
+        '';
+
+        preCheck = ''
+          # USER must not be empty
+          export USER=just-user
+          export USERNAME=just-user
+        '';
+
+        passthru = o.passthru or { } // {
+          # just symlinks certain programs under different names while testing.
+          # When this happens with argv[0]-dependent executables like the GNU
+          # coreutils suite, functionality via the new links changes and tests
+          # break. Creating wrappers in the middle prevents this.
+          check-wrapper-farm = { lib, runCommand, makeWrapper
+          , coreutils
+          }: let
+            sh = lib.escapeShellArg;
+            cu = coreutils;
+          in runCommand "just-check-wrapper-farm" {
+            buildInputs = [ makeWrapper ];
+          } ''
+            makeWrapper ${sh "${cu}/bin/cat"} "$out/bin/cat"
+          '';
+        };
+      }))
       pkgs.lzip
       pkgs-unstable.nur.pkgs.bb010g.mosh-unstable
       pkgs.ngrok
@@ -301,7 +360,9 @@ in
 
     gui-editors = [
       pkgs-unstable.standardnotes
-      pkgs.texstudio
+      # on unstable until #73484 is merged to release-19.09
+      # and #70511 is resolved
+      pkgs-unstable.texstudio
       pkgs.wxhexeditor
     ];
 
@@ -558,7 +619,8 @@ in
 
   programs.jq = {
     enable = true;
-    package = pkgs-unstable.jq;
+    # package = pkgs-unstable.jq;
+    package = pkgs-unstable.nur.pkgs.bb010g.jq;
   };
 
   programs.mercurial = {
