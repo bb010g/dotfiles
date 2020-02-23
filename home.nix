@@ -260,7 +260,7 @@ in
       pkgs.hecate
       pkgs-unstable.hyperfine
       pkgs.icdiff
-      pkgs.nur.repos.mic92.inxi
+      pkgs.inxi
       pkgs.ispell
       (let p = pkgs-unstable; in p.just.overrideAttrs (o: rec {
         version = "0.5.4";
