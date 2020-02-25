@@ -280,6 +280,8 @@ in
       pkgs.rclone
       pkgs.sbcl
       sublime-merge
+      (pkgs.writeShellScriptBin "smergetool"
+        ''exec -a smerge ${lib.escapeShellArg sublime-merge}/bin/sublime_merge mergetool "$@"'')
       pkgs.tokei
       pkgs.nur.pkgs.bb010g.ttyd
       pkgs.unzip
@@ -538,15 +540,24 @@ in
         algorithm = "histogram";
         submodule = "log";
       };
-      status = {
-        submoduleSummary = "true";
-        showStash = "true";
+      github = {
+        user = "bb010g";
+      };
+      merge = {
+        tool = "smerge";
+      };
+      mergetool = {
+        smerge = {
+          cmd = ''smerge mergetool "$BASE" "$LOCAL" "$REMOTE" -o "$MERGED"'';
+          trustExitCode = "true";
+        };
       };
       push = {
         recurseSubmodules = "check";
       };
-      github = {
-        user = "bb010g";
+      status = {
+        submoduleSummary = "true";
+        showStash = "true";
       };
     };
     lfs = {
