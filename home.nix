@@ -242,7 +242,16 @@ in
       pkgs.biber
     ];
 
-    tools = [
+    tools = let
+      sublime-merge = pkgs.sublime-merge.overrideAttrs (o: {
+        installPhase =
+          let regex = "(makeWrapper [^\n]*)"; in
+          lib.concatStrings (lib.concatMap (matches:
+            if !(lib.isList matches) then [ matches ] else
+              matches ++ [ " --argv0 '$0'" ]
+          ) (builtins.split regex o.installPhase));
+      });
+    in [
       pkgs.acpi
       pkgs.androidenv.androidPkgs_9_0.platform-tools
       pkgs.asciinema
@@ -262,66 +271,7 @@ in
       pkgs.icdiff
       pkgs.inxi
       pkgs.ispell
-      (let p = pkgs-unstable; in p.just.overrideAttrs (o: rec {
-        version = "0.5.4";
-
-        src = p.fetchFromGitHub {
-          owner = "casey";
-          repo = o.pname;
-          rev = "v${version}";
-          sha256 = "0ag4wmixxxnli8ssb5pnxhfaywmx4k0mdxqgq7arll27i313ccvc";
-        };
-
-        cargoDeps = p.rustPlatform.fetchcargo {
-          cargoUpdateHook = "";
-          copyLockfile = false;
-          name = "${o.pname}-${version}";
-          patches = o.cargoDeps.patches;
-          sha256 = "0nj6fn3k41xd897yc149q5lasx4z1ipvl7lx5silw5mk1zl9x1hg";
-          sourceRoot = null;
-          src = src;
-          unpackPhase = o.cargoDeps.unpackPhase;
-        };
-
-        checkFHSUserEnv = p.buildFHSUserEnv {
-          name = "just-check-env";
-          runScript = "env";
-          targetPkgs = p: [
-            (p.callPackage passthru.check-wrapper-farm { })
-          ];
-        };
-
-        checkPhase = ''
-          runHook preCheck
-          echo "Running cargo cargo test -- ''${checkFlags} ''${checkFlagsArray+''${checkFlagsArray[@]}}"
-          "$checkFHSUserEnv/bin/just-check-env" -- \
-          cargo test -- ''${checkFlags} ''${checkFlagsArray+"''${checkFlagsArray[@]}"}
-          runHook postCheck
-        '';
-
-        preCheck = ''
-          # USER must not be empty
-          export USER=just-user
-          export USERNAME=just-user
-        '';
-
-        passthru = o.passthru or { } // {
-          # just symlinks certain programs under different names while testing.
-          # When this happens with argv[0]-dependent executables like the GNU
-          # coreutils suite, functionality via the new links changes and tests
-          # break. Creating wrappers in the middle prevents this.
-          check-wrapper-farm = { lib, runCommand, makeWrapper
-          , coreutils
-          }: let
-            sh = lib.escapeShellArg;
-            cu = coreutils;
-          in runCommand "just-check-wrapper-farm" {
-            buildInputs = [ makeWrapper ];
-          } ''
-            makeWrapper ${sh "${cu}/bin/cat"} "$out/bin/cat"
-          '';
-        };
-      }))
+      pkgs-unstable.nur.pkgs.bb010g.just
       pkgs.lzip
       pkgs-unstable.nur.pkgs.bb010g.mosh-unstable
       pkgs.ngrok
@@ -329,7 +279,7 @@ in
       pkgs.ponymix
       pkgs.rclone
       pkgs.sbcl
-      pkgs-unstable.sublime-merge
+      sublime-merge
       pkgs.tokei
       pkgs.nur.pkgs.bb010g.ttyd
       pkgs.unzip
@@ -351,15 +301,15 @@ in
       pkgs.breeze-qt5
       pkgs.glxinfo
       pkgs.gnome3.adwaita-icon-theme
-      pkgs-unstable.nur.repos.nexromancers.hacksaw
+      pkgs-unstable.nur.pkgs.nexromancers.hacksaw
       pkgs.hicolor-icon-theme
-      pkgs-unstable.nur.repos.nexromancers.shotgun
+      pkgs-unstable.nur.pkgs.nexromancers.shotgun
       pkgs.nur.pkgs.bb010g.st-bb010g-unstable
       pkgs.xsel
     ];
 
     gui-editors = [
-      pkgs-unstable.standardnotes
+      pkgs.standardnotes
       # on unstable until #73484 is merged to release-19.09
       # and #70511 is resolved
       pkgs-unstable.texstudio
@@ -391,18 +341,18 @@ in
     ];
 
     gui-misc = [
-      pkgs-unstable.discord
+      pkgs.discord
       pkgs.google-chrome
       pkgs.gucharmap
       pkgs.keybase-gui
       # for Firefox MozLz4a JSON files (.jsonlz4)
-      pkgs-unstable.nur.pkgs.bb010g.mozlz4-tool
+      pkgs.nur.pkgs.bb010g.mozlz4-tool
       (pkgs-unstable.qutebrowser.overrideAttrs (o: {
         buildInputs = o.buildInputs ++ hunspellDicts;
       }))
-      pkgs-unstable.riot-desktop
+      pkgs.riot-desktop
       pkgs-unstable.tdesktop
-      pkgs-unstable.wire-desktop
+      pkgs.wire-desktop
     ];
 
     gui-tools = [
@@ -421,7 +371,7 @@ in
       pkgs.sqlitebrowser
       pkgs.nur.pkgs.bb010g.surf-unstable
       pkgs.wireshark
-      pkgs-unstable.nur.pkgs.bb010g.xcolor
+      pkgs.nur.pkgs.bb010g.xcolor
       pkgs.xorg.xbacklight
     ];
   in lib.concatLists [
