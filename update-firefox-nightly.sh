@@ -3,7 +3,7 @@
 
 set -o errexit -o errtrace -o nounset -o pipefail
 shopt -s inherit_errexit
-# Allow ${COMMENT-""} comments
+# Allow ${COMMENT-""} comments (useful during line continuations)
 typeset +gx COMMENT=
 
 typeset +gf read_nul jq_nul
@@ -14,13 +14,20 @@ jq_nul() {
     (2; if . > 0 then . - 1 else . end; (select(. == 0) | $nul), $v)' "$@"
 }
 
-# variables
+# Stack variable system
+typeset +gx
+
+# # Variable declarations
+# Local scalars
 typeset +gx \
-  src_key \
-  srcs \
-  \
-  entry_key_i \
-  entry_value_i \
+  ${COMMENT-'"reliable" global variables'} \
+  src_key= \
+  srcs= \
+  ${COMMENT-'reusable working variables'} \
+  entry_key= \
+  entry_value= \
+  result= \
+  ${COMMENT-'array subscript states'} \
   \
   \
   buildhub_filename \
@@ -30,11 +37,10 @@ typeset +gx \
   version \
   versions_url \
   #
+# Local arrays
 typeset +gx -a \
-  \
-  entry_key \
-  entry_value \
   #
+# Local associative arrays
 typeset +gx -A \
   entries \
   entry_deps \
