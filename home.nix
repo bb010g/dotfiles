@@ -1131,6 +1131,30 @@ keep-outputs = true
     };
   };
 
+  xresources.properties = let
+    # https://github.com/dracula/xresources/blob/8de11976678054f19a9e0ec49a48ea8f9e881a05/Xresources
+    dracula-xresources = prefix: {
+      "${prefix}foreground" = "#F8F8F2";
+      "${prefix}background" = "#282A36";
+      "${prefix}color0" = "#000000";
+      "${prefix}color8" = "#4D4D4D";
+      "${prefix}color1" = "#FF5555";
+      "${prefix}color9" = "#FF6E67";
+      "${prefix}color2" = "#50FA7B";
+      "${prefix}color10" = "#5AF78E";
+      "${prefix}color3" = "#F1FA8C";
+      "${prefix}color11" = "#F4F99D";
+      "${prefix}color4" = "#BD93F9";
+      "${prefix}color12" = "#CAA9FA";
+      "${prefix}color5" = "#FF79C6";
+      "${prefix}color13" = "#FF92D0";
+      "${prefix}color6" = "#8BE9FD";
+      "${prefix}color14" = "#9AEDFE";
+      "${prefix}color7" = "#BFBFBF";
+      "${prefix}color15" = "#E6E6E6";
+    };
+  in (dracula-xresources "URxvt*") // {
+  };
 
   xsession = {
     enable = true;
