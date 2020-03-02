@@ -328,7 +328,8 @@ in
       pkgs.evince
       pkgs.geeqie
       pkgs.gimp
-      pkgs-unstable-bb010g.pkgs.grafx2
+      # pkgs-unstable-bb010g.pkgs.grafx2
+      pkgs-unstable.grafx2
       pkgs.inkscape
       pkgs.kdeApplications.kolourpaint
       pkgs.krita
