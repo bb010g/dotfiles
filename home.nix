@@ -73,6 +73,7 @@ in
   in trace "home imports" [
     ./private-home.nix
     bb010g.programs.pijul
+    bb010g.xcompose
   ];
 
   # dconf. 24-hour time
@@ -227,7 +228,10 @@ in
         pythonPath = o.pythonPath ++ [ pkgs.zip ];
       }))
       pkgs.niv.niv
-      pkgs-unstable.nix-diff
+      # It's a Hackage package! (:
+      (if pkgs-unstable.nix-diff.meta.broken or false
+        then pkgs.nix-diff
+        else pkgs-unstable.nix-diff)
       pkgs-unstable.nix-index
       pkgs-unstable.nix-prefetch-github
       pkgs-unstable.nix-prefetch-scripts
@@ -350,7 +354,7 @@ in
       pkgs.keybase-gui
       # for Firefox MozLz4a JSON files (.jsonlz4)
       pkgs.nur.pkgs.bb010g.mozlz4-tool
-      (pkgs-unstable.qutebrowser.overrideAttrs (o: {
+      (pkgs.qutebrowser.overrideAttrs (o: {
         buildInputs = o.buildInputs ++ hunspellDicts;
       }))
       pkgs.riot-desktop
@@ -726,7 +730,7 @@ set scrolloff=5 sidescrolloff=4
       "vim-undotree"
       "vim-visualrepeat"
     ] ++ [
-      vim-sved
+      # vim-sved
     ];
   };
 

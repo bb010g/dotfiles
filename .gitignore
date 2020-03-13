@@ -1,1 +1,5 @@
+# home-manager dotfiles
 private*.nix
+
+# nix
+result*

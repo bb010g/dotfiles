@@ -4,7 +4,6 @@
     "https://github.com/nix-community/NUR/archive/master.tar.gz"
 , repoOverrides' ? [
     "bb010g"
-    "mozilla"
     "nexromancers"
   ]
 , repoOverrides ? {
