@@ -1119,6 +1119,22 @@ first((. as $p | $drvs | keys_unsorted[] | . as $k |
     # };
   };
 
+  xcompose = let
+    ruleOn = rule: events: rule // { inherit events; };
+    minus = {
+      result = { string = "−"; keysym = "U2212"; };
+      comment = "MINUS SIGN";
+    };
+  in {
+    enable = true;
+    rules = [
+      { include = "%L"; }
+      { commentLines = ""; } # blank line
+      (ruleOn minus [ "<Multi_key>" "<underscore>" "<minus>" ])
+      (ruleOn minus [ "<Multi_key>" "<minus>" "<underscore>" ])
+    ];
+  };
+
   xdg = {
     enable = true;
 
