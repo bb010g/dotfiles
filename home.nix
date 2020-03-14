@@ -763,23 +763,38 @@ set scrolloff=5 sidescrolloff=4
 
   programs.texlive = {
     enable = true;
-    extraPackages = tpkgs: { inherit (tpkgs)
-      collection-bibtexextra
-      collection-context
-      collection-fontsextra
-      collection-formatsextra
-      collection-games
-      collection-humanities
-      collection-latexextra
-      collection-luatex
-      collection-mathscience
-      collection-music
-      collection-pictures
-      collection-pstricks
-      collection-publishers
-      scheme-small
-      scheme-tetex
-    ; };
+    # for sane combine
+    texlivePackage = pkgs.nur.pkgs.bb010g.texlive;
+    extraPackages = tpkgs: {
+      pkgFilter = let inherit (lib) any elem id; in p: any id [
+        (p.tlType == "run" || p.tlType == "bin")
+        (p.tlType == "doc" && !(elem p.pname [
+          # avoid collisions with texlive-bin-YYYY-doc
+          "aleph"
+          "autosp"
+          "latex-bin"
+          "synctex"
+        ]))
+        (p.pname == "core")
+      ];
+      inherit (tpkgs)
+        collection-bibtexextra
+        collection-context
+        collection-fontsextra
+        collection-formatsextra
+        collection-games
+        collection-humanities
+        collection-latexextra
+        collection-luatex
+        collection-mathscience
+        collection-music
+        collection-pictures
+        collection-pstricks
+        collection-publishers
+        scheme-small
+        scheme-tetex
+      ;
+    };
   };
 
   programs.tmux = {
