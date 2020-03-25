@@ -2,14 +2,8 @@
 let
   trace = args.trace or (_: x: x);
   # trace = args.trace or builtins.trace;
-  argPkgs = trace "home argPkgs"
-    (if args.pkgs == null then
-      trace "home argPkgs null" null
-    else args.pkgs);
-  argLib = trace "home argLib"
-    (if args.lib == null then
-      trace "home argLib pkgs.lib" pkgs.lib
-    else args.lib);
+  argPkgs = pkgs;
+  argLib = lib;
 in
 
 let
@@ -19,58 +13,39 @@ let
   # might also have some personal patches?
   # if so, they'd be up at https://github.com/bb010g/nixpkgs, branch bb010g-*
 
-  sources = trace "home sources" (import ./nix/sources.nix);
+  sources = import ./nix/sources.nix;
 
-  pinned = trace "home pinned" (let p = if args ? "pinned" then
-    trace "pinned args" args.pinned
-  else
-    trace "pinned default" false; in
-  trace "pinned ${if p then "true" else "false"}" p);
-
-  nur = trace "home nur" (import ./config-nur.nix {
+  nur = import ./config-nur.nix {
     inherit pkgs;
-    nur-local = trace "nur nur-local null" null;
-    nur-remote = trace "nur nur-remote sources.nur" sources.nur;
+    nur-local = null;
+    nur-remote = sources.nur;
     inherit trace;
-  });
+  };
 
-  pkgs = trace "home pkgs" (if pinned || argPkgs == null then
-    trace "pkgs sources.nixpkgs" sources.nixpkgs
-  else
-    trace "pkgs argPkgs" argPkgs);
-  lib = trace "home lib pkgs.lib" pkgs.lib;
-  pkgs-stable = trace "home pkgs-stable" (import (
-    if !pinned && lib.pathExists <nixos-19.03> then
-      trace "pkgs-stable <nixos-19.03>" <nixos-19.03> else
-    if !pinned && lib.pathExists <nixos> then
-      trace "pkgs-stable <nixos>" <nixos> else
-    if !pinned && lib.pathExists <nixpkgs> then
-      trace "pkgs-stable <nixpkgs>" <nixpkgs> else
-    trace "pkgs-stable sources.nixpkgs-stable" sources.nixpkgs-stable
-  ) { });
-  lib-stable = trace "home lib-stable pkgs-stable.lib" pkgs-stable.lib;
-  pkgs-unstable = trace "home pkgs-unstable" (import (
-    if !pinned && lib.pathExists <nixos-unstable> then
-      trace "pkgs-unstable <nixos-unstable>" <nixos-unstable> else
-    trace "pkgs-stable sources.nixpkgs-unstable" sources.nixpkgs-unstable
-  ) { });
-  lib-unstable = trace "home lib-unstable pkgs-unstable.lib"
-    pkgs-unstable.lib;
-  pkgs-unstable-bb010g = trace "home pkgs-unstable-bb010g" (import (
-    if !pinned && lib.pathExists <bb010g-nixos-unstable> then
-      trace "pkgs-unstable-bb010g <bb010g-nixos-unstable>"
-        <bb010g-nixos-unstable> else
-    trace "pkgs-unstable-bb010g sources.nixpkgs-unstable-bb010g"
-      sources.nixpkgs-unstable-bb010g
-  ) { });
-  lib-unstable-bb010g =
-    trace "home lib-unstable-bb010g pkgs-unstable-bb010g.lib"
-      pkgs-unstable-bb010g.lib;
+  pkgs = argPkgs;
+  lib = pkgs.lib;
+  pkgs-stable =
+    import (lib.findFirst lib.pathExists sources.nixpkgs-stable [
+      <nixos-19.03>
+      <nixos>
+      <nixpkgs>
+    ]) { };
+  lib-stable = pkgs-stable.lib;
+  pkgs-unstable =
+    import (lib.findFirst lib.pathExists sources.nixpkgs-unstable [
+      <nixos-unstable>
+    ]) { };
+  lib-unstable = pkgs-unstable.lib;
+  pkgs-unstable-bb010g =
+    import (lib.findFirst lib.pathExists sources.nixpkgs-unstable-bb010g [
+      <bb010g-nixos-unstable>
+    ]) { };
+  lib-unstable-bb010g = pkgs-unstable-bb010g.lib;
 in
 {
   imports = let
     bb010g = nur.modules.bb010g.home-manager;
-  in trace "home imports" [
+  in [
     ./private-home.nix
     bb010g.programs.pijul
     bb010g.xcompose
