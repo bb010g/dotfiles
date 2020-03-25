@@ -635,6 +635,13 @@ if has("patch-8.1.0360")
   set diffopt+=internal,algorithm:patience
 endif
 
+"" polyglot configuration
+" disable language packs
+let g:polyglot_disabled = [
+"\ LaTeX-Box
+\ "latex",
+\]
+
 "" swapfiles
 " don't bother with unmodified, detached swapfiles
 let g:RecoverPlugin_Delete_Unmodified_Swapfile = 1
