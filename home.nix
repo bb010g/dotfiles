@@ -591,19 +591,27 @@ let mapleader = "\<Space>"
 if !exists('g:context_filetype#filetypes')
   let g:context_filetype#filetypes = {}
 endif
+let g:context_filetype#filetypes.markdown = [{ 'start': '^\s\{,3}\([`~]\)\(\1\{2,}\)\s*\(\w*\)\@>', 'end': '^\s\{,3}\1\2$', 'filetype': '\3', }]
+let g:context_filetype#filetypes.markdown = [
+\ {
+\   'start': '^\s*```\s*\(\h\w*\)',
+\   'end': '^\s*```$',
+\   'filetype': '\1',
+\ },
+\]
 let g:context_filetype#filetypes.nix = [
 \ {
 \   'start': '/\*\(\h\w*\)\*/'."'"."'",
 \   'end': "'"."'".'\%($\|[^$'."'".']\|.\@!$\)',
 \   'filetype': '\1',
-\ }
+\ },
 \]
 let g:context_filetype#filetypes.sh = [
 \ {
 \   'start': '<<\s*\(['."'".'"]\)\(\h\w*\)\1\s*#\s*vim:\s*ft=\(\h\w*\)\n',
 \   'end': '\n\2',
 \   'filetype': '\3',
-\ }
+\ },
 \]
 
 "" diff output
