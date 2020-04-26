@@ -2,6 +2,7 @@
     "firefox-nightly": {
         "buildhub_url": "https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/firefox-77.0a1.en-US.linux-x86_64.buildhub.json",
         "buildhub_url_template": "https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/<slug>.buildhub.json",
+        "builtin": true,
         "date": "2020-04-26",
         "date_d": "04",
         "date_m": "26",
@@ -15,7 +16,7 @@
         "timestamp": "2020-04-26-09-43-12",
         "timestamp_template": "<date>-<timestamp_time>",
         "timestamp_time": "09-43-12",
-        "type": "builtin-url",
+        "type": "file",
         "url": "https://archive.mozilla.org/pub/firefox/nightly/2020/04/2020-04-26-09-43-12-mozilla-central/firefox-77.0a1.en-US.linux-x86_64.tar.bz2",
         "url_template": "https://archive.mozilla.org/pub/firefox/nightly/<date_y>/<date_m>/<timestamp>-mozilla-central/<slug>.tar.bz2",
         "version": "77.0a1",
