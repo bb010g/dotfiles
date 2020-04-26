@@ -71,7 +71,7 @@ in
       pkgs.moreutils
       pkgs.nvi
       pkgs.posix_man_pages
-      (pkgs-unstable.ripgrep.override { withPCRE2 = true; })
+      (pkgs.ripgrep.override { withPCRE2 = true; })
       pkgs.tree
       pkgs.zsh-completions
     ];
@@ -246,7 +246,7 @@ in
       pkgs.nur.pkgs.bb010g.gitAndTools.git-revise
       pkgs.gnumake
       pkgs.hecate
-      pkgs-unstable.hyperfine
+      pkgs.hyperfine
       pkgs.icdiff
       pkgs.inxi
       pkgs.ispell
@@ -290,6 +290,7 @@ in
     ];
 
     gui-editors = [
+      pkgs.nur.pkgs.bb010g._010-editor
       pkgs.standardnotes
       # on unstable until #73484 is merged to release-19.09
       # and #70511 is resolved
@@ -312,7 +313,7 @@ in
       pkgs.inkscape
       pkgs.kdeApplications.kolourpaint
       pkgs.krita
-      (pkgs-unstable.mpv.override rec {
+      (pkgs.mpv.override rec {
         archiveSupport = true;
         openalSupport = true;
       })
@@ -323,6 +324,7 @@ in
     ];
 
     gui-misc = [
+      pkgs.bitwarden
       pkgs.discord
       pkgs.google-chrome
       pkgs.gucharmap
@@ -746,7 +748,7 @@ set scrolloff=5 sidescrolloff=4
   programs.texlive = {
     enable = true;
     # for sane combine
-    texlivePackage = pkgs.nur.pkgs.bb010g.texlive;
+    packageSet = pkgs.nur.pkgs.bb010g.texlive;
     extraPackages = tpkgs: {
       pkgFilter = let inherit (lib) any elem id; in p: any id [
         (p.tlType == "run" || p.tlType == "bin")
@@ -773,6 +775,7 @@ set scrolloff=5 sidescrolloff=4
         collection-pictures
         collection-pstricks
         collection-publishers
+        latexmk
         scheme-small
         scheme-tetex
       ;
@@ -1048,6 +1051,9 @@ first((. as $p | $drvs | keys_unsorted[] | . as $k |
         musicDirectory = "${external.musicDirectory}/beets";
         network.port = 6602;
       };
+      nas = external // {
+        network.port = 6603;
+      };
     };
   };
 
@@ -1182,6 +1188,7 @@ keep-outputs = true
     # };
     windowManager.i3 = {
       enable = true;
+      package = pkgs-unstable.i3;
       config = let
         zipToAttrs = lib.zipListsWith (n: v: { ${n} = v; });
         mergeAttrList = lib.foldr lib.mergeAttrs {};
@@ -1242,6 +1249,9 @@ keep-outputs = true
         };
         inherit modifier;
       };
+      extraConfig = ''
+        focus_wrapping workspace
+      '';
     };
   };
 }
