@@ -71,26 +71,30 @@ $new[0] as $new |
   else . end;
   MISSING;
   { filter_at: 0 }
-) | to_entries | sort_by(.key) |
-
-"[sources] update (\(length))\n",
-(.[] | (
-  .key as $key |
-  .value | (
+) | (. as $dot | reduce keys[] as $key (
+  {init: 0, update: 0, remove: 0, lines: []};
+  ($dot[$key] |
     if (type == "array") then
       map(if type == "object" then .date else . end)
     else
       .date
     end |
-    map(if (. != MISSING) then sub("T.*"; "") else . end) |
-    if (.[0] == MISSING) then
-      "\($key): init at \(.[1])"
-    elif (.[1] == MISSING) then
-      "\($key): remove"
-    else
-      "\($key): \(.[0]) -> \(.[1])"
-    end
-  )
-))
+    map(if (. != MISSING) then sub("T.*"; "") else . end)
+  ) as $value |
+  if ($value[0] == MISSING) then
+    .init += 1 |
+    .lines += ["\($key): init at \($value[1])"]
+  elif ($value[1] == MISSING) then
+    .remove += 1 |
+    .lines += ["\($key): remove"]
+  else
+    .update += 1 |
+    .lines += ["\($key): \($value[0]) -> \($value[1])"]
+  end
+)) | ("[sources] \(
+  [("init", "update", "remove") as $key | .[$key] |
+    select(. != 0) | "\($key) (\(.))"
+  ] | join(", ")
+)\n", .lines[])
 
 # vim:ft=jq:et:sw=2:tw=78
