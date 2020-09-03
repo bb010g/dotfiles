@@ -24,20 +24,25 @@ let
 
   pkgs = argPkgs;
   lib = pkgs.lib;
+  # tryEval' :: (a -> t) -> f -> a -> (t & f)
+  tryEval' = t: f: e:
+    let e' = builtins.tryEval e; in if e'.success then t e'.value else f;
+  tryPathExists = tryEval' lib.pathExists false;
   pkgs-stable =
-    import (lib.findFirst lib.pathExists sources.nixpkgs-stable [
-      <nixos-19.03>
+    import (lib.findFirst tryPathExists sources.nixpkgs-stable [
+      <nixos-20.03>
       <nixos>
       <nixpkgs>
     ]) { };
   lib-stable = pkgs-stable.lib;
   pkgs-unstable =
-    import (lib.findFirst lib.pathExists sources.nixpkgs-unstable [
+    import (lib.findFirst tryPathExists sources.nixpkgs-unstable [
       <nixos-unstable>
+      <nixpkgs-unstable>
     ]) { };
   lib-unstable = pkgs-unstable.lib;
   pkgs-unstable-bb010g =
-    import (lib.findFirst lib.pathExists sources.nixpkgs-unstable-bb010g [
+    import (lib.findFirst tryPathExists sources.nixpkgs-unstable-bb010g [
       <bb010g-nixos-unstable>
     ]) { };
   lib-unstable-bb010g = pkgs-unstable-bb010g.lib;
@@ -69,7 +74,7 @@ in
       pkgs.file
       pkgs.manpages
       pkgs.moreutils
-      pkgs.nvi
+      # pkgs.nvi
       pkgs.posix_man_pages
       (pkgs.ripgrep.override { withPCRE2 = true; })
       pkgs.tree
@@ -187,7 +192,7 @@ in
       pkgs-unstable.nur.pkgs.bb010g.edbrowse
       pkgs.elinks
       pkgs.fortune
-      # pkgs-unstable.nur.bb010g.html2json-unstable
+      # pkgs-unstable.nur.pkgs.bb010g.html2json-unstable
       pkgs.lynx
       pkgs.megatools
       pkgs.ponysay
@@ -222,7 +227,11 @@ in
     ];
 
     tools = let
-      sublime-merge = pkgs.sublime-merge.overrideAttrs (o: {
+      # deal with buggy libredirect glibc linking (it shouldn't be linked)
+      sublime-merge = let sublime-mergeRelPath =
+        "/pkgs/applications/version-management/sublime-merge";
+      in (pkgs.callPackage (pkgs-unstable.path + sublime-mergeRelPath) {
+      }).sublime-merge.overrideAttrs (o: {
         installPhase =
           let regex = "(makeWrapper [^\n]*)"; in
           lib.concatStrings (lib.concatMap (matches:
@@ -241,6 +250,7 @@ in
       pkgs.cv
       pkgs.diffstat
       pkgs.nur.pkgs.bb010g.dwdiff
+      pkgs.gitAndTools.git-crypt
       pkgs.gitAndTools.git-imerge
       pkgs.nur.pkgs.bb010g.gitAndTools.git-my
       pkgs.nur.pkgs.bb010g.gitAndTools.git-revise
@@ -250,7 +260,7 @@ in
       pkgs.icdiff
       pkgs.inxi
       pkgs.ispell
-      pkgs-unstable.nur.pkgs.bb010g.just
+      # pkgs-unstable.nur.pkgs.bb010g.just
       pkgs.lzip
       pkgs-unstable.nur.pkgs.bb010g.mosh-unstable
       pkgs.ngrok
@@ -285,12 +295,13 @@ in
       pkgs-unstable.nur.pkgs.nexromancers.hacksaw
       pkgs.hicolor-icon-theme
       pkgs-unstable.nur.pkgs.nexromancers.shotgun
-      pkgs.nur.pkgs.bb010g.st-bb010g-unstable
+      pkgs-unstable.nur.pkgs.bb010g.st-bb010g-unstable
       pkgs.xsel
     ];
 
     gui-editors = [
       pkgs.nur.pkgs.bb010g._010-editor
+      pkgs.libreoffice
       pkgs.standardnotes
       # on unstable until #73484 is merged to release-19.09
       # and #70511 is resolved
@@ -324,13 +335,13 @@ in
     ];
 
     gui-misc = [
-      pkgs.bitwarden
+      pkgs-unstable.bitwarden
       pkgs.discord
       pkgs.google-chrome
       pkgs.gucharmap
       pkgs.keybase-gui
       # for Firefox MozLz4a JSON files (.jsonlz4)
-      pkgs.nur.pkgs.bb010g.mozlz4-tool
+      pkgs-unstable.nur.pkgs.bb010g.mozlz4-tool
       (pkgs.qutebrowser.overrideAttrs (o: {
         buildInputs = o.buildInputs ++ hunspellDicts;
       }))
@@ -355,7 +366,7 @@ in
       pkgs.sqlitebrowser
       pkgs.nur.pkgs.bb010g.surf-unstable
       pkgs.wireshark
-      pkgs.nur.pkgs.bb010g.xcolor
+      pkgs-unstable.nur.pkgs.bb010g.xcolor
       pkgs.xorg.xbacklight
     ];
   in lib.concatLists [
@@ -713,6 +724,7 @@ set scrolloff=5 sidescrolloff=4
       "vim-remote-viewer"
       "vim-repeat"
       "vim-sandwich"
+      "vim-scriptease"
       "vim-startuptime"
       "vim-suckless"
       "vim-suda"
@@ -742,15 +754,15 @@ set scrolloff=5 sidescrolloff=4
 
   programs.ssh = {
     enable = true;
-    matchBlocks = [
-      { host = "aur.archlinux.org";
+    matchBlocks = {
+      "aur.archlinux.org" = {
         identityFile = "~/.ssh/aur";
         user = "aur";
-      }
-      { host = "wank";
+      };
+      "wank" = {
         hostname = "wank.party";
-      }
-    ];
+      };
+    };
   };
 
   programs.texlive = {
@@ -882,9 +894,9 @@ set scrolloff=5 sidescrolloff=4
         local p=("''${@:P}");
         nix show-derivation "''${p[@]}" | \
           ${config.programs.jq.package}/bin/jq -r \
-'. as $drvs | $ARGS.positional[] |
-first((. as $p | $drvs | keys_unsorted[] | . as $k |
-  select($p | startswith($drvs[$k].outputs[].path))
+'. as $drvs | $ARGS.positional[] | first((. as $p |
+  $drvs | keys_unsorted[] | . as $k |
+    select($p | startswith($drvs[$k].outputs[].path))
 ), "unknown-deriver")' --args "''${p[@]}"
       }
 
@@ -1014,9 +1026,8 @@ first((. as $p | $drvs | keys_unsorted[] | . as $k |
     ];
   };
 
-  services.compton = {
+  services.picom = {
     enable = true;
-    package = pkgs.compton-git;
   };
 
   services.dunst = {
@@ -1028,7 +1039,7 @@ first((. as $p | $drvs | keys_unsorted[] | . as $k |
 
   services.kbfs = { enable = true; };
 
-  services.kdeconnect = {
+  ${null/*services.kdeconnect*/} = {
     enable = true;
     indicator = true;
   };

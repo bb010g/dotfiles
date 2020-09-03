@@ -50,6 +50,10 @@ flycheck_*.el
 # Meghanada
 .meghanada
 
+## Direnv
+
+.envrc
+
 ## Linux
 
 *~
