@@ -731,6 +731,7 @@ set scrolloff=5 sidescrolloff=4
       "vim-table-mode"
       "vim-targets"
       "vim-termopen"
+      "vim-textobj-user"
       "vim-undotree"
       "vim-visualrepeat"
     ] ++ [
@@ -1047,6 +1048,11 @@ set scrolloff=5 sidescrolloff=4
   services.keybase = { enable = true; };
 
   services.lorri = { enable = true; };
+  systemd.user.services.lorri = {
+    Service.Environment = [
+      "NIX_PATH=${config.home.sessionVariables.NIX_PATH}"
+    ];
+  };
 
   services.mpd = {
     enable = true;
