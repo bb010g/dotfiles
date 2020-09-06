@@ -128,28 +128,28 @@
     },
     "nur": {
         "branch": "master",
-        "date": "2020-09-03T00:17:43Z",
+        "date": "2020-09-06T20:49:39Z",
         "description": "Nix User Repository: User contributed nix packages [maintainer=@Mic92]",
         "homepage": "",
         "owner": "nix-community",
         "repo": "NUR",
-        "rev": "e1fa5e383dda925be3c5ee0c2e4842b70c090c0a",
-        "sha256": "08ygvccplflamcbvrb3qbar5mv58kxyycyflznrwmz3r9v6sp8ay",
+        "rev": "358dfac85d647bd3e0b30aa76c2b63d203233419",
+        "sha256": "1xm2z8f7zhwdzwasy348ilk4850i71s98jrhqhjrmaanhc0p67nl",
         "type": "tarball",
-        "url": "https://github.com/nix-community/NUR/archive/e1fa5e383dda925be3c5ee0c2e4842b70c090c0a.tar.gz",
+        "url": "https://github.com/nix-community/NUR/archive/358dfac85d647bd3e0b30aa76c2b63d203233419.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "vim-ale": {
         "branch": "master",
-        "date": "2020-08-31T08:26:33Z",
+        "date": "2020-09-05T20:46:39Z",
         "description": "Check syntax in Vim asynchronously and fix files, with Language Server Protocol (LSP) support",
         "homepage": "",
         "owner": "dense-analysis",
         "repo": "ale",
-        "rev": "d4a14746cdcda99ec70915c5540962c85e33f661",
-        "sha256": "1k93gab46y3ld9s3h3ha3vmdfy37vhb3px79p5a62b21jwma9mxc",
+        "rev": "5bc49d204782617e01da65d83c0d9700a1b0a72f",
+        "sha256": "0f639ag9pk601mjvfp7kyb14ymrclqz3g7aarh0absmwyf70vr95",
         "type": "tarball",
-        "url": "https://github.com/dense-analysis/ale/archive/d4a14746cdcda99ec70915c5540962c85e33f661.tar.gz",
+        "url": "https://github.com/dense-analysis/ale/archive/5bc49d204782617e01da65d83c0d9700a1b0a72f.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "vim-caw": {
@@ -232,15 +232,15 @@
     },
     "vim-dirvish": {
         "branch": "master",
-        "date": "2020-09-01T15:51:20Z",
+        "date": "2020-09-06T04:24:53Z",
         "description": "Directory viewer for Vim :zap:",
         "homepage": "",
         "owner": "justinmk",
         "repo": "vim-dirvish",
-        "rev": "4bc6add29683230dd79a53b2ae8c770fa548a708",
-        "sha256": "1vz5fbq5aqlqh6sg6flg8lcds50vy8nck21jpppvhxq7acjn5630",
+        "rev": "da0c27eff741e9b85483802148be5c5319b264e6",
+        "sha256": "0qcj6xycbnhyf7rl8jpa6wc06zsgy8j3bwn6dzrxkglkcqzv0x5q",
         "type": "tarball",
-        "url": "https://github.com/justinmk/vim-dirvish/archive/4bc6add29683230dd79a53b2ae8c770fa548a708.tar.gz",
+        "url": "https://github.com/justinmk/vim-dirvish/archive/da0c27eff741e9b85483802148be5c5319b264e6.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "vim-editorconfig": {
@@ -336,15 +336,15 @@
     },
     "vim-polyglot": {
         "branch": "master",
-        "date": "2020-09-01T21:38:17Z",
+        "date": "2020-09-06T19:07:04Z",
         "description": "A solid language pack for Vim.",
         "homepage": "",
         "owner": "sheerun",
         "repo": "vim-polyglot",
-        "rev": "63119f09d1390b61155cc0dc3ff497356d2fc7e5",
-        "sha256": "0b04la1i0sawkwbwhb708jzdqflpdxavbf2s0dw8ys65z79z8qzn",
+        "rev": "48254ec7adc9cbbc2ff15c606faf062d23d7f200",
+        "sha256": "17mf8lqxp8qqqbpfkpydn8r27g6c9h10w9lcsnx2v8y7xs4m0wqf",
         "type": "tarball",
-        "url": "https://github.com/sheerun/vim-polyglot/archive/63119f09d1390b61155cc0dc3ff497356d2fc7e5.tar.gz",
+        "url": "https://github.com/sheerun/vim-polyglot/archive/48254ec7adc9cbbc2ff15c606faf062d23d7f200.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "vim-precious": {
@@ -527,6 +527,19 @@
         "sha256": "0qq4spa2wb15pdx51aixgc4z2hvy844qpiaccwxdp3h6ncpfbg12",
         "type": "tarball",
         "url": "https://github.com/fabi1cazenave/termopen.vim/archive/3194a991a18a9be2fd9fcf8c4c55fe990c04b2bd.tar.gz",
+        "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
+    },
+    "vim-textobj-user": {
+        "branch": "master",
+        "date": "2020-02-21T09:29:24Z",
+        "description": "Vim plugin: Create your own text objects",
+        "homepage": "http://www.vim.org/scripts/script.php?script_id=2100",
+        "owner": "kana",
+        "repo": "vim-textobj-user",
+        "rev": "41a675ddbeefd6a93664a4dc52f302fe3086a933",
+        "sha256": "1y1g3vcm97fqjyigiajbvbck4nlc04vxl3535x4sl40s5jbm5vz3",
+        "type": "tarball",
+        "url": "https://github.com/kana/vim-textobj-user/archive/41a675ddbeefd6a93664a4dc52f302fe3086a933.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "vim-undotree": {
