@@ -384,7 +384,7 @@ in
   home.sessionVariables = {
     EDITOR = "ed";
     # GITHUB_TOKEN = in ./private-home.nix
-    NIX_PATH = "${config.home.homeDirectory}/nix/channels:$NIX_PATH";
+    # NIX_PATH = in pam.sessionVariables
     PAGER = "less -RF";
     VISUAL = "nvim";
   };
@@ -394,6 +394,10 @@ in
   manual = {
     html.enable = true;
     manpages.enable = true;
+  };
+
+  pam.sessionVariables = {
+    NIX_PATH = "DEFAULT=@{HOME}/nix/channels OVERRIDE=@{HOME}/nix/channels:\${NIX_PATH}";
   };
 
   programs.autorandr = {
@@ -1048,11 +1052,6 @@ set scrolloff=5 sidescrolloff=4
   services.keybase = { enable = true; };
 
   services.lorri = { enable = true; };
-  systemd.user.services.lorri = {
-    Service.Environment = [
-      "NIX_PATH=${config.home.sessionVariables.NIX_PATH}"
-    ];
-  };
 
   services.mpd = {
     enable = true;
