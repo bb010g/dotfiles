@@ -14,6 +14,7 @@ let
   # if so, they'd be up at https://github.com/bb010g/nixpkgs, branch bb010g-*
 
   sources = import ./nix/sources.nix;
+  sources-ext = builtins.fromJSON (builtins.readFile ./nix/sources-ext.json);
 
   nur = import ./config-nur.nix {
     inherit pkgs;
@@ -496,7 +497,7 @@ in
       name = "Firefox Nightly";
       # https://product-details.mozilla.org/1.0/firefox_versions.json
       #  : FIREFOX_NIGHTLY
-      inherit (sources.firefox-nightly) version;
+      inherit (sources-ext.firefox-nightly) version;
       # system: ? arch (if stdenv.system == "i686-linux" then "linux-i686" else "linux-x86_64")
       # https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/firefox-${version}.en-US.${system}.buildhub.json
       #  : download -> url -> (parse)
@@ -504,7 +505,7 @@ in
       #  : build -> date -> (parse) also works
       #  - %Y-%m-%dT%H:%m:%sZ
       #  need %Y-%m-%d-%H-%m-%s
-      inherit (sources.firefox-nightly) timestamp;
+      inherit (sources-ext.firefox-nightly) timestamp;
       release = false;
     }).overrideAttrs (o: {
       buildCommand = lib.replaceStrings [ ''

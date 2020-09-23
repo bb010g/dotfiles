@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
-# Copyright 2019 bb010g \
-exec jq -nr --slurpfile orig <(git show HEAD:nix/sources.json) --slurpfile new nix/sources.json -f "$0"
+# Copyright 2019-2020 bb010g \
+exec jq -nr --slurpfile orig <(git show "HEAD:${1-nix/sources.json}") --slurpfile new "${1-nix/sources.json}" -f "$0"
 # SPDX-License-Identifier: ISC OR Apache-2.0
 
 def zip(f; g; default):
