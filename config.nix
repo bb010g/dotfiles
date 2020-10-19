@@ -6,6 +6,7 @@ let sources = import ./nix/sources.nix; in
     gitignore = import sources.gitignore { inherit (pkgs) lib; };
     niv = import sources.niv { inherit pkgs; };
     nur = import ./config-nur.nix { inherit pkgs; };
+    nix-gl = import sources.nix-gl { inherit pkgs; };
   };
 }
 

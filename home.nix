@@ -295,6 +295,8 @@ in
       pkgs.gnome3.adwaita-icon-theme
       pkgs-unstable.nur.pkgs.nexromancers.hacksaw
       pkgs.hicolor-icon-theme
+      pkgs.nix-gl.nixGLIntel
+      pkgs.nix-gl.nixVulkanIntel
       pkgs-unstable.nur.pkgs.nexromancers.shotgun
       pkgs-unstable.nur.pkgs.bb010g.st-bb010g-unstable
       pkgs.xsel
