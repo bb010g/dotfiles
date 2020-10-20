@@ -19,6 +19,7 @@ in
 
     ./conf/input.nix
 
+    ./secrets/geolocation.nix
     ./secrets/tokens.nix
 
     nur.modules.bb010g.home-manager.programs.pijul
@@ -1034,8 +1035,8 @@ set scrolloff=5 sidescrolloff=4
   services.redshift = {
     enable = true;
     tray = true;
-    # latitude = in ./private-home.nix;
-    # longitude = in ./private-home.nix;
+    latitude = config.secrets.geolocation.latitude;
+    longitude = config.secrets.geolocation.longitude;
     temperature = {
       day = 6500;
       night = 3700;
