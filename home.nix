@@ -1,60 +1,24 @@
-{ config, lib ? null, pkgs ? null, ... } @ args:
+{ config, lib, pkgs, ... } @ args:
 let
-  trace = args.trace or (_: x: x);
-  # trace = args.trace or builtins.trace;
-  argPkgs = pkgs;
-  argLib = lib;
-in
-
-let
-  # > nix-channel --list
-  # nixos-unstable https://nixos.org/channels/nixos-unstable
-  #
-  # might also have some personal patches?
-  # if so, they'd be up at https://github.com/bb010g/nixpkgs, branch bb010g-*
-
-  sources = import ./nix/sources.nix;
-  sources-ext = builtins.fromJSON (builtins.readFile ./nix/sources-ext.json);
-
-  nur = import ./config-nur.nix {
-    inherit pkgs;
-    nur-local = null;
-    nur-remote = sources.nur;
-    inherit trace;
-  };
-
-  pkgs = argPkgs;
-  lib = pkgs.lib;
-  # tryEval' :: (a -> t) -> f -> a -> (t & f)
-  tryEval' = t: f: e:
-    let e' = builtins.tryEval e; in if e'.success then t e'.value else f;
-  tryPathExists = tryEval' lib.pathExists false;
-  pkgs-stable =
-    import (lib.findFirst tryPathExists sources.nixpkgs-stable [
-      <nixos-20.03>
-      <nixos>
-      <nixpkgs>
-    ]) { };
-  lib-stable = pkgs-stable.lib;
-  pkgs-unstable =
-    import (lib.findFirst tryPathExists sources.nixpkgs-unstable [
-      <nixos-unstable>
-      <nixpkgs-unstable>
-    ]) { };
-  lib-unstable = pkgs-unstable.lib;
-  pkgs-unstable-bb010g =
-    import (lib.findFirst tryPathExists sources.nixpkgs-unstable-bb010g [
-      <bb010g-nixos-unstable>
-    ]) { };
-  lib-unstable-bb010g = pkgs-unstable-bb010g.lib;
+  srcs = import ./sources.nix;
+  inherit (srcs)
+    sources
+    sources-ext
+    nixpkgs-stable
+    lib-stable
+    nixpkgs-unstable
+    lib-unstable
+    nixpkgs-unstable-bb010g
+    lib-unstable-bb010g
+  ;
+  nur = srcs.nur { inherit pkgs; };
 in
 {
-  imports = let
-    bb010g = nur.modules.bb010g.home-manager;
-  in [
+  imports = [
     ./private-home.nix
-    bb010g.programs.pijul
-    bb010g.xcompose
+
+    nur.modules.bb010g.home-manager.programs.pijul
+    nur.modules.bb010g.home-manager.xcompose
   ];
 
   # dconf. 24-hour time
@@ -165,8 +129,8 @@ in
     fonts-emoji = [
       # fontconfig-emoji # needs global installation
       pkgs.nur.pkgs.bb010g.mutant-standard
-      pkgs-unstable.noto-fonts-emoji
-      pkgs-unstable.twitter-color-emoji
+      nixpkgs-unstable.noto-fonts-emoji
+      nixpkgs-unstable.twitter-color-emoji
     ];
 
     fonts = fonts-extended-lt ++ [
@@ -187,18 +151,18 @@ in
     ];
 
     misc = [
-      pkgs-unstable.bitwarden-cli
+      nixpkgs-unstable.bitwarden-cli
       pkgs.nur.pkgs.bb010g.broca-unstable
       pkgs.cowsay
-      pkgs-unstable.nur.pkgs.bb010g.edbrowse
+      nixpkgs-unstable.nur.pkgs.bb010g.edbrowse
       pkgs.elinks
       pkgs.fortune
-      # pkgs-unstable.nur.pkgs.bb010g.html2json-unstable
+      # nixpkgs-unstable.nur.pkgs.bb010g.html2json-unstable
       pkgs.lynx
       pkgs.megatools
       pkgs.ponysay
       pkgs.smbclient
-      pkgs-unstable.synapse-bt
+      nixpkgs-unstable.synapse-bt
       pkgs.units
     ];
 
@@ -210,15 +174,15 @@ in
       }))
       pkgs.niv.niv
       # It's a Hackage package! (:
-      (if pkgs-unstable.nix-diff.meta.broken or false
+      (if nixpkgs-unstable.nix-diff.meta.broken or false
         then pkgs.nix-diff
-        else pkgs-unstable.nix-diff)
-      pkgs-unstable.nix-index
-      pkgs-unstable.nix-prefetch-github
-      pkgs-unstable.nix-prefetch-scripts
-      pkgs-unstable.nix-top
-      pkgs-unstable.nix-universal-prefetch
-      pkgs-unstable.vulnix
+        else nixpkgs-unstable.nix-diff)
+      nixpkgs-unstable.nix-index
+      nixpkgs-unstable.nix-prefetch-github
+      nixpkgs-unstable.nix-prefetch-scripts
+      nixpkgs-unstable.nix-top
+      nixpkgs-unstable.nix-universal-prefetch
+      nixpkgs-unstable.vulnix
       pkgs.yarn2nix-moretea.yarn2nix
       # TODO figure out how to build nixpkgs manual
     ];
@@ -231,7 +195,7 @@ in
       # deal with buggy libredirect glibc linking (it shouldn't be linked)
       sublime-merge = let sublime-mergeRelPath =
         "/pkgs/applications/version-management/sublime-merge";
-      in (pkgs.callPackage (pkgs-unstable.path + sublime-mergeRelPath) {
+      in (pkgs.callPackage (nixpkgs-unstable.path + sublime-mergeRelPath) {
       }).sublime-merge.overrideAttrs (o: {
         installPhase =
           let regex = "(makeWrapper [^\n]*)"; in
@@ -261,9 +225,9 @@ in
       pkgs.icdiff
       pkgs.inxi
       pkgs.ispell
-      # pkgs-unstable.nur.pkgs.bb010g.just
+      # nixpkgs-unstable.nur.pkgs.bb010g.just
       pkgs.lzip
-      pkgs-unstable.nur.pkgs.bb010g.mosh-unstable
+      nixpkgs-unstable.nur.pkgs.bb010g.mosh-unstable
       pkgs.ngrok
       pkgs.p7zip
       pkgs.ponymix
@@ -293,12 +257,12 @@ in
       pkgs.breeze-qt5
       pkgs.glxinfo
       pkgs.gnome3.adwaita-icon-theme
-      pkgs-unstable.nur.pkgs.nexromancers.hacksaw
+      nixpkgs-unstable.nur.pkgs.nexromancers.hacksaw
       pkgs.hicolor-icon-theme
       pkgs.nix-gl.nixGLIntel
       pkgs.nix-gl.nixVulkanIntel
-      pkgs-unstable.nur.pkgs.nexromancers.shotgun
-      pkgs-unstable.nur.pkgs.bb010g.st-bb010g-unstable
+      nixpkgs-unstable.nur.pkgs.nexromancers.shotgun
+      nixpkgs-unstable.nur.pkgs.bb010g.st-bb010g-unstable
       pkgs.xsel
     ];
 
@@ -308,7 +272,7 @@ in
       pkgs.standardnotes
       # on unstable until #73484 is merged to release-19.09
       # and #70511 is resolved
-      pkgs-unstable.texstudio
+      nixpkgs-unstable.texstudio
       pkgs.wxhexeditor
     ];
 
@@ -322,8 +286,8 @@ in
       pkgs.evince
       pkgs.geeqie
       pkgs.gimp
-      # pkgs-unstable-bb010g.pkgs.grafx2
-      pkgs-unstable.grafx2
+      # nixpkgs-unstable-bb010g.pkgs.grafx2
+      nixpkgs-unstable.grafx2
       pkgs.inkscape
       pkgs.kdeApplications.kolourpaint
       pkgs.krita
@@ -338,18 +302,18 @@ in
     ];
 
     gui-misc = [
-      pkgs-unstable.bitwarden
+      nixpkgs-unstable.bitwarden
       pkgs.discord
       pkgs.google-chrome
       pkgs.gucharmap
       pkgs.keybase-gui
       # for Firefox MozLz4a JSON files (.jsonlz4)
-      pkgs-unstable.nur.pkgs.bb010g.mozlz4-tool
+      nixpkgs-unstable.nur.pkgs.bb010g.mozlz4-tool
       (pkgs.qutebrowser.overrideAttrs (o: {
         buildInputs = o.buildInputs ++ hunspellDicts;
       }))
       pkgs.riot-desktop
-      pkgs-unstable.tdesktop
+      nixpkgs-unstable.tdesktop
       pkgs.wire-desktop
     ];
 
@@ -360,7 +324,7 @@ in
       pkgs.freerdp
       pkgs.gnome3.gnome-system-monitor
       pkgs.ksysguard
-      # pkgs-unstable-bb010g.nur.pkgs.bb010g.ipscan
+      # nixpkgs-unstable-bb010g.nur.pkgs.bb010g.ipscan
       pkgs.notify-desktop
       pkgs.pavucontrol
       pkgs.pcmanfm
@@ -369,7 +333,7 @@ in
       pkgs.sqlitebrowser
       pkgs.nur.pkgs.bb010g.surf-unstable
       pkgs.wireshark
-      pkgs-unstable.nur.pkgs.bb010g.xcolor
+      nixpkgs-unstable.nur.pkgs.bb010g.xcolor
       pkgs.xorg.xbacklight
     ];
   in lib.concatLists [
@@ -424,7 +388,7 @@ in
 
   programs.beets = {
     enable = true;
-    package = pkgs-unstable.beets;
+    package = nixpkgs-unstable.beets;
     settings = {
       plugins = [
         # autotagger
@@ -570,8 +534,8 @@ in
 
   programs.jq = {
     enable = true;
-    # package = pkgs-unstable.jq;
-    package = pkgs-unstable.nur.pkgs.bb010g.jq;
+    # package = nixpkgs-unstable.jq;
+    package = nixpkgs-unstable.nur.pkgs.bb010g.jq;
   };
 
   programs.mercurial = {
@@ -581,7 +545,7 @@ in
   };
 
   programs.neovim = let
-    pkgsNvim = pkgs-unstable;
+    pkgsNvim = nixpkgs-unstable;
     nvimUnwrapped = pkgsNvim.neovim-unwrapped;
     nvim = pkgsNvim.wrapNeovim nvimUnwrapped {
       vimAlias = true;
@@ -743,7 +707,7 @@ set scrolloff=5 sidescrolloff=4
   #programs.pijul = {
   #  enable = true;
   #  # configDir = "${config.xdg.configHome}/pijul";
-  #  package = pkgs-unstable.pijul;
+  #  package = nixpkgs-unstable.pijul;
   #  global = {
   #    author = "bb010g <me@bb010g.com>";
   #    signing_key = "/home/bb010g/.config/pijul/config/signing_secret_key";
@@ -1056,7 +1020,7 @@ set scrolloff=5 sidescrolloff=4
             name "PulseAudio"
           }
         '';
-        package = pkgs-unstable.mpd;
+        package = nixpkgs-unstable.mpd;
         musicDirectory = "${config.home.homeDirectory}/Music";
       };
       external = default // {
@@ -1128,7 +1092,7 @@ set scrolloff=5 sidescrolloff=4
       Type = "simple";
       Environment = [ "RUST_BACKTRACE=1" ];
       ExecStart = [
-        "${pkgs-unstable.synapse-bt}/bin/synapse"
+        "${nixpkgs-unstable.synapse-bt}/bin/synapse"
       ];
       WorkingDirectory = "%h";
       Restart = "always";
@@ -1219,7 +1183,7 @@ keep-outputs = true
     # };
     windowManager.i3 = {
       enable = true;
-      package = pkgs-unstable.i3;
+      package = nixpkgs-unstable.i3;
       config = let
         zipToAttrs = lib.zipListsWith (n: v: { ${n} = v; });
         mergeAttrList = lib.foldr lib.mergeAttrs {};
