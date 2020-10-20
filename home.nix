@@ -15,6 +15,7 @@ let
 in
 {
   imports = [
+    ./conf/beets.nix
     ./conf/input.nix
     ./conf/mpd.nix
 
@@ -375,71 +376,6 @@ in
       home-docked.config = {
         laptop = { enable = false; };
         home = { };
-      };
-    };
-  };
-
-  programs.beets = {
-    enable = true;
-    package = nixpkgs-unstable.beets;
-    settings = {
-      plugins = [
-        # autotagger
-        "chroma"
-        "discogs"
-        "fromfilename"
-        # metadata
-        # "absubmit" (needs streaming_music_extractor)
-        "acousticbrainz"
-        "fetchart"
-        "ftintitle"
-        "lastgenre"
-        "lyrics"
-        "mbsync"
-        "replaygain"
-        "scrub"
-        # path formats
-        "rewrite"
-        "the"
-        # interoperability
-        "badfiles"
-        "mpdupdate"
-        # miscellaneous
-        "convert"
-        "duplicates"
-        "export"
-        "fuzzy"
-        "info"
-        "mbsubmit"
-        "missing"
-      ];
-
-      acoustid.apikey = config.secrets.tokens.acoustid;
-      badfiles = {
-        commands = {
-        };
-      };
-      convert = {
-        embed = "no";
-        format = "opus";
-        formats = {
-          opus = {
-            command = "ffmpeg -i $source -y -map_metadata 0 -c:a libopus -b:a 256k $dest";
-          };
-        };
-      };
-      discogs.user_token = config.secrets.tokens.discogs;
-      lyrics.google_API_key = config.secrets.tokens.google-custom-search;
-      paths = {
-        "default" = "%the{$albumartist}/%the{$album}%aunique{}/$track $title";
-        "singleton" = "Non-Album/%the{$artist}/$title";
-        "comp" = "Compilations/%the{$album}%aunique{}/$track $title";
-      };
-      replaygain = {
-        backend = "bs1770gain";
-      };
-      mpd = {
-        port = config.services.mpd.daemons.default.network.port;
       };
     };
   };
