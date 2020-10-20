@@ -11,18 +11,17 @@ let
     nixpkgs-unstable-bb010g
     lib-unstable-bb010g
   ;
-  nur = srcs.nur { inherit pkgs; };
 in
 {
   imports = [
     ./conf/beets.nix
     ./conf/input.nix
     ./conf/mpd.nix
+    # TODO: unbreak (possibly involves nur.modules.bb010g)
+    # ./conf/pijul.nix
     ./conf/redshift.nix
 
     ./secrets/tokens.nix
-
-    nur.modules.bb010g.home-manager.programs.pijul
   ];
 
   # dconf. 24-hour time
@@ -633,15 +632,6 @@ set scrolloff=5 sidescrolloff=4
     enable = true;
   };
 
-  #programs.pijul = {
-  #  enable = true;
-  #  # configDir = "${config.xdg.configHome}/pijul";
-  #  package = nixpkgs-unstable.pijul;
-  #  global = {
-  #    author = "bb010g <me@bb010g.com>";
-  #    signing_key = "/home/bb010g/.config/pijul/config/signing_secret_key";
-  #  };
-  #};
 
   programs.ssh = {
     enable = true;
