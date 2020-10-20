@@ -3,3 +3,6 @@
 
 # home-manager dotfile secrets
 private-*.nix filter=lfs diff=git-crypt lfs-extensions=git-crypt
+
+# secrets
+/secrets/** filter=lfs diff=git-crypt lfs-extensions=git-crypt

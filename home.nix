@@ -19,6 +19,8 @@ in
 
     ./conf/input.nix
 
+    ./secrets/tokens.nix
+
     nur.modules.bb010g.home-manager.programs.pijul
   ];
 
@@ -412,7 +414,7 @@ in
         "missing"
       ];
 
-      # acoustid.apikey = in ./private-home.nix;
+      acoustid.apikey = config.secrets.tokens.acoustid;
       badfiles = {
         commands = {
         };
@@ -426,8 +428,8 @@ in
           };
         };
       };
-      # discogs.user_token = in ./private-home.nix;
-      # lyrics.google_API_key = in ./private-home.nix;
+      discogs.user_token = config.secrets.tokens.discogs;
+      lyrics.google_API_key = config.secrets.tokens.google-custom-search;
       paths = {
         "default" = "%the{$albumartist}/%the{$album}%aunique{}/$track $title";
         "singleton" = "Non-Album/%the{$artist}/$title";
@@ -1096,8 +1098,7 @@ set scrolloff=5 sidescrolloff=4
 
   systemd.user.sessionVariables = {
     EDITOR = "ed";
-    # GITHUB_TOKEN = in ./private-home.nix
-    #     NIX_PATH DEFAULT="@{HOME}/nix/channels"
+    GITHUB_TOKEN = config.secrets.tokens.github;
     NIX_PATH = "$HOME/nix/channels\${NIX_PATH:+:$NIX_PATH}";
     PAGER = "less -RF";
     VISUAL = "nvim";
