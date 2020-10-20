@@ -1,0 +1,4 @@
+version https://git-lfs.github.com/spec/v1
+ext-0-git-crypt sha256:032e05a0973c8dc4b3bf39f295d8d694300255d5800fbab495ba706a6bd4d7a2
+oid sha256:e355a64606dcf0fad9181e654f8a6d9db545a61e7f81f9aa2a4e4294a60c2300
+size 1215
