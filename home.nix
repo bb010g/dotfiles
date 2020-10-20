@@ -17,21 +17,12 @@ in
   imports = [
     ./private-home.nix
 
+    ./conf/input.nix
+
     nur.modules.bb010g.home-manager.programs.pijul
-    nur.modules.bb010g.home-manager.xcompose
   ];
 
   # dconf. 24-hour time
-
-  home.keyboard = {
-    layout = "us,gr";
-    options = [
-      "compose:ralt"
-      "ctrl:swap_lalt_lctl"
-      "caps:swapescape"
-      "grp:rctrl_rshift_toggle"
-    ];
-  };
 
   home.packages = let
     core = [
@@ -1115,22 +1106,6 @@ set scrolloff=5 sidescrolloff=4
     # # https://github.com/NixOS/nixpkgs/pull/67389
     # #   NixOS/nixpkgs@48426833c861ad8c4e601324462b352c58b8b230
     # XDG_CONFIG_DIRS = "/etc/xdg\${XDG_CONFIG_DIRS:+:$XDG_CONFIG_DIRS}";
-  };
-
-  xcompose = let
-    ruleOn = rule: events: rule // { inherit events; };
-    minus = {
-      result = { string = "−"; keysym = "U2212"; };
-      comment = "MINUS SIGN";
-    };
-  in {
-    enable = true;
-    rules = [
-      { include = "%L"; }
-      { commentLines = ""; } # blank line
-      (ruleOn minus [ "<Multi_key>" "<underscore>" "<minus>" ])
-      (ruleOn minus [ "<Multi_key>" "<minus>" "<underscore>" ])
-    ];
   };
 
   xdg = {
