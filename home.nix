@@ -16,9 +16,9 @@ in
 {
   imports = [
     ./conf/input.nix
+    ./conf/mpd.nix
 
     ./secrets/geolocation.nix
-    ./secrets/mpd.nix
     ./secrets/tokens.nix
 
     nur.modules.bb010g.home-manager.programs.pijul
@@ -140,7 +140,7 @@ in
 
     media = [
       pkgs.ffmpeg
-      pkgs.mpc_cli
+      # pkgs.mpc_cli -> conf/mpd.nix
     ];
 
     misc = [
@@ -311,7 +311,7 @@ in
     ];
 
     gui-tools = [
-      pkgs.cantata
+      # pkgs.cantata -> pkgs/mpd.nix
       pkgs.cmst
       pkgs.dmenu
       pkgs.freerdp
@@ -439,7 +439,7 @@ in
         backend = "bs1770gain";
       };
       mpd = {
-        port = 6600;
+        port = config.services.mpd.daemons.default.network.port;
       };
     };
   };
@@ -1002,34 +1002,6 @@ set scrolloff=5 sidescrolloff=4
   services.keybase = { enable = true; };
 
   services.lorri = { enable = true; };
-
-  services.mpd = {
-    enable = true;
-    daemons = rec {
-      default = {
-        extraConfig = ''
-          audio_output {
-            type "pulse"
-            name "PulseAudio"
-          }
-        '';
-        package = nixpkgs-unstable.mpd;
-        musicDirectory = "${config.home.homeDirectory}/Music";
-      };
-      external = default // {
-        autoStart = false;
-        musicDirectory = "/run/media/${config.home.username}/music";
-        network.port = 6601;
-      };
-      external-beets = external // {
-        musicDirectory = "${external.musicDirectory}/beets";
-        network.port = 6602;
-      };
-      nas = external // {
-        network.port = 6603;
-      };
-    };
-  };
 
   services.redshift = {
     enable = true;
