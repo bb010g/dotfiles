@@ -20,8 +20,7 @@ in
     # TODO: unbreak (possibly involves nur.modules.bb010g)
     # ./conf/pijul.nix
     ./conf/redshift.nix
-
-    ./secrets/tokens.nix
+    ./conf/session-variables.nix
   ];
 
   # dconf. 24-hour time
@@ -981,19 +980,6 @@ set scrolloff=5 sidescrolloff=4
     # Install = {
     #   WantedBy = [ "default.target" ];
     # };
-  };
-
-  systemd.user.sessionVariables = {
-    EDITOR = "ed";
-    GITHUB_TOKEN = config.secrets.tokens.github;
-    NIX_PATH = "$HOME/nix/channels\${NIX_PATH:+:$NIX_PATH}";
-    PAGER = "less -RF";
-    VISUAL = "nvim";
-    # # We have to replicate this from `environment.variables` in
-    # # `<nixpkgs/nixos/modules/programs/environment.nix>`.
-    # # https://github.com/NixOS/nixpkgs/pull/67389
-    # #   NixOS/nixpkgs@48426833c861ad8c4e601324462b352c58b8b230
-    # XDG_CONFIG_DIRS = "/etc/xdg\${XDG_CONFIG_DIRS:+:$XDG_CONFIG_DIRS}";
   };
 
   xdg = {
