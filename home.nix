@@ -15,11 +15,10 @@ let
 in
 {
   imports = [
-    ./private-home.nix
-
     ./conf/input.nix
 
     ./secrets/geolocation.nix
+    ./secrets/mpd.nix
     ./secrets/tokens.nix
 
     nur.modules.bb010g.home-manager.programs.pijul
