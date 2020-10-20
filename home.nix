@@ -18,8 +18,8 @@ in
     ./conf/beets.nix
     ./conf/input.nix
     ./conf/mpd.nix
+    ./conf/redshift.nix
 
-    ./secrets/geolocation.nix
     ./secrets/tokens.nix
 
     nur.modules.bb010g.home-manager.programs.pijul
@@ -938,17 +938,6 @@ set scrolloff=5 sidescrolloff=4
   services.keybase = { enable = true; };
 
   services.lorri = { enable = true; };
-
-  services.redshift = {
-    enable = true;
-    tray = true;
-    latitude = config.secrets.geolocation.latitude;
-    longitude = config.secrets.geolocation.longitude;
-    temperature = {
-      day = 6500;
-      night = 3700;
-    };
-  };
 
   services.screen-locker = {
     enable = true;
