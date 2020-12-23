@@ -287,8 +287,6 @@ in
       pkgs.google-chrome
       pkgs.gucharmap
       pkgs.keybase-gui
-      # for Firefox MozLz4a JSON files (.jsonlz4)
-      nixpkgs-unstable.nur.pkgs.bb010g.mozlz4-tool
       pkgs.qutebrowser
       pkgs.element-desktop
       nixpkgs-unstable.tdesktop

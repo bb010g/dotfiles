@@ -16,6 +16,7 @@ in
   imports = [
     ./conf/autorandr.nix
     ./conf/beets.nix
+    ./conf/firefox.nix
     ./conf/input.nix
     ./conf/mpd.nix
     ./conf/neovim.nix
@@ -42,34 +43,6 @@ in
   programs.emacs = { enable = true; };
 
   programs.feh = { enable = true; };
-
-  programs.firefox = {
-    enable = true;
-    package = ((pkgs.nur.lib.mozilla.firefoxOverlay.firefoxVersion {
-      name = "Firefox Nightly";
-      # https://product-details.mozilla.org/1.0/firefox_versions.json
-      #  : FIREFOX_NIGHTLY
-      inherit (sources-ext.firefox-nightly) version;
-      # system: ? arch (if stdenv.system == "i686-linux" then "linux-i686" else "linux-x86_64")
-      # https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/firefox-${version}.en-US.${system}.buildhub.json
-      #  : download -> url -> (parse)
-      #  - https://archive.mozilla.org/pub/firefox/nightly/%Y/%m/%Y-%m-%d-%H-%m-%s-mozilla-central/firefox-${version}.en-US.${system}.tar.bz2
-      #  : build -> date -> (parse) also works
-      #  - %Y-%m-%dT%H:%m:%sZ
-      #  need %Y-%m-%d-%H-%m-%s
-      inherit (sources-ext.firefox-nightly) timestamp;
-      release = false;
-    }).overrideAttrs (o: {
-      buildCommand = lib.replaceStrings [ ''
-        --set MOZ_SYSTEM_DIR "$out/lib/mozilla" \
-      '' ] [ ''
-        --set MOZ_SYSTEM_DIR "$out/lib/mozilla" \
-        --set SNAP_NAME firefox \
-      '' ] o.buildCommand;
-    }));
-    # https://github.com/NixOS/nixpkgs/issues/59276
-    # enableAdobeFlash = true;
-  };
 
   programs.git = {
     enable = true;
