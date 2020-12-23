@@ -1,22 +1,22 @@
 {
     "firefox-nightly": {
-        "buildhub_url": "https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/firefox-83.0a1.en-US.linux-x86_64.buildhub.json",
+        "buildhub_url": "https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/firefox-85.0a1.en-US.linux-x86_64.buildhub.json",
         "buildhub_url_template": "https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/<slug>.buildhub.json",
-        "date": "2020-09-23",
-        "date_d": "23",
-        "date_m": "09",
+        "date": "2020-12-12",
+        "date_d": "12",
+        "date_m": "12",
         "date_template": "<date_y>-<date_m>-<date_d>",
         "date_y": "2020",
         "locale": "en-US",
-        "slug": "firefox-83.0a1.en-US.linux-x86_64",
+        "slug": "firefox-85.0a1.en-US.linux-x86_64",
         "slug_template": "firefox-<version>.<locale>.<system>",
         "system": "linux-x86_64",
-        "timestamp": "2020-09-23-09-59-09",
+        "timestamp": "2020-12-12-21-29-13",
         "timestamp_template": "<date>-<timestamp_time>",
-        "timestamp_time": "09-59-09",
-        "url": "https://archive.mozilla.org/pub/firefox/nightly/2020/09/2020-09-23-09-59-09-mozilla-central/firefox-83.0a1.en-US.linux-x86_64.tar.bz2",
+        "timestamp_time": "21-29-13",
+        "url": "https://archive.mozilla.org/pub/firefox/nightly/2020/12/2020-12-12-21-29-13-mozilla-central/firefox-85.0a1.en-US.linux-x86_64.tar.bz2",
         "url_template": "https://archive.mozilla.org/pub/firefox/nightly/<date_y>/<date_m>/<timestamp>-mozilla-central/<slug>.tar.bz2",
-        "version": "83.0a1",
+        "version": "85.0a1",
         "versions_url": "https://product-details.mozilla.org/1.0/firefox_versions.json"
     }
 }

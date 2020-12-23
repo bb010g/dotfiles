@@ -42,19 +42,22 @@ in {
     nur-remote = sources.nur;
   };
 
+  nixpkgsArg-stable = self.nixpkgsArg;
   nixpkgsFun-stable = importFirstExists sources.nixpkgs-stable [
     <nixos-20.03>
     <nixos>
     <nixpkgs>
   ];
-  nixpkgs-stable = self.nixpkgsFun-stable self.nixpkgsArg;
+  nixpkgs-stable = self.nixpkgsFun-stable self.nixpkgsArg-stable;
   lib-stable = self.nixpkgs-stable.lib;
+  nixpkgsArg-unstable = self.nixpkgsArg;
   nixpkgsFun-unstable = importFirstExists sources.nixpkgs-unstable [
     <nixos-unstable>
     <nixpkgs-unstable>
   ];
-  nixpkgs-unstable = self.nixpkgsFun-unstable self.nixpkgsArg;
+  nixpkgs-unstable = self.nixpkgsFun-unstable self.nixpkgsArg-stable;
   lib-unstable = self.nixpkgs-unstable.lib;
+  nixpkgsArg-unstable-bb010g = self.nixpkgsArg;
   nixpkgsFun-unstable-bb010g = importFirstExists
     sources.nixpkgs-unstable-bb010g
   [
@@ -63,6 +66,7 @@ in {
     <bb010g-nixos-unstable>
     <bb010g-nixpkgs-unstable>
   ];
-  nixpkgs-unstable-bb010g = self.nixpkgsFun-unstable-bb010g self.nixpkgsArg;
+  nixpkgs-unstable-bb010g =
+    self.nixpkgsFun-unstable-bb010g self.nixpkgsArg-unstable-bb010g;
   lib-unstable-bb010g = self.nixpkgs-unstable-bb010g.lib;
 })

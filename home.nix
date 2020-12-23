@@ -48,7 +48,7 @@ in
     ];
 
     filesystem = [
-      pkgs.bcachefs-tools
+      # pkgs.bcachefs-tools
       pkgs.cifs-utils
       pkgs.dosfstools
       # pkgs.e2fsprogs
@@ -56,7 +56,7 @@ in
       # pkgs.exfat-utils
       pkgs.f2fs-tools
       pkgs.hfsprogs
-      pkgs.mtdutils
+      # pkgs.mtdutils
       pkgs.nfs-utils
       pkgs.squashfsTools
     ];
@@ -284,10 +284,7 @@ in
       pkgs.inkscape
       pkgs.kdeApplications.kolourpaint
       pkgs.krita
-      (pkgs.mpv.override rec {
-        archiveSupport = true;
-        openalSupport = true;
-      })
+      pkgs.mpv
       pkgs.mtpaint
       pkgs.pinta
       pkgs.sxiv
@@ -302,10 +299,8 @@ in
       pkgs.keybase-gui
       # for Firefox MozLz4a JSON files (.jsonlz4)
       nixpkgs-unstable.nur.pkgs.bb010g.mozlz4-tool
-      (pkgs.qutebrowser.overrideAttrs (o: {
-        buildInputs = o.buildInputs ++ hunspellDicts;
-      }))
-      pkgs.riot-desktop
+      pkgs.qutebrowser
+      pkgs.element-desktop
       nixpkgs-unstable.tdesktop
       pkgs.wire-desktop
     ];
@@ -368,13 +363,18 @@ in
       mobile.config = {
         laptop = { };
       };
-      home.config = {
-        laptop = { };
-        home = { };
-      };
       home-docked.config = {
         laptop = { enable = false; };
-        home = { };
+        home-docked-vga = { };
+        home-docked-dp = { };
+      };
+      home-hdmi.config = {
+        laptop = { };
+        home-hdmi = { };
+      };
+      home-docked-hdmi.config = {
+        laptop = { enable = false; };
+        home-hdmi = { };
       };
     };
   };
@@ -409,7 +409,8 @@ in
         --set SNAP_NAME firefox \
       '' ] o.buildCommand;
     }));
-    enableAdobeFlash = true;
+    # https://github.com/NixOS/nixpkgs/issues/59276
+    # enableAdobeFlash = true;
   };
 
   programs.git = {
@@ -891,7 +892,7 @@ keep-outputs = true
         fonts = [ "monospace 10" ];
 
         dirNames = [ "left" "down" "up" "right" ];
-        resizeActions = [ "shrink width" "grow height" "shrink height" "grow width" ];
+        resizeActions = [ "shrink width" "shrink height" "grow height" "grow width" ];
       in {
         bars = [ { inherit fonts; position = "top"; } ];
         inherit fonts;
