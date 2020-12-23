@@ -17,6 +17,7 @@ in
     ./conf/autorandr.nix
     ./conf/beets.nix
     ./conf/firefox.nix
+    ./conf/git.nix
     ./conf/input.nix
     ./conf/mpd.nix
     ./conf/neovim.nix
@@ -43,44 +44,6 @@ in
   programs.emacs = { enable = true; };
 
   programs.feh = { enable = true; };
-
-  programs.git = {
-    enable = true;
-    extraConfig = {
-      core = {
-        commentChar = "auto";
-      };
-      diff = {
-        algorithm = "histogram";
-        submodule = "log";
-      };
-      github = {
-        user = "bb010g";
-      };
-      merge = {
-        tool = "smerge";
-      };
-      mergetool = {
-        smerge = {
-          cmd = ''smerge mergetool "$BASE" "$LOCAL" "$REMOTE" -o "$MERGED"'';
-          trustExitCode = "true";
-        };
-      };
-      push = {
-        recurseSubmodules = "check";
-      };
-      status = {
-        submoduleSummary = "true";
-        showStash = "true";
-      };
-    };
-    lfs = {
-      enable = true;
-    };
-    package = pkgs.gitAndTools.gitFull;
-    userEmail = "me@bb010g.com";
-    userName = "Dusk Banks";
-  };
 
   # Home Manager config
   programs.home-manager = {
@@ -462,8 +425,6 @@ in
     enable = true;
 
     configFile = {
-      "git/ignore".source = ./gitignore_global;
-
       # "fontconfig/conf.d".source =
       #   "${config.home.homeDirectory}/.nix-profile/etc/fonts/conf.d";
 

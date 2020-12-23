@@ -174,20 +174,7 @@ in
       pkgs.biber
     ];
 
-    tools = let
-      # deal with buggy libredirect glibc linking (it shouldn't be linked)
-      sublime-merge = let sublime-mergeRelPath =
-        "/pkgs/applications/version-management/sublime-merge";
-      in (pkgs.callPackage (nixpkgs-unstable.path + sublime-mergeRelPath) {
-      }).sublime-merge.overrideAttrs (o: {
-        installPhase =
-          let regex = "(makeWrapper [^\n]*)"; in
-          lib.concatStrings (lib.concatMap (matches:
-            if !(lib.isList matches) then [ matches ] else
-              matches ++ [ " --argv0 '$0'" ]
-          ) (builtins.split regex o.installPhase));
-      });
-    in [
+    tools = [
       pkgs.acpi
       pkgs.androidenv.androidPkgs_9_0.platform-tools
       pkgs.asciinema
@@ -198,10 +185,6 @@ in
       pkgs.cv
       pkgs.diffstat
       pkgs.nur.pkgs.bb010g.dwdiff
-      pkgs.gitAndTools.git-crypt
-      pkgs.gitAndTools.git-imerge
-      pkgs.nur.pkgs.bb010g.gitAndTools.git-my
-      pkgs.nur.pkgs.bb010g.gitAndTools.git-revise
       pkgs.gnumake
       pkgs.hecate
       pkgs.hyperfine
@@ -216,9 +199,6 @@ in
       pkgs.ponymix
       pkgs.rclone
       pkgs.sbcl
-      sublime-merge
-      (pkgs.writeShellScriptBin "smergetool"
-        ''exec -a smerge ${lib.escapeShellArg sublime-merge}/bin/sublime_merge mergetool "$@"'')
       pkgs.tokei
       pkgs.nur.pkgs.bb010g.ttyd
       pkgs.unzip
