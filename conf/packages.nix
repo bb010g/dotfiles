@@ -1,6 +1,6 @@
-{ config, lib, pkgs, ... } @ args:
+let srcs = import ../sources.nix; in
+{ config, lib, pkgs, ... }:
 let
-  srcs = import ../sources.nix;
   inherit (srcs)
     sources
     sources-ext
