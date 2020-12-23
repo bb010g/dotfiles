@@ -51,11 +51,14 @@ in
     fontconfig-emoji = pkgs.runCommand "fontconfig-emoji" {
       src = sources.fontconfig-emoji;
     } ''
-      mkdir -p "$out"/etc/fonts/conf.d
-      cp -t "$out"/etc/fonts/conf.d/ \
-        "$src"/69-emoji.conf \
-        "$src"/70-no-mozilla-emoji.conf
-      # cp -t "$out/etc/fonts/conf.d/ "$src"/69-emoji-monospace.conf
+      supportFolder=$out/etc/fonts/conf.d
+
+      mkdir -p "$supportFolder"
+
+      ln -st "$supportFolder" "$src"/69-emoji.conf
+      ${lib.optionalString false ''
+        ln -st "$supportFolder" "$src"/69-emoji-monospace.conf
+      ''}ln -st "$supportFolder" "$src"/70-no-mozilla-emoji.conf
     '';
 
     fontconfig-user = pkgs.runCommand "fontconfig-user" {

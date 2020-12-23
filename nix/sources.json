@@ -1,15 +1,15 @@
 {
     "fontconfig-emoji": {
-        "branch": "master",
-        "date": "2020-09-23T19:08:23Z",
+        "branch": "1e60c4bbc6f57081358cddbf9d0574479d3dfc5b",
+        "date": "2020-09-23T18:57:36Z",
         "description": "Emoji prioritization rules",
         "homepage": null,
         "owner": "stove-panini",
         "repo": "fontconfig-emoji",
-        "rev": "a5a0ae3c69f8d018640faeb705b2d51b7f9cf210",
-        "sha256": "0bnlg5pk5wc0wdjyq6qynndfz2pvlvnr5naw1mx2bc45kbz3jgn9",
+        "rev": "1e60c4bbc6f57081358cddbf9d0574479d3dfc5b",
+        "sha256": "11ix2byr22z4maksc0xi209fgln0idzmgvzn5pl7lgpalf9qrbns",
         "type": "tarball",
-        "url": "https://github.com/stove-panini/fontconfig-emoji/archive/a5a0ae3c69f8d018640faeb705b2d51b7f9cf210.tar.gz",
+        "url": "https://github.com/stove-panini/fontconfig-emoji/archive/1e60c4bbc6f57081358cddbf9d0574479d3dfc5b.tar.gz",
         "url_template": "https://github.com/<owner>/<repo>/archive/<rev>.tar.gz"
     },
     "gitignore": {
