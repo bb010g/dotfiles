@@ -26,6 +26,7 @@ in
     # ./conf/pijul.nix
     ./conf/redshift.nix
     ./conf/session-variables.nix
+    ./conf/tex.nix
   ];
 
   # dconf. 24-hour time
@@ -81,43 +82,6 @@ in
       "wank" = {
         hostname = "wank.party";
       };
-    };
-  };
-
-  programs.texlive = {
-    enable = true;
-    # for sane combine
-    packageSet = pkgs.nur.pkgs.bb010g.texlive;
-    extraPackages = tpkgs: {
-      pkgFilter = let inherit (lib) any elem id; in p: any id [
-        (p.tlType == "run" || p.tlType == "bin")
-        (p.tlType == "doc" && !(elem p.pname [
-          # avoid collisions with texlive-bin-YYYY-doc
-          "aleph"
-          "autosp"
-          "latex-bin"
-          "synctex"
-        ]))
-        (p.pname == "core")
-      ];
-      inherit (tpkgs)
-        collection-bibtexextra
-        collection-context
-        collection-fontsextra
-        collection-formatsextra
-        collection-games
-        collection-humanities
-        collection-latexextra
-        collection-luatex
-        collection-mathscience
-        collection-music
-        collection-pictures
-        collection-pstricks
-        collection-publishers
-        latexmk
-        scheme-small
-        scheme-tetex
-      ;
     };
   };
 

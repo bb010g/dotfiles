@@ -170,10 +170,6 @@ in
       # TODO figure out how to build nixpkgs manual
     ];
 
-    tex = [
-      pkgs.biber
-    ];
-
     tools = [
       pkgs.acpi
       pkgs.androidenv.androidPkgs_9_0.platform-tools
@@ -233,9 +229,6 @@ in
       pkgs.nur.pkgs.bb010g._010-editor
       pkgs.libreoffice
       pkgs.standardnotes
-      # on unstable until #73484 is merged to release-19.09
-      # and #70511 is resolved
-      nixpkgs-unstable.texstudio
       pkgs.wxhexeditor
     ];
 
