@@ -342,49 +342,6 @@ in
     timeout = 5;
   };
 
-  systemd.user.services.broca = {
-    Unit = {
-      Description = "Bittorrent RPC proxy between Transmission clients and " +
-        "Synapse servers";
-      After = [ "synapse.service" ];
-    };
-
-    Service = {
-      Type = "simple";
-      Environment = [ "RUST_BACKTRACE=1" ];
-      ExecStart = [
-        "${pkgs.nur.pkgs.bb010g.broca-unstable}/bin/broca-daemon"
-      ];
-      WorkingDirectory = "%h";
-      Restart = "always";
-    };
-
-    # Install = {
-    #   WantedBy = [ "default.target" ];
-    # };
-  };
-
-  systemd.user.services.synapse-bt = {
-    Unit = {
-      Description = "Flexible and fast BitTorrent daemon";
-      After = [ "network-online.target" ];
-    };
-
-    Service = {
-      Type = "simple";
-      Environment = [ "RUST_BACKTRACE=1" ];
-      ExecStart = [
-        "${nixpkgs-unstable.synapse-bt}/bin/synapse"
-      ];
-      WorkingDirectory = "%h";
-      Restart = "always";
-    };
-
-    # Install = {
-    #   WantedBy = [ "default.target" ];
-    # };
-  };
-
   xdg = {
     enable = true;
 
