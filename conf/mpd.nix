@@ -1,4 +1,3 @@
-let srcs = import ../sources.nix; in
 { config, lib, pkgs, ... }:
 
 {
@@ -22,7 +21,7 @@ let srcs = import ../sources.nix; in
               name "PulseAudio"
             }
           '';
-          package = srcs.nixpkgs-unstable.mpd;
+          package = pkgs.mpd;
           musicDirectory = "${config.home.homeDirectory}/Music";
         };
         external = default // {

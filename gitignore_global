@@ -53,6 +53,7 @@ flycheck_*.el
 ## Direnv
 
 .envrc
+.direnv/*
 
 ## Linux
 

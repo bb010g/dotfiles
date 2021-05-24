@@ -30,26 +30,9 @@ let sources = import ./nix/sources.nix; in
     niv = import sources.niv { inherit pkgs; };
     nur = import ./config-nur.nix { inherit pkgs; };
     nix-gl = import sources.nix-gl { inherit pkgs; };
-    pythonInterpreters = pkgsSuper.pythonInterpreters.overrideScope' (pySelf: pySuper: let
+    pythonInterpreters = pkgsSuper.pythonInterpreters.overrideScope (pySelf: pySuper: let
       inherit (pySelf) callPackage;
     in {
-      soco = let
-        p = pySuper.soco;
-      in if p.version != "0.20" then p else let
-        extraInputs = callPackage ({ black } @ ps: ps) { };
-      in p.overridePythonAttrs (attrsSuper: {
-        checkInputs = attrsSuper.checkInputs ++ [
-          extraInputs.black
-        ];
-
-        doCheck = false; # pytest-cov < 2.6.0; Nixpkgs has 2.10.1
-
-        postPatch = attrsSuper.postPatch or "" + ''
-          substituteInPlace requirements-dev.txt \
-            --replace 'black==' 'black>=' \
-            --replace 'pytest-cov < 2.6.0' 'pytest-cov >= 2' \
-        '';
-      });
     });
   })
 ]

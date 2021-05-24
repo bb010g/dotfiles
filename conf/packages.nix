@@ -4,12 +4,6 @@ let
   inherit (srcs)
     sources
     sources-ext
-    nixpkgs-stable
-    lib-stable
-    nixpkgs-unstable
-    lib-unstable
-    nixpkgs-unstable-bb010g
-    lib-unstable-bb010g
   ;
 in
 {
@@ -112,8 +106,8 @@ in
     fonts-emoji = [
       # fontconfig-emoji # needs global installation
       pkgs.nur.pkgs.bb010g.mutant-standard
-      nixpkgs-unstable.noto-fonts-emoji
-      nixpkgs-unstable.twitter-color-emoji
+      pkgs.noto-fonts-emoji
+      pkgs.twitter-color-emoji
     ];
 
     fonts = fonts-extended-lt ++ [
@@ -134,18 +128,17 @@ in
     ];
 
     misc = [
-      nixpkgs-unstable.bitwarden-cli
+      pkgs.bitwarden-cli
       pkgs.nur.pkgs.bb010g.broca-unstable
       pkgs.cowsay
-      nixpkgs-unstable.nur.pkgs.bb010g.edbrowse
+      pkgs.nur.pkgs.bb010g.edbrowse
       pkgs.elinks
       pkgs.fortune
-      # nixpkgs-unstable.nur.pkgs.bb010g.html2json-unstable
+      # pkgs.nur.pkgs.bb010g.html2json-unstable
       pkgs.lynx
       pkgs.megatools
       pkgs.ponysay
       pkgs.smbclient
-      nixpkgs-unstable.synapse-bt
       pkgs.units
     ];
 
@@ -154,18 +147,19 @@ in
       pkgs.cachix
       ((pkgs.diffoscope.override { enableBloat = true; }).overrideAttrs (o: {
         pythonPath = o.pythonPath ++ [ pkgs.zip ];
+        # disabledTests = o.disabledTests or [ ] ++ [
+        #   "test_ico_image"
+        #   "test_jpeg_image"
+        # ];
       }))
       pkgs.niv.niv
-      # It's a Hackage package! (:
-      (if nixpkgs-unstable.nix-diff.meta.broken or false
-        then pkgs.nix-diff
-        else nixpkgs-unstable.nix-diff)
-      nixpkgs-unstable.nix-index
-      nixpkgs-unstable.nix-prefetch-github
-      nixpkgs-unstable.nix-prefetch-scripts
-      nixpkgs-unstable.nix-top
-      nixpkgs-unstable.nix-universal-prefetch
-      nixpkgs-unstable.vulnix
+      pkgs.nix-diff
+      pkgs.nix-index
+      pkgs.nix-prefetch-github
+      pkgs.nix-prefetch-scripts
+      pkgs.nix-top
+      pkgs.nix-universal-prefetch
+      pkgs.vulnix
       pkgs.yarn2nix-moretea.yarn2nix
       # TODO figure out how to build nixpkgs manual
     ];
@@ -187,9 +181,9 @@ in
       pkgs.icdiff
       pkgs.inxi
       pkgs.ispell
-      # nixpkgs-unstable.nur.pkgs.bb010g.just
+      # pkgs.nur.pkgs.bb010g.just
       pkgs.lzip
-      nixpkgs-unstable.nur.pkgs.bb010g.mosh-unstable
+      pkgs.nur.pkgs.bb010g.mosh-unstable
       pkgs.ngrok
       pkgs.p7zip
       pkgs.ponymix
@@ -216,12 +210,14 @@ in
       pkgs.breeze-qt5
       pkgs.glxinfo
       pkgs.gnome3.adwaita-icon-theme
-      nixpkgs-unstable.nur.pkgs.nexromancers.hacksaw
+      # pkgs.nur.pkgs.nexromancers.hacksaw
+      pkgs.hacksaw
       pkgs.hicolor-icon-theme
       pkgs.nix-gl.nixGLIntel
       pkgs.nix-gl.nixVulkanIntel
-      nixpkgs-unstable.nur.pkgs.nexromancers.shotgun
-      nixpkgs-unstable.nur.pkgs.bb010g.st-bb010g-unstable
+      # pkgs.nur.pkgs.nexromancers.shotgun
+      pkgs.shotgun
+      pkgs.nur.pkgs.bb010g.st-bb010g-unstable
       pkgs.xsel
     ];
 
@@ -238,14 +234,15 @@ in
     ];
 
     gui-media = [
+      # TODO: ugh, aseprite-skia build times
       pkgs.aseprite-unfree
+      pkgs.audacity
       pkgs.evince
       pkgs.geeqie
       pkgs.gimp
-      # nixpkgs-unstable-bb010g.pkgs.grafx2
-      nixpkgs-unstable.grafx2
+      pkgs.grafx2
       pkgs.inkscape
-      pkgs.kdeApplications.kolourpaint
+      pkgs.plasma5Packages.kolourpaint
       pkgs.krita
       pkgs.mpv
       pkgs.mtpaint
@@ -255,25 +252,26 @@ in
     ];
 
     gui-misc = [
-      nixpkgs-unstable.bitwarden
+      pkgs.bitwarden
       pkgs.discord
       pkgs.google-chrome
       pkgs.gucharmap
       pkgs.keybase-gui
       pkgs.qutebrowser
       pkgs.element-desktop
-      nixpkgs-unstable.tdesktop
+      pkgs.tdesktop
       pkgs.wire-desktop
     ];
 
     gui-tools = [
       # pkgs.cantata -> pkgs/mpd.nix
-      pkgs.cmst
+      pkgs.captive-browser
+      pkgs.carla
       pkgs.dmenu
       pkgs.freerdp
       pkgs.gnome3.gnome-system-monitor
       pkgs.ksysguard
-      # nixpkgs-unstable-bb010g.nur.pkgs.bb010g.ipscan
+      # pkgs.nur.pkgs.bb010g.ipscan
       pkgs.notify-desktop
       pkgs.pavucontrol
       pkgs.pcmanfm
@@ -282,7 +280,8 @@ in
       pkgs.sqlitebrowser
       pkgs.nur.pkgs.bb010g.surf-unstable
       pkgs.wireshark
-      nixpkgs-unstable.nur.pkgs.bb010g.xcolor
+      # pkgs.nur.pkgs.bb010g.xcolor
+      pkgs.xcolor
       pkgs.xorg.xbacklight
     ];
   in lib.concatLists [

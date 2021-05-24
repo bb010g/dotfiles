@@ -4,12 +4,6 @@ let
   inherit (srcs)
     sources
     sources-ext
-    nixpkgs-stable
-    lib-stable
-    nixpkgs-unstable
-    lib-unstable
-    nixpkgs-unstable-bb010g
-    lib-unstable-bb010g
   ;
 in
 {
@@ -40,7 +34,10 @@ in
     manpages.enable = true;
   };
 
-  programs.direnv = { enable = true; };
+  programs.direnv = {
+    enable = true;
+    enableNixDirenvIntegration = true;
+  };
 
   programs.emacs = { enable = true; };
 
@@ -58,8 +55,8 @@ in
 
   programs.jq = {
     enable = true;
-    # package = nixpkgs-unstable.jq;
-    package = nixpkgs-unstable.nur.pkgs.bb010g.jq;
+    # package = pkgs.jq;
+    package = pkgs.nur.pkgs.bb010g.jq;
   };
 
   programs.mercurial = {
@@ -331,6 +328,8 @@ in
 
   services.lorri = { enable = true; };
 
+  services.network-manager-applet = { enable = true; };
+
   services.screen-locker = {
     enable = true;
     inactiveInterval = 10;
@@ -390,7 +389,7 @@ keep-outputs = true
     # };
     windowManager.i3 = {
       enable = true;
-      package = nixpkgs-unstable.i3;
+      package = pkgs.i3;
       config = let
         zipToAttrs = lib.zipListsWith (n: v: { ${n} = v; });
         mergeAttrList = lib.foldr lib.mergeAttrs {};
@@ -413,8 +412,10 @@ keep-outputs = true
           (mergeAttrMap (ks: zipToAttrs (map (k: "${modifier}+${k}") ks) (map (d: "focus ${d}") dirNames)) [ viKeys arrowKeys ])
           (mergeAttrMap (ks: zipToAttrs (map (k: "${modifier}+Shift+${k}") ks) (map (d: "move ${d}") dirNames)) [ viKeys arrowKeys ])
           (mergeAttrMap (ks: zipToAttrs (map (k: "${modifier}+Ctrl+${k}") ks) (map (d: "move container to output ${d}") dirNames)) [ viKeys arrowKeys ])
-          (mergeAttrList (zipToAttrs (map (k: "${modifier}+${k}") workspaceKeys) (map (d: "workspace ${d}") workspaceNames)))
-          (mergeAttrList (zipToAttrs (map (k: "${modifier}+Shift+${k}") workspaceKeys) (map (d: "move workspace ${d}") workspaceNames)))
+          (mergeAttrMap (ks: zipToAttrs (map (k: "${modifier}+Shift+Ctrl+${k}") ks) (map (d: "move workspace to output ${d}") dirNames)) [ viKeys arrowKeys ])
+          (mergeAttrList (zipToAttrs (map (k: "${modifier}+${k}") workspaceKeys) (map (n: "workspace ${n}") workspaceNames)))
+          (mergeAttrList (zipToAttrs (map (k: "${modifier}+Shift+${k}") workspaceKeys) (map (n: "move workspace ${n}") workspaceNames)))
+          (mergeAttrList (zipToAttrs (map (k: "${modifier}+Shift+Ctrl+${k}") workspaceKeys) (map (n: "move workspace to output ${n}") workspaceNames)))
           {
             "${modifier}+Return" = "exec st";
             "${modifier}+Shift+q" = "kill";

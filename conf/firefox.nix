@@ -4,14 +4,13 @@ let srcs = import ../sources.nix; in
 let
   inherit (srcs)
     sources-ext
-    nixpkgs-unstable
   ;
 in
 {
   config = {
     home.packages = [
       # for Firefox MozLz4a JSON files (.jsonlz4)
-      nixpkgs-unstable.nur.pkgs.bb010g.mozlz4-tool
+      pkgs.nur.pkgs.bb010g.mozlz4-tool
     ];
 
     programs.firefox = {

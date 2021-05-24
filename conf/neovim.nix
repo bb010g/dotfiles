@@ -4,7 +4,7 @@ let srcs = import ../sources.nix; in
 {
   config = {
     programs.neovim = let
-      pkgsNvim = srcs.nixpkgs-unstable;
+      pkgsNvim = pkgs;
       nvimUnwrapped = pkgsNvim.neovim-unwrapped;
       nvim = pkgsNvim.wrapNeovim nvimUnwrapped {
         vimAlias = true;
@@ -16,6 +16,10 @@ let srcs = import ../sources.nix; in
 "" general mappings (set before other uses)
 " <Leader>
 let mapleader = "\<Space>"
+
+"" ale
+" completion
+let g:ale_completion_enabled = 1
 
 "" context_filetype
 " language support
@@ -67,24 +71,8 @@ let g:RecoverPlugin_Delete_Unmodified_Swapfile = 1
 set hidden
 " more natural new splits (sb spr)
 set splitbelow splitright
-" suckless.vim: mappings
-" - divid[e]d (default): all windows share available vertical space in column
-" - [s]tacked: in col, active window maximizes and others collapse to one row
-" - [f]ullscreen: active window maximizes height & width and others collapse
-let g:suckless_mappings = {
-\ '<M-[esf]>' : 'SetTilingMode("[dsf]")',
-\ '<M-[hjkl]>' : 'SelectWindow("[hjkl]")',
-\ '<M-[HJKL]>' : 'MoveWindow("[hjkl]")',
-\ '<C-M-[hjkl]>' : 'ResizeWindow("[hjkl]")',
-\ '<M-[gv]>' : 'CreateWindow("[sv]")',
-\ '<M-q>' : 'CloseWindow()',
-\ '<Leader>[123456789]' : 'SelectTab([123456789])',
-\ '<Leader>t[123456789]' : 'MoveWindowToTab([123456789])',
-\ '<Leader>T[123456789]' : 'CopyWindowToTab([123456789])',
-\}
-" suckless.vim: use Alt (<M-) shortcuts in terminals
-let g:suckless_tmap = 1
 " termopen.vim: easy terminal splits
+let g:termopen_autoinsert = 0
 nmap <silent> <M-Return> :call TermOpen()<CR>
 
 "" window viewport
@@ -133,6 +121,7 @@ set scrolloff=5 sidescrolloff=4
         "vim-direnv"
         "vim-dirvish"
         "vim-editorconfig"
+        "vim-eunuch"
         "vim-exchange"
         "vim-gina"
         "vim-linediff"
@@ -148,7 +137,6 @@ set scrolloff=5 sidescrolloff=4
         "vim-sandwich"
         "vim-scriptease"
         "vim-startuptime"
-        "vim-suckless"
         "vim-suda"
         "vim-table-mode"
         "vim-targets"
@@ -164,6 +152,9 @@ set scrolloff=5 sidescrolloff=4
     systemd.user.sessionVariables = {
       VISUAL = "nvim";
     };
+
+    xdg.configFile."nvim/filetype.vim".text = /*vim*/''
+'';
   };
 }
 

@@ -8,21 +8,9 @@
 
     programs.texlive = {
       enable = true;
-      # for sane combine
-      # TODO(bb010g): Upstream this!
-      packageSet = pkgs.nur.pkgs.bb010g.texlive;
+      packageSet = pkgs.texlive;
       extraPackages = tpkgs: {
-        pkgFilter = let inherit (lib) any elem id; in p: any id [
-          (p.tlType == "run" || p.tlType == "bin")
-          (p.tlType == "doc" && !(elem p.pname [
-            # avoid collisions with texlive-bin-YYYY-doc
-            "aleph"
-            "autosp"
-            "latex-bin"
-            "synctex"
-          ]))
-          (p.pname == "core")
-        ];
+        pkgFilter = p: p.tlType == "run" || p.tlType == "bin" || p.tlType == "doc" || p.pname == "core";
         inherit (tpkgs)
           collection-bibtexextra
           collection-context

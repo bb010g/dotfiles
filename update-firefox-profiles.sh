@@ -23,12 +23,14 @@ jq_fxpath() {
 typeset -l profile file
 for profile ( ~/.mozilla/firefox/*.default(/) ) {
   for file ( extensions.json ) {
+    if [[ ! -e $profile/$file ]]; then continue; fi
     jq_fxpath -c $profile/$file > $profile/$file.new
     if [[ "$(jq -c '.' $profile/$file | wc -c)" = "$(jq -c '.' $profile/$file.new | wc -c)" ]] {
       mv $profile/$file{.new,}
     }
   }
   for file ( addonStartup.json.lz4 ) {
+    if [[ ! -e $profile/$file ]]; then continue; fi
     mozlz4-tool -d $profile/$file \
     | jq_fxpath -c \
     | mozlz4-tool -c /dev/fd/0 > $profile/$file.new

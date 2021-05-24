@@ -1,4 +1,3 @@
-let srcs = import ../sources.nix; in
 { config, lib, pkgs, ... }:
 
 {
@@ -9,7 +8,7 @@ let srcs = import ../sources.nix; in
   config = {
     programs.beets = {
       enable = true;
-      package = srcs.nixpkgs-unstable.beets;
+      # package = pkgs.beets;
       settings = {
         plugins = [
           # autotagger

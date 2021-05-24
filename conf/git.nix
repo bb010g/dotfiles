@@ -1,18 +1,12 @@
-let srcs = import ../sources.nix; in
 { config, lib, pkgs, ... }:
 
-let
-  inherit (srcs)
-    nixpkgs-unstable
-  ;
-in
 {
   config = {
     home.packages = let
       # deal with buggy libredirect glibc linking (it shouldn't be linked)
       sublime-merge = let sublime-mergeRelPath =
         "/pkgs/applications/version-management/sublime-merge";
-      in (pkgs.callPackage (nixpkgs-unstable.path + sublime-mergeRelPath) {
+      in (pkgs.callPackage (pkgs.path + sublime-mergeRelPath) {
       }).sublime-merge.overrideAttrs (o: {
         installPhase =
           let regex = "(makeWrapper [^\n]*)"; in
@@ -27,6 +21,7 @@ in
     in [
       pkgs.gitAndTools.git-crypt
       pkgs.gitAndTools.git-imerge
+      pkgs.gitAndTools.git-remote-hg
       pkgs.nur.pkgs.bb010g.gitAndTools.git-my
       pkgs.nur.pkgs.bb010g.gitAndTools.git-revise
       sublime-merge
@@ -45,6 +40,9 @@ in
         };
         github = {
           user = "bb010g";
+        };
+        init = {
+          defaultBranch = "dev";
         };
         merge = {
           tool = "smerge";
