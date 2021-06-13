@@ -7,7 +7,7 @@
 
   config = {
     services.redshift = {
-      enable = true;
+      enable = false; # TODO: reenable
       tray = true;
       latitude = config.secrets.geolocation.latitude;
       longitude = config.secrets.geolocation.longitude;

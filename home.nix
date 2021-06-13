@@ -384,26 +384,30 @@ keep-outputs = true
   in (dracula-xresources "URxvt*") // {
   };
 
+  programs.foot = {
+    enable = true;
+  };
+
   programs.i3status = {
     enable = true;
     enableDefault = true;
   };
 
-  xsession = {
-    enable = true;
+  wayland = {
+    # enable = true;
     # pointerCursor = {
     #   package = pkgs.capitaine-cursors;
     #   name = "Capataine Cursors";
     # };
-    windowManager.i3 = {
+    windowManager.sway = {
       enable = true;
-      package = pkgs.i3;
+      # package = pkgs.sway;
       config = let
         zipToAttrs = lib.zipListsWith (n: v: { ${n} = v; });
         mergeAttrList = lib.foldr lib.mergeAttrs {};
         mergeAttrMap = f: l: mergeAttrList (lib.concatMap f l);
 
-        modifier = "Mod4";
+        inherit (config.wayland.windowManager.sway.config) modifier;
         arrowKeys = [ "Left" "Down" "Up" "Right" ];
         viKeys = [ "h" "j" "k" "l" ];
         workspaceNames = [ "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" ];
@@ -416,16 +420,16 @@ keep-outputs = true
       in {
         bars = [
           {
-            colors = {
-              activeWorkspace = { background = "#5f676a"; border = "#333333"; text = "#ffffff"; };
-              background = "#000000";
-              bindingMode = { background = "#900000"; border = "#2f343a"; text = "#ffffff"; };
-              focusedWorkspace = { background = "#285577"; border = "#4c7899"; text = "#ffffff"; };
-              inactiveWorkspace = { background = "#222222"; border = "#333333"; text = "#888888"; };
-              separator = "#666666";
-              statusline = "#ffffff";
-              urgentWorkspace = { background = "#900000"; border = "#2f343a"; text = "#ffffff"; };
-            };
+            # colors = {
+            #   activeWorkspace = { background = "#5f676a"; border = "#333333"; text = "#ffffff"; };
+            #   background = "#000000";
+            #   bindingMode = { background = "#900000"; border = "#2f343a"; text = "#ffffff"; };
+            #   focusedWorkspace = { background = "#285577"; border = "#4c7899"; text = "#ffffff"; };
+            #   inactiveWorkspace = { background = "#222222"; border = "#333333"; text = "#888888"; };
+            #   separator = "#666666";
+            #   statusline = "#ffffff";
+            #   urgentWorkspace = { background = "#900000"; border = "#2f343a"; text = "#ffffff"; };
+            # };
             inherit fonts;
             hiddenState = "hide";
             mode = "dock";
@@ -446,13 +450,12 @@ keep-outputs = true
           (mergeAttrList (zipToAttrs (map (k: "${modifier}+Shift+${k}") workspaceKeys) (map (n: "move workspace ${n}") workspaceNames)))
           (mergeAttrList (zipToAttrs (map (k: "${modifier}+Shift+Ctrl+${k}") workspaceKeys) (map (n: "move workspace to output ${n}") workspaceNames)))
           {
-            "${modifier}+Return" = "exec st";
-            "${modifier}+Shift+q" = "kill";
-            "${modifier}+d" = "exec ${pkgs.dmenu}/bin/dmenu_run";
+            # "${modifier}+Shift+q" = "kill";
+            # "${modifier}+d" = "exec ${pkgs.dmenu}/bin/dmenu_run";
 
-            "${modifier}+a" = "focus parent";
+            # "${modifier}+a" = "focus parent";
 
-            "${modifier}+r" = "mode resize";
+            # "${modifier}+r" = "mode resize";
 
             "${modifier}+g" = "split h";
             "${modifier}+v" = "split v";
@@ -467,9 +470,12 @@ keep-outputs = true
 
             "${modifier}+Shift+c" = "reload";
             "${modifier}+Shift+r" = "restart";
-            "${modifier}+Shift+e" = "exec i3-nagbar -t warning -m 'Do you want to exit i3?' -b 'Yes' 'i3-msg exit'";
+            "${modifier}+Shift+e" =
+              "exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'";
+            # "${modifier}+Shift+e" = "exec i3-nagbar -t warning -m 'Do you want to exit i3?' -b 'Yes' 'i3-msg exit'";
           }
         ];
+        menu = "${pkgs.dmenu}/bin/dmenu_run";
         modes = {
           resize = mergeAttrList [
             (mergeAttrMap (ks: zipToAttrs ks (map (a: "resize ${a}") resizeActions)) [ viKeys arrowKeys ])
@@ -479,7 +485,8 @@ keep-outputs = true
             }
           ];
         };
-        inherit modifier;
+        modifier = "Mod4";
+        terminal = "${config.programs.foot.package}/bin/foot";
       };
       extraConfig = ''
         focus_wrapping workspace
