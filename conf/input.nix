@@ -1,11 +1,11 @@
-let srcs = import ../sources.nix; in
+# let srcs = import ../sources.nix; in
 { config, lib, pkgs, ... }:
-let nur = srcs.nur { inherit pkgs; }; in
+# let nur = srcs.nur { inherit pkgs; }; in
 
 {
-  imports = [
-    nur.modules.bb010g.home-manager.xcompose
-  ];
+  # imports = [
+  #   # nur.modules.bb010g.home-manager.xcompose
+  # ];
 
   config = {
     home.keyboard = {

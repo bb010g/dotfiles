@@ -11,7 +11,7 @@ setopt \
   -o WARN_CREATE_GLOBAL -o WARN_NESTED_VAR \
   #
 
-typeset -l fxpath=( ${${(Q)${(@Z+C+)${(@f)"$(<=firefox)"}[-1]}}[(r)/nix/store/*/bin/firefox*]:h:h}/usr/lib/firefox-bin-*/ )
+typeset -l fxpath=( ${${(Q)${(@Z+C+)${(@f)"$(<=firefox)"}[-1]}}[(r)/nix/store/*/bin/*firefox*]:h:h}/usr/lib/firefox-bin-*/ )
 fxpath=${fxpath[1]}
 
 jq_fxpath() {

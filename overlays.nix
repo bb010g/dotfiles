@@ -27,7 +27,25 @@ let sources = import ./nix/sources.nix; in
   (import ./nixpkgs-customization-overlay.nix)
   (pkgs: pkgsSuper: {
     gitignore = import sources.gitignore { inherit (pkgs) lib; };
-    niv = import sources.niv { inherit pkgs; };
+    niv = (import (pkgs.applyPatches {
+      src = sources.niv;
+      name = "niv-src";
+      patches = [
+        (builtins.toFile "niv-lib.patch" /*patch*/''
+--- a/foo/default.nix
++++ b/foo/default.nix
+@@ -76,7 +76,7 @@ mkDerivation {
+               description = spec.synopsis;
+               license =
+                 if builtins.hasAttr "license" spec && spec.license == "MIT"
+-                then stdenv.lib.licenses.mit
++                then lib.licenses.mit
+                 else throw "Don't know how to handle license: ''${builtins.toJSON spec.license}";
+             }
+         ) {};
+'')
+      ];
+    }) { inherit pkgs; }).niv;
     nur = import ./config-nur.nix { inherit pkgs; };
     nix-gl = import sources.nix-gl { inherit pkgs; };
     pythonInterpreters = pkgsSuper.pythonInterpreters.overrideScope (pySelf: pySuper: let

@@ -19,11 +19,12 @@
       sublime-merge-tool = pkgs.writeShellScriptBin "smergetool"
         ''exec -a smerge ${lib.escapeShellArg sublime_merge} mergetool "$@"'';
     in [
+      pkgs.gitAndTools.git-cinnabar # hg support
       pkgs.gitAndTools.git-crypt
       pkgs.gitAndTools.git-imerge
-      pkgs.gitAndTools.git-remote-hg
-      pkgs.nur.pkgs.bb010g.gitAndTools.git-my
-      pkgs.nur.pkgs.bb010g.gitAndTools.git-revise
+      pkgs.gitAndTools.git-my
+      pkgs.gitAndTools.git-octopus
+      pkgs.gitAndTools.git-revise
       sublime-merge
       sublime-merge-tool
     ];
@@ -31,6 +32,9 @@
     programs.git = {
       enable = true;
       extraConfig = {
+        clone = {
+          defaultRemoteName = "o";
+        };
         core = {
           commentChar = "auto";
         };
@@ -54,6 +58,7 @@
           };
         };
         push = {
+          default = "upstream";
           recurseSubmodules = "check";
         };
         status = {

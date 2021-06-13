@@ -152,7 +152,7 @@ in
         #   "test_jpeg_image"
         # ];
       }))
-      pkgs.niv.niv
+      pkgs.niv
       pkgs.nix-diff
       pkgs.nix-index
       pkgs.nix-prefetch-github

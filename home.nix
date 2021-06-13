@@ -27,7 +27,9 @@ in
 
   # home.sessionVariables = you probably want systemd.user.sessionVariables
 
-  home.stateVersion = "19.09";
+  home.stateVersion = "21.05";
+  home.username = "bb010g";
+  home.homeDirectory = "/home/bb010g";
 
   manual = {
     html.enable = true;
@@ -46,7 +48,8 @@ in
   # Home Manager config
   programs.home-manager = {
     enable = true;
-    path = if lib.pathExists ~/nix/home-manager then "$HOME/nix/home-manager" else <home-manager>;
+    path = let p = "${config.home.homeDirectory}/nix/home-manager"; in
+      if lib.pathExists p then p else <home-manager>;
   };
 
   programs.htop = {
@@ -307,7 +310,7 @@ in
   };
 
   services.picom = {
-    enable = true;
+    enable = false; # TODO: reenable
   };
 
   services.dunst = {
@@ -381,6 +384,11 @@ keep-outputs = true
   in (dracula-xresources "URxvt*") // {
   };
 
+  programs.i3status = {
+    enable = true;
+    enableDefault = true;
+  };
+
   xsession = {
     enable = true;
     # pointerCursor = {
@@ -401,12 +409,33 @@ keep-outputs = true
         workspaceNames = [ "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" ];
         workspaceKeys = [ "1" "2" "3" "4" "5" "6" "7" "8" "9" "0" ];
 
-        fonts = [ "monospace 10" ];
+        fonts = { names = [ "monospace" ]; size = 10.0; };
 
         dirNames = [ "left" "down" "up" "right" ];
         resizeActions = [ "shrink width" "shrink height" "grow height" "grow width" ];
       in {
-        bars = [ { inherit fonts; position = "top"; } ];
+        bars = [
+          {
+            colors = {
+              activeWorkspace = { background = "#5f676a"; border = "#333333"; text = "#ffffff"; };
+              background = "#000000";
+              bindingMode = { background = "#900000"; border = "#2f343a"; text = "#ffffff"; };
+              focusedWorkspace = { background = "#285577"; border = "#4c7899"; text = "#ffffff"; };
+              inactiveWorkspace = { background = "#222222"; border = "#333333"; text = "#888888"; };
+              separator = "#666666";
+              statusline = "#ffffff";
+              urgentWorkspace = { background = "#900000"; border = "#2f343a"; text = "#ffffff"; };
+            };
+            inherit fonts;
+            hiddenState = "hide";
+            mode = "dock";
+            position = "top";
+            statusCommand = "${config.programs.i3status.package}/bin/i3status";
+            trayOutput = "primary";
+            workspaceButtons = true;
+            workspaceNumbers = true;
+          }
+        ];
         inherit fonts;
         keybindings = mergeAttrList [
           (mergeAttrMap (ks: zipToAttrs (map (k: "${modifier}+${k}") ks) (map (d: "focus ${d}") dirNames)) [ viKeys arrowKeys ])
