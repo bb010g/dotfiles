@@ -19,12 +19,13 @@
       sublime-merge-tool = pkgs.writeShellScriptBin "smergetool"
         ''exec -a smerge ${lib.escapeShellArg sublime_merge} mergetool "$@"'';
     in [
-      pkgs.gitAndTools.git-cinnabar # hg support
-      pkgs.gitAndTools.git-crypt
-      pkgs.gitAndTools.git-imerge
-      pkgs.gitAndTools.git-my
-      pkgs.gitAndTools.git-octopus
-      pkgs.gitAndTools.git-revise
+      pkgs.git-cinnabar # hg support
+      pkgs.git-crypt
+      pkgs.git-imerge
+      pkgs.git-my
+      pkgs.git-octopus
+      pkgs.git-revise
+      pkgs.git-subtrac
       sublime-merge
       sublime-merge-tool
     ];
