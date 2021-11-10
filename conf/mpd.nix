@@ -15,6 +15,7 @@
       enable = true;
       daemons = rec {
         default = {
+          autoStart = false;
           extraConfig = ''
             audio_output {
               type "pulse"
