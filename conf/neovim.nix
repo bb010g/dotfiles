@@ -60,6 +60,7 @@ endif
 let g:polyglot_disabled = [
 "\ LaTeX-Box
 \ "latex",
+\ "sensible",
 \]
 
 "" swapfiles
