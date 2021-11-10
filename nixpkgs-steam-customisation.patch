@@ -1,0 +1,77 @@
+From 88df15b58693ca22494a29d15eda68b69212bad1 Mon Sep 17 00:00:00 2001
+From: Dusk Banks <me@bb010g.com>
+Date: Sun, 10 Oct 2021 14:58:22 -0700
+Subject: steamPackages: make customisable
+MIME-Version: 1.0
+Content-Type: text/plain; charset=UTF-8
+Content-Transfer-Encoding: 8bit
+
+Keep in mind the note in `lib.makeScopeWithSplicing`'s source:
+
+    # N.B. the other stages of the package set spliced in are *not*
+    # overridden.
+
+To globally override `pkgs.steamPackages`, overlay `pkgs` like:
+
+    final: prev: { steamPackages = steamPackages.overrideScope …; }
+---
+ pkgs/games/steam/default.nix | 35 +++++++++++++++++++++++------------
+ 1 file changed, 23 insertions(+), 12 deletions(-)
+
+diff --git a/pkgs/games/steam/default.nix b/pkgs/games/steam/default.nix
+index ff2c6e13288..bfe19a88ca9 100644
+--- a/pkgs/games/steam/default.nix
++++ b/pkgs/games/steam/default.nix
+@@ -1,26 +1,37 @@
+-{ pkgs, newScope, buildFHSUserEnv }:
++{ lib, newScope, splicePackages, steamPackagesAttr ? "steamPackages"
++, pkgsBuildBuild, pkgsBuildHost, pkgsBuildTarget, pkgsHostHost, pkgsTargetTarget
++, stdenv, buildFHSUserEnv, pkgsi686Linux
++}:
+ 
+ let
+-  callPackage = newScope self;
+-
+-  self = rec {
+-    steamArch = if pkgs.stdenv.hostPlatform.system == "x86_64-linux" then "amd64"
+-                else if pkgs.stdenv.hostPlatform.system == "i686-linux" then "i386"
+-                else throw "Unsupported platform: ${pkgs.stdenv.hostPlatform.system}";
++  steamPackagesFun = self: let
++    inherit (self) callPackage;
++  in {
++    steamArch = if stdenv.hostPlatform.system == "x86_64-linux" then "amd64"
++                else if stdenv.hostPlatform.system == "i686-linux" then "i386"
++                else throw "Unsupported platform: ${stdenv.hostPlatform.system}";
+ 
+     steam-runtime = callPackage ./runtime.nix { };
+     steam-runtime-wrapped = callPackage ./runtime-wrapped.nix { };
+     steam = callPackage ./steam.nix { };
+     steam-fonts = callPackage ./fonts.nix { };
+     steam-fhsenv = callPackage ./fhsenv.nix {
+-      glxinfo-i686 = pkgs.pkgsi686Linux.glxinfo;
++      glxinfo-i686 = pkgsi686Linux.glxinfo;
+       steam-runtime-wrapped-i686 =
+-        if steamArch == "amd64"
+-        then pkgs.pkgsi686Linux.steamPackages.steam-runtime-wrapped
++        if self.steamArch == "amd64"
++        then pkgsi686Linux.${steamPackagesAttr}.steam-runtime-wrapped
+         else null;
+       inherit buildFHSUserEnv;
+     };
+     steamcmd = callPackage ./steamcmd.nix { };
+   };
+-
+-in self
++  otherSplices = {
++    selfBuildBuild = pkgsBuildBuild.${steamPackagesAttr};
++    selfBuildHost = pkgsBuildHost.${steamPackagesAttr};
++    selfBuildTarget = pkgsBuildTarget.${steamPackagesAttr};
++    selfHostHost = pkgsHostHost.${steamPackagesAttr};
++    selfTargetTarget = pkgsTargetTarget.${steamPackagesAttr};
++  };
++  keep = self: { };
++  extra = spliced0: { };
++in lib.makeScopeWithSplicing splicePackages newScope otherSplices keep extra steamPackagesFun
+-- 
+2.31.1
+

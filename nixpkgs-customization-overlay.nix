@@ -8,34 +8,38 @@ let
   mapAttrOrElse = name: f: nulF: set: mapAttrOr name f (nulF name set) set;
 
   isOverridable = hasAttr "override";
-  isScope' = hasAttr "overrideScope";
+  isScope = hasAttr "overrideScope";
 in
-pkgs: pkgsSuper: let
-  inherit (pkgs.lib) composeExtensions makeOverridable;
-  attachScope' = f: genSelf:
-    let self = genSelf self // {
-      overrideScope = g: attachScope' (composeExtensions f g) genSelf;
-      overrideScopeGenSelf = g: attachScope' f (g genSelf);
-      scopeGenSelf = genSelf;
+pkgsFinal: pkgsPrev: let
+  inherit (pkgsFinal.lib) composeExtensions makeOverridable;
+  attachScope = f: genFinal:
+    let final = genFinal final // {
+      overrideScope = g: attachScope (composeExtensions f g) genFinal;
+      overrideScopeGenFinal = g: attachScope f (g genFinal);
+      scopeGenFinal = genFinal;
       scopeOverrides = f;
-    }; in self;
-  attachEmptyScope' = attachScope' (self: super: { });
+    }; in final;
+  attachEmptyScope = attachScope (final: prev: { });
 in {
   fetchFromGitHub = let
-    fetchSuper = pkgsSuper.fetchFromGitHub;
-  in if isOverridable (fetchSuper { owner = null; repo = null; rev = null; })
-    then fetchSuper
-    else makeOverridable fetchSuper;
+    fetchPrev = pkgsPrev.fetchFromGitHub;
+  in if isOverridable (fetchPrev { owner = null; repo = null; rev = null; })
+    then fetchPrev
+    else makeOverridable fetchPrev;
 
   pythonInterpreters = let
-    pyInterpsSuper = pkgsSuper.pythonInterpreters;
-  in if isScope' pyInterpsSuper then pyInterpsSuper else attachEmptyScope' (self:
-    pyInterpsSuper.override (mapAttr "pkgs" (pkgs':
+    pyInterpsPrev = pkgsPrev.pythonInterpreters;
+  in if isScope pyInterpsPrev then pyInterpsPrev else attachEmptyScope (final:
+    pyInterpsPrev.override (mapAttr "pkgs" (pkgs':
       mapAttr "callPackage" (callPackage:
         fn: flow (mapAttrOrElse "overrides" (overrides:
-          pkgs'.lib.composeExtensions self.scopeOverrides overrides
-        ) (pySelf: pySuper: pySuper)) (callPackage fn)
+          pkgs'.lib.composeExtensions final.scopeOverrides overrides
+        ) (pyFinal: pyPrev: pyPrev)) (callPackage fn)
       ) pkgs'
     ))
   );
+
+  steamPackages = pkgsFinal.dontRecurseIntoAttrs (pkgsFinal.callPackage ./nixpkgs-steam-customisation.nix {
+    buildFHSUserEnv = pkgsFinal.buildFHSUserEnvBubblewrap;
+  });
 }
