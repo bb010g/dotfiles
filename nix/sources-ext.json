@@ -1,22 +1,22 @@
 {
     "firefox-nightly": {
-        "buildhub_url": "https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/firefox-91.0a1.en-US.linux-x86_64.buildhub.json",
+        "buildhub_url": "https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/firefox-96.0a1.en-US.linux-x86_64.buildhub.json",
         "buildhub_url_template": "https://download.cdn.mozilla.net/pub/firefox/nightly/latest-mozilla-central/<slug>.buildhub.json",
-        "date": "2021-06-12",
-        "date_d": "12",
-        "date_m": "06",
+        "date": "2021-11-10",
+        "date_d": "10",
+        "date_m": "11",
         "date_template": "<date_y>-<date_m>-<date_d>",
         "date_y": "2021",
         "locale": "en-US",
-        "slug": "firefox-91.0a1.en-US.linux-x86_64",
+        "slug": "firefox-96.0a1.en-US.linux-x86_64",
         "slug_template": "firefox-<version>.<locale>.<system>",
         "system": "linux-x86_64",
-        "timestamp": "2021-06-12-21-37-42",
+        "timestamp": "2021-11-10-09-24-53",
         "timestamp_template": "<date>-<timestamp_time>",
-        "timestamp_time": "21-37-42",
-        "url": "https://archive.mozilla.org/pub/firefox/nightly/2021/06/2021-06-12-21-37-42-mozilla-central/firefox-91.0a1.en-US.linux-x86_64.tar.bz2",
+        "timestamp_time": "09-24-53",
+        "url": "https://archive.mozilla.org/pub/firefox/nightly/2021/11/2021-11-10-09-24-53-mozilla-central/firefox-96.0a1.en-US.linux-x86_64.tar.bz2",
         "url_template": "https://archive.mozilla.org/pub/firefox/nightly/<date_y>/<date_m>/<timestamp>-mozilla-central/<slug>.tar.bz2",
-        "version": "91.0a1",
+        "version": "96.0a1",
         "versions_url": "https://product-details.mozilla.org/1.0/firefox_versions.json"
     }
 }
