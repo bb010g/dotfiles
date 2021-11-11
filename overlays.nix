@@ -78,11 +78,6 @@ let sources = import ./nix/sources.nix; in
     #     ];
     #   });
     # });
-    # tracker = if pkgsPrev.stdenv.buildPlatform.isi686 then pkgsPrev.tracker.overrideAttrs (attrsPrev: {
-    #   patches = attrsPrev.patches or [ ] ++ [
-    #     ./tracker-test.patch
-    #   ];
-    # }) else pkgsPrev.tracker;
     webex = pkgsFinal.callPackage ./webex {
       enableWayland = true;
     };
