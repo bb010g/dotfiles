@@ -34,7 +34,7 @@ in
       pkgs.dosfstools
       # pkgs.e2fsprogs
       pkgs.e2tools
-      # pkgs.exfat-utils
+      pkgs.exfatprogs
       pkgs.f2fs-tools
       pkgs.hfsprogs
       # pkgs.mtdutils
@@ -175,6 +175,8 @@ in
       pkgs.cv
       pkgs.diffstat
       pkgs.nur.pkgs.bb010g.dwdiff
+      # glib: Provides gio(1) & friends.
+      (lib.getBin pkgs.glib)
       pkgs.gnumake
       pkgs.hecate
       pkgs.hyperfine
@@ -190,7 +192,7 @@ in
       pkgs.rclone
       pkgs.sbcl
       pkgs.tokei
-      pkgs.nur.pkgs.bb010g.ttyd
+      # pkgs.nur.pkgs.bb010g.ttyd
       pkgs.unzip
       pkgs.nur.pkgs.bb010g.ydiff
     ];
@@ -204,21 +206,50 @@ in
       gui-tools
     ];
 
+    gui-x11 = true;
+    gui-x11-only = gui-x11 && false;
+    gui-wayland = true;
+    # gui-wayland-only = gui-wayland && true;
+
     gui-core = [
-      pkgs.arandr
       pkgs.breeze-icons
       pkgs.breeze-qt5
       pkgs.glxinfo
       pkgs.gnome3.adwaita-icon-theme
-      # pkgs.nur.pkgs.nexromancers.hacksaw
-      pkgs.hacksaw
       pkgs.hicolor-icon-theme
       pkgs.nix-gl.nixGLIntel
       pkgs.nix-gl.nixVulkanIntel
+      pkgs.qt5ct
+    ] ++ gui-core-x11 ++ gui-core-x11-only ++ gui-core-wayland;
+    gui-core-x11 = lib.optionals gui-x11 [
+      # arandr: Still works with multiple Wayland displays.
+      pkgs.arandr
+      # hacksaw: Has graphical glitches.
+      # pkgs.nur.pkgs.nexromancers.hacksaw
+      pkgs.hacksaw
+      # st-bb010g-unstable: foot is nicer.
+      pkgs.nur.pkgs.bb010g.st-bb010g-unstable
+    ];
+    gui-core-x11-only = lib.optionals gui-x11-only [
+      # shotgun: Requires X_GetImage.
       # pkgs.nur.pkgs.nexromancers.shotgun
       pkgs.shotgun
-      pkgs.nur.pkgs.bb010g.st-bb010g-unstable
+      # xsel: Requires XConvertSelection -> |event|(
+      #     event.type == SelectionNotify &&
+      #       event.xselection.property != None
+      #   )
       pkgs.xsel
+    ];
+    gui-core-wayland = lib.optionals gui-wayland [
+      # foot: Handled by programs.foot.
+      # pkgs.foot
+      pkgs.grim
+      pkgs.qt5.qtwayland
+      pkgs.slurp
+      pkgs.wl-clipboard
+      pkgs.wtype
+      # pkgs.xdg-desktop-portal
+      # pkgs.xdg-desktop-portal-wlr
     ];
 
     gui-editors = [
@@ -234,8 +265,8 @@ in
     ];
 
     gui-media = [
-      # TODO: ugh, aseprite-skia build times
-      pkgs.aseprite-unfree
+      # # TODO: ugh, aseprite-skia build times
+      # pkgs.aseprite-unfree
       pkgs.audacity
       pkgs.evince
       pkgs.geeqie
@@ -270,7 +301,7 @@ in
       pkgs.dmenu
       pkgs.freerdp
       pkgs.gnome3.gnome-system-monitor
-      pkgs.ksysguard
+      pkgs.plasma5Packages.ksystemstats
       # pkgs.nur.pkgs.bb010g.ipscan
       pkgs.notify-desktop
       pkgs.pavucontrol

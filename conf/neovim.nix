@@ -129,6 +129,7 @@ set scrolloff=5 sidescrolloff=4
         "vim-lion"
         "vim-magnum"
         "vim-operator-user"
+        "vim-oscyank"
         "vim-polyglot"
         "vim-precious"
         "vim-radical"

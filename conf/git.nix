@@ -34,7 +34,7 @@
       enable = true;
       extraConfig = {
         clone = {
-          defaultRemoteName = "o";
+          defaultRemoteName = "m";
         };
         core = {
           commentChar = "auto";

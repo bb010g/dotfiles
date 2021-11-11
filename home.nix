@@ -38,7 +38,9 @@ in
 
   programs.direnv = {
     enable = true;
-    enableNixDirenvIntegration = true;
+    enableBashIntegration = true;
+    enableZshIntegration = true;
+    nix-direnv.enable = true;
   };
 
   programs.emacs = { enable = true; };
@@ -333,16 +335,16 @@ in
 
   services.network-manager-applet = { enable = true; };
 
-  services.screen-locker = {
-    enable = true;
-    inactiveInterval = 10;
-    lockCmd = "${pkgs.i3lock}/bin/i3lock -f -c 131736";
-  };
+  # services.screen-locker = {
+  #   enable = true;
+  #   inactiveInterval = 10;
+  #   lockCmd = "${pkgs.i3lock}/bin/i3lock -f -c 131736";
+  # };
 
-  services.unclutter = {
-    enable = true;
-    timeout = 5;
-  };
+  # services.unclutter = {
+  #   enable = true;
+  #   timeout = 5;
+  # };
 
   xdg = {
     enable = true;
@@ -386,6 +388,34 @@ keep-outputs = true
 
   programs.foot = {
     enable = true;
+    server.enable = true;
+    settings = {
+      main.dpi-aware = "no";
+      main.font = "monospace-14:pixelsize=14"; # :antialias=true:autohint=true
+      mouse.hide-when-typing = "yes";
+      colors = {
+        foreground = "f8f8f2";
+        background = "282a36";
+
+        regular0   = "000000"; # black
+        regular1   = "ff5555"; # red
+        regular2   = "50fa7b"; # green
+        regular3   = "f1fa8c"; # yellow
+        regular4   = "bd93f9"; # blue
+        regular5   = "ff79c6"; # magenta
+        regular6   = "8be9fd"; # cyan
+        regular7   = "bfbfbf"; # white
+
+        bright0    = "4d4d4d"; # black
+        bright1    = "ff6e67"; # red
+        bright2    = "5af78e"; # green
+        bright3    = "f4f99d"; # yellow
+        bright4    = "caa9fa"; # blue
+        bright5    = "ff92d0"; # magenta
+        bright6    = "9aedfe"; # cyan
+        bright7    = "e6e6e6"; # white
+      };
+    };
   };
 
   programs.i3status = {
@@ -393,13 +423,16 @@ keep-outputs = true
     enableDefault = true;
   };
 
+  xsession.enable = false;
+  graphical-session.preferStatusNotifierItems = true;
+  services.xembed-sni-proxy.enable = true;
   wayland = {
     # enable = true;
     # pointerCursor = {
     #   package = pkgs.capitaine-cursors;
     #   name = "Capataine Cursors";
     # };
-    windowManager.sway = {
+    windowManager.sway = let cfg = config.wayland.windowManager.sway; in {
       enable = true;
       # package = pkgs.sway;
       config = let
@@ -407,7 +440,11 @@ keep-outputs = true
         mergeAttrList = lib.foldr lib.mergeAttrs {};
         mergeAttrMap = f: l: mergeAttrList (lib.concatMap f l);
 
-        inherit (config.wayland.windowManager.sway.config) modifier;
+        escapeSwayArg = arg:
+          if builtins.match "[^\\ \"]*" arg != null then arg else
+            "\"${lib.escape [ "\\" "\"" ] arg}\"";
+
+        inherit (cfg.config) modifier;
         arrowKeys = [ "Left" "Down" "Up" "Right" ];
         viKeys = [ "h" "j" "k" "l" ];
         workspaceNames = [ "1" "2" "3" "4" "5" "6" "7" "8" "9" "10" ];
@@ -418,7 +455,8 @@ keep-outputs = true
         dirNames = [ "left" "down" "up" "right" ];
         resizeActions = [ "shrink width" "shrink height" "grow height" "grow width" ];
       in {
-        bars = [
+        bars = [ ];
+        ${null/*bars*/} = [
           {
             # colors = {
             #   activeWorkspace = { background = "#5f676a"; border = "#333333"; text = "#ffffff"; };
@@ -440,22 +478,35 @@ keep-outputs = true
             workspaceNumbers = true;
           }
         ];
+        defaultWorkspace = "workspace number 1";
         inherit fonts;
+        input = {
+          "type:keyboard" = let cfgKeyboard = config.home.keyboard; in lib.mkIf (cfgKeyboard != null) {
+            xkb_layout = lib.mkIf (cfgKeyboard.layout != null) (escapeSwayArg cfgKeyboard.layout);
+            xkb_model = lib.mkIf (cfgKeyboard.model != null) (escapeSwayArg cfgKeyboard.model);
+            xkb_options = escapeSwayArg (lib.concatStringsSep "," cfgKeyboard.options);
+            xkb_variant = lib.mkIf (cfgKeyboard.variant != null) (escapeSwayArg cfgKeyboard.variant);
+          };
+          "type:touchpad" = {
+            dwt = "disabled";
+          };
+        };
         keybindings = mergeAttrList [
           (mergeAttrMap (ks: zipToAttrs (map (k: "${modifier}+${k}") ks) (map (d: "focus ${d}") dirNames)) [ viKeys arrowKeys ])
           (mergeAttrMap (ks: zipToAttrs (map (k: "${modifier}+Shift+${k}") ks) (map (d: "move ${d}") dirNames)) [ viKeys arrowKeys ])
           (mergeAttrMap (ks: zipToAttrs (map (k: "${modifier}+Ctrl+${k}") ks) (map (d: "move container to output ${d}") dirNames)) [ viKeys arrowKeys ])
           (mergeAttrMap (ks: zipToAttrs (map (k: "${modifier}+Shift+Ctrl+${k}") ks) (map (d: "move workspace to output ${d}") dirNames)) [ viKeys arrowKeys ])
-          (mergeAttrList (zipToAttrs (map (k: "${modifier}+${k}") workspaceKeys) (map (n: "workspace ${n}") workspaceNames)))
-          (mergeAttrList (zipToAttrs (map (k: "${modifier}+Shift+${k}") workspaceKeys) (map (n: "move workspace ${n}") workspaceNames)))
+          (mergeAttrList (zipToAttrs (map (k: "${modifier}+${k}") workspaceKeys) (map (n: "workspace number ${n}") workspaceNames)))
+          (mergeAttrList (zipToAttrs (map (k: "${modifier}+Shift+${k}") workspaceKeys) (map (n: "move workspace number ${n}") workspaceNames)))
           (mergeAttrList (zipToAttrs (map (k: "${modifier}+Shift+Ctrl+${k}") workspaceKeys) (map (n: "move workspace to output ${n}") workspaceNames)))
           {
-            # "${modifier}+Shift+q" = "kill";
-            # "${modifier}+d" = "exec ${pkgs.dmenu}/bin/dmenu_run";
+            "${modifier}+Return" = "exec ${cfg.config.terminal}";
+            "${modifier}+Shift+q" = "kill";
+            "${modifier}+d" = "exec ${pkgs.dmenu}/bin/dmenu_run";
 
-            # "${modifier}+a" = "focus parent";
+            "${modifier}+a" = "focus parent";
 
-            # "${modifier}+r" = "mode resize";
+            "${modifier}+r" = "mode resize";
 
             "${modifier}+g" = "split h";
             "${modifier}+v" = "split v";
@@ -471,8 +522,7 @@ keep-outputs = true
             "${modifier}+Shift+c" = "reload";
             "${modifier}+Shift+r" = "restart";
             "${modifier}+Shift+e" =
-              "exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit'";
-            # "${modifier}+Shift+e" = "exec i3-nagbar -t warning -m 'Do you want to exit i3?' -b 'Yes' 'i3-msg exit'";
+              "exec swaynag -t warning -m 'You pressed the exit shortcut. Do you really want to exit sway? This will end your Wayland session.' -b 'Yes, exit sway' 'swaymsg exit; systemctl --user stop graphical-session.target; systemctl --user stop graphical-session-pre.target'";
           }
         ];
         menu = "${pkgs.dmenu}/bin/dmenu_run";
@@ -486,13 +536,90 @@ keep-outputs = true
           ];
         };
         modifier = "Mod4";
-        terminal = "${config.programs.foot.package}/bin/foot";
+        terminal = "${config.programs.foot.package}/bin/footclient";
+        # workspaceLayout = "tabbed";
       };
       extraConfig = ''
         focus_wrapping workspace
+        for_window [shell=".*"] title_format "%title :: %shell"
       '';
+      extraSessionCommands = ''
+        export SDL_VIDEODRIVER=wayland
+        # needs qt5.qtwayland in systemPackages
+        export QT_QPA_PLATFORM=wayland
+        export QT_QPA_PLATFORMTHEME=qt5ct
+        export QT_WAYLAND_DISABLE_WINDOWDECORATION="1"
+        # Firefox
+        export MOZ_ENABLE_WAYLAND=1
+        # Fix for some Java AWT applications (e.g. Android Studio),
+        # use this if they aren't displayed properly:
+        export _JAVA_AWT_WM_NONREPARENTING=1
+      '';
+      systemdIntegration = true;
+      wrapperFeatures.gtk = true;
+      xwayland = true;
     };
   };
+  xdg.portal.desktop = {
+    enable = true;
+    gtk.usePortal = true;
+    wlr.enable = true;
+  };
+
+  programs.waybar = {
+    enable = true;
+    settings = [
+      {
+        layer = "bottom";
+        position = "top";
+        modules-left = [ "sway/workspaces" "sway/mode" "sway/window" ]; # "wlr/taskbar"
+        # modules-center = [ "sway/window" ];
+        modules-center = [ ];
+        # modules-right = [ "network" "battery" "disk" "cpu" "memory" "clock" "tray" ];
+        modules-right = [ "custom/status" "tray" ];
+        modules = {
+          # "cpu" = {
+          #   format = "{load}";
+          # };
+          "sway/workspaces" = {
+            all-outputs = true;
+          };
+          "custom/status" = {
+            exec = "${config.programs.i3status.package}/bin/i3status";
+            tooltip = false;
+          };
+          # "wlr/taskbar" = {
+          #   all-outputs = false;
+          # };
+        };
+      }
+    ];
+    style = ''
+      * {
+        border: none;
+        border-radius: 0;
+        font-family: monospace;
+        font-size: 10pt;
+      }
+      window#waybar {
+        background: #000000;
+        color: #ffffff;
+      }
+      #workspaces button {
+        padding: 0 2px;
+        background: #222222;
+        color: #888888;
+        border: 1px solid #333333;
+      }
+      #workspaces button.focused {
+        background: #285577;
+        color: #ffffff;
+        border: 1px solid #4c7899;
+      }
+    '';
+    systemd.enable = true;
+  };
+  services.blueman-applet.enable = true;
 }
 
 # vim:ft=nix:et:sw=2:tw=78
