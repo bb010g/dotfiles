@@ -1,4 +1,4 @@
-{ lib, stdenv, runCommand, fetchurl, patchelf, makeDesktopItem
+{ lib, stdenv, runCommand, fetchurl, autoPatchelfHook, makeDesktopItem
 , alsa-lib, at-spi2-atk, at-spi2-core, atk, cups, dbus, expat, fontconfig
 , freetype, glib, harfbuzz, libdrm, libgcrypt, libglvnd, libkrb5, libpulseaudio
 , libsecret, udev, libxcb, libxkbcommon, lshw, mesa, nspr, nss, pango, zlib
@@ -28,7 +28,7 @@ in stdenv.mkDerivation rec {
   src = unpackedSrc;
 
   nativeBuildInputs = [
-    patchelf
+    autoPatchelfHook
   ];
 
   buildInputs = [
