@@ -53,7 +53,7 @@ let sources = import ./nix/sources.nix; in
     addLibraryPath = addSearchPathOutput "lib" "lib";
   in {
     gitignore = import sources.gitignore { inherit (pkgsFinal) lib; };
-    niv = (import sources.niv { pkgs = pkgsFinal; }).niv;
+    # niv = (import sources.niv { pkgs = pkgsFinal; }).niv;
     nur = import ./config-nur.nix { pkgs = pkgsFinal; };
     nix-gl = import sources.nix-gl { pkgs = pkgsFinal; };
     # pythonInterpreters = pkgsPrev.pythonInterpreters.overrideScope (pyFinal: pyPrev: let

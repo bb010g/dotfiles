@@ -11,7 +11,7 @@ in
     core = [
       pkgs.ed # ed is the STANDARD text editor
       pkgs.file
-      pkgs.manpages
+      pkgs.man-pages
       pkgs.moreutils
       # pkgs.nvi
       pkgs.posix_man_pages
@@ -131,14 +131,15 @@ in
       pkgs.bitwarden-cli
       pkgs.nur.pkgs.bb010g.broca-unstable
       pkgs.cowsay
-      pkgs.nur.pkgs.bb010g.edbrowse
+      # pkgs.nur.pkgs.bb010g.edbrowse
+      pkgs.edbrowse
       pkgs.elinks
       pkgs.fortune
       # pkgs.nur.pkgs.bb010g.html2json-unstable
       pkgs.lynx
       pkgs.megatools
       pkgs.ponysay
-      pkgs.smbclient
+      pkgs.samba
       pkgs.units
     ];
 
@@ -159,7 +160,7 @@ in
       pkgs.nix-prefetch-scripts
       pkgs.nix-top
       pkgs.nix-universal-prefetch
-      pkgs.vulnix
+      # pkgs.vulnix
       pkgs.yarn2nix-moretea.yarn2nix
       # TODO figure out how to build nixpkgs manual
     ];
@@ -172,7 +173,6 @@ in
       pkgs.bind
       pkgs.binutils
       pkgs.colordiff
-      pkgs.cv
       pkgs.diffstat
       pkgs.nur.pkgs.bb010g.dwdiff
       # glib: Provides gio(1) & friends.
@@ -189,6 +189,7 @@ in
       pkgs.ngrok
       pkgs.p7zip
       pkgs.ponymix
+      pkgs.progress
       pkgs.rclone
       pkgs.sbcl
       pkgs.tokei

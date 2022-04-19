@@ -1,15 +1,77 @@
-{ lib, stdenv, runCommand, fetchurl, autoPatchelfHook, makeDesktopItem
-, alsa-lib, at-spi2-atk, at-spi2-core, atk, cups, dbus, expat, fontconfig
-, freetype, glib, harfbuzz, libdrm, libgcrypt, libglvnd, libkrb5, libpulseaudio
-, libsecret, udev, libxcb, libxkbcommon, lshw, mesa, nspr, nss, pango, zlib
-, libX11, libXcomposite, libXcursor, libXdamage, libXext , libXfixes, libXi
-, libXrandr, libXrender, libXtst, libxshmfence, xcbutil , xcbutilimage
-, xcbutilkeysyms, xcbutilrenderutil, xcbutilwm, p7zip, wayland
+{ lib, stdenv, runCommand, fetchurl, autoPatchelfHook, makeDesktopItem, p7zip
+, alsa-lib
+, at-spi2-atk
+, at-spi2-core
+, atk
+, cups
+, curl
+, dbus
+, expat
+, ffmpeg
+, fontconfig
+, freetype
+, glib
+, harfbuzz
+, icu
+, jsoncpp
+, libX11
+, libXcomposite
+, libXcursor
+, libXdamage
+, libXext
+, libXfixes
+, libXi
+, libXrandr
+, libXrender
+, libXtst
+, libcap
+, libdrm
+, libevent
+, libgcrypt
+, libglvnd
+, libjpeg
+, libkrb5
+, libopus
+, libpng
+, libpulseaudio
+, libsecret
+, libtiff
+, libvpx
+, libwebp
+, libxcb
+, libxkbcommon
+, libxkbfile
+, libxml2
+, libxshmfence
+, libxslt
+, lshw
+, mesa
+, minizip
+, nspr
+, nss
+, openssl
+, pango
+, pciutils
+, pcre2
+, pipewire
+, protobuf
+, snappy
+, sqlite
+, srtp
+, udev
+, wayland
+, xcbutil
+, xcbutilimage
+, xcbutilkeysyms
+, xcbutilrenderutil
+, xcbutilwm
+, xrandr
+, zlib
 , enableWayland ? false
 }:
 
 let
-  inherit (lib) optional;
+  inherit (lib) concatStringsSep getLib optional;
   desktopName = "Webex";
   binaryName = "CiscoCollabHost";
   versionSpec = builtins.fromJSON (builtins.readFile ./version.json);
@@ -37,27 +99,16 @@ in stdenv.mkDerivation rec {
     at-spi2-core
     atk
     cups
+    curl
     dbus
     expat
+    ffmpeg
     fontconfig
     freetype
     glib
     harfbuzz
-    lshw
-    mesa
-    nspr
-    nss
-    pango
-    zlib
-    libdrm
-    libgcrypt
-    libglvnd
-    libkrb5
-    libpulseaudio
-    libsecret
-    udev
-    libxcb
-    libxkbcommon
+    icu
+    jsoncpp
     libX11
     libXcomposite
     libXcursor
@@ -68,17 +119,55 @@ in stdenv.mkDerivation rec {
     libXrandr
     libXrender
     libXtst
+    libcap
+    libdrm
+    libevent
+    libgcrypt
+    libglvnd
+    libjpeg
+    libkrb5
+    libopus
+    libpng
+    libpulseaudio
+    libsecret
+    libtiff
+    libvpx
+    libwebp
+    libxcb
+    libxkbcommon
+    libxkbfile
+    libxml2
     libxshmfence
+    libxslt
+    lshw
+    mesa
+    minizip
+    nspr
+    nss
+    openssl
+    pango
+    pciutils
+    pcre2
+    pipewire
+    protobuf
+    snappy
+    sqlite
+    srtp
+    udev
     xcbutil
     xcbutilimage
     xcbutilkeysyms
     xcbutilrenderutil
     xcbutilwm
+    xrandr
+    zlib
   ] ++ optional enableWayland wayland;
 
-  libPath = lib.makeLibraryPath (buildInputs ++ [
+  runtimeDependencies = concatStringsSep " " (map getLib buildInputs ++ [
     "${placeholder "out"}/opt/Webex"
-  ]) + ":${placeholder "out"}/opt/Webex/bin";
+    # guard $out/opt/Webex/bin from having /lib suffixed
+    "${placeholder "out"}/opt/Webex/bin:/dev/null"
+  ]);
 
   postUnpack = ''
     sourceRoot=$sourceRoot/Webex_ubuntu
@@ -91,14 +180,14 @@ in stdenv.mkDerivation rec {
   #   runHook preBuild
   #   patchelf \
   #     --set-interpreter "$(cat $NIX_CC/nix-support/dynamic-linker)" \
-  #     --set-rpath "$libPath" \
+  #     --set-rpath "$runtimeDependencies" \
   #     opt/Webex/bin/CiscoCollabHost \
   #     opt/Webex/bin/CiscoCollabHostCef \
   #     opt/Webex/bin/CiscoCollabHostCefWM \
   #     opt/Webex/bin/WebexFileSelector \
   #     opt/Webex/bin/pxgsettings
   #   for each in $(find opt/Webex -type f | grep \\.so); do
-  #     patchelf --set-rpath "$libPath" "$each"
+  #     patchelf --set-rpath "$runtimeDependencies" "$each"
   #   done
   #   runHook postBuild
   # '';

@@ -20,27 +20,28 @@ in
     # ./conf/pijul.nix
     ./conf/redshift.nix
     ./conf/session-variables.nix
-    ./conf/tex.nix
+    # ./conf/tex.nix
   ];
 
   # dconf. 24-hour time
 
   # home.sessionVariables = you probably want systemd.user.sessionVariables
 
-  home.stateVersion = "21.05";
+  home.stateVersion = "22.05";
   home.username = "bb010g";
   home.homeDirectory = "/home/bb010g";
 
   manual = {
     html.enable = true;
-    manpages.enable = true;
+    man-pages.enable = true;
   };
 
   programs.direnv = {
     enable = true;
     enableBashIntegration = true;
     enableZshIntegration = true;
-    nix-direnv.enable = true;
+    # nix-direnv.enable = true;
+    # nix-direnv.enableFlakes = true;
   };
 
   programs.emacs = { enable = true; };
@@ -61,7 +62,7 @@ in
   programs.jq = {
     enable = true;
     # package = pkgs.jq;
-    package = pkgs.nur.pkgs.bb010g.jq;
+    # package = pkgs.nur.pkgs.bb010g.jq;
   };
 
   programs.mercurial = {
