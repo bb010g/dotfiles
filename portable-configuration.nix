@@ -111,36 +111,52 @@ in
 
       # Select internationalisation properties.
       i18n.defaultLocale = "en_US.UTF-8";
-      # console = {
-      #   font = "Lat2-Terminus16";
-      #   # keyMap = "us";
-      #   useXkbConfig = true; # use xkb.options in tty.
-      # };
+      console = {
+        # font = "Lat2-Terminus16";
+        # keyMap = "us";
+        useXkbConfig = true; # use xkb.options in tty.
+      };
     }
     # Enable magic SysRq
     {
       boot.kernel.sysctl."kernel.sysrq" = 1;
       boot.kernelParams = [ "sysrq_always_enabled=1" ];
     }
+    # # Enable system greeter.
+    # {
+    #   services.greetd.enable = true;
+    # }
+    # Use Wayland.
+    {
+      services.xserver.displayManager.sddm.wayland.enable = true;
+    }
+    # KDE Plasma 6 graphical session.
+    {
+      services.xserver.enable = true;
+      services.desktopManager.plasma6.enable = true;
+    }
     # Uncategorized confifguration.
     {
+      boot.initrd.systemd.emergencyAccess = config.users.users.root.hashedPassword;
 
-      # # Enable the X11 windowing system.
-      # services.xserver.enable = true;
-
-
-      
+      services.smartd.enable = true;
 
       # # Configure keymap in X11
       services.xserver.xkb.layout = "us";
       # services.xserver.xkb.options = "eurosign:e,caps:escape";
 
-      # # Enable CUPS to print documents.
-      # services.printing.enable = true;
+      # Enable CUPS to print documents.
+      services.printing.enable = true;
+      services.printing.browsing = true;
+      services.printing.cups-pdf.enable = true;
+      services.printing.tempDir = "/tmp/cups";
 
-      # # Enable sound.
-      # sound.enable = true;
-      # hardware.pulseaudio.enable = true;
+      # Enable sound.
+      sound.enable = true;
+      services.pipewire.enable = true;
+      services.pipewire.alsa.enable = true;
+      services.pipewire.jack.enable = true;
+      services.pipewire.pulse.enable = true;
 
       # # Enable touchpad support (enabled default in most desktopManager).
       # services.xserver.libinput.enable = true;
@@ -149,7 +165,6 @@ in
 
       # Define a user account. Don't forget to set a password with ‘passwd’.
       users.users.root.hashedPassword = "$y$j9T$cUQllF01PobECG4vm4/Pw/$qDfVrxiI/4i53T54oDhf9rr3ZZpRhAwPFdcZfO.UNmD";
-      boot.initrd.systemd.emergencyAccess = config.users.users.root.hashedPassword;
       users.users.bb010g = {
         isNormalUser = true;
         extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
@@ -159,13 +174,6 @@ in
           # pkgs.tree
         ];
       };
-
-      # # List packages installed in system profile. To search, run:
-      # $ nix search wget
-      # environment.systemPackages = [
-      #   pkgs.nvim # Do not forget to add an editor to edit configuration.nix! The Nano editor is also installed by default.
-      #   pkgs.nwget
-      # ];
 
       # # Some programs need SUID wrappers, can be configured further or are
       # # started in user sessions.
