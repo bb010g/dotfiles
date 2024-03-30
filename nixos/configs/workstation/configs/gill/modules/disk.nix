@@ -6,10 +6,6 @@ let
   nixosConfigDir = builtins.dirOf nixosConfigPath;
 in
 {
-  imports = [
-    # Intentionally separate disko configuration.
-    ./disko-configuration.nix
-  ];
   config = lib.mkMerge [
     # TODO(Dusk): allow defining this in disko
     # TODO(Dusk): systemd.mount(5) for Impermanence?
@@ -313,10 +309,5 @@ in
         virtualisation.containers.storage.settings.graphroot = "/var/lib/containers/storage";
       })
     ])
-    {
-      system.extraSystemBuilderCmds = lib.mkIf config.system.copySystemConfiguration ''
-        ln -s ${lib.escapeShellArg (nixosConfigDir + "/disko-configuration.nix")} "$out/disko-configuration.nix"
-        ln -s ${lib.escapeShellArg (nixosConfigDir + "/disk-configuration.nix")} "$out/disk-configuration.nix"'';
-    }
   ];
 }

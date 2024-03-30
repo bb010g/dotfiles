@@ -39,9 +39,6 @@ in
     hardware.enableRedistributableFirmware = lib.mkDefault true;
 
     nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
-
-    system.extraSystemBuilderCmds = lib.mkIf config.system.copySystemConfiguration ''
-      ln -s ${lib.escapeShellArg (nixosConfigDir + "/hardware-configuration.nix")} "$out/hardware-configuration.nix"'';
   };
 }
 # vim: set sta et sw=2 ts=8:

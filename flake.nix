@@ -21,36 +21,82 @@
   inputs.systems.url = "github:nix-systems/default";
 
   outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (
-    { config, getSystem, inputs, lib, options, self, ... }:
     let
+      _moduleDataForPath = import ./nix/lib/_moduleDataForPath.nix;
+      # _nixosDataForPath = _moduleDataForPath.withNixosAttrNames;
+      _nixosDataForPath = _moduleDataForPath.withShortBaseNames;
+      # _nixosDataForPath' = _moduleDataForPath.withNixosBaseNames;
+      nixosDataForPath = _nixosDataForPath.moduleDataForPath;
+      # nixosDataForPath' = _nixosDataForPath'.moduleDataForPath;
+      nixosData = nixosDataForPath ./nixos;
+      # safeCwd = builtins.filterSource (path: type: !(builtins.elem (builtins.baseNameOf path) [ ".git" "default.nix" "shell.nix" ])) ./.;
+      # nixosData' = nixosDataForPath' safeCwd;
+    in
+    { config, getSystem, inputs, lib, moduleLocation, options, self, ... }:
+    let
+      inherit (builtins) attrNames concatMap listToAttrs;
+      concatMapAttrs' = f: attrs: listToAttrs (concatMapAttrsToList f attrs);
+      concatMapAttrsToList = f: attrs:
+        concatMap (attrName: f attrName attrs.${attrName}) (attrNames attrs);
       flakeConfig = config;
       flakeOptions = options;
       importModules = imports: { inherit imports; };
+
+      # nixosModuleData = builtins.
+      nixosModuleLists =
+        let
+          f = parentName: name: value:
+            let
+              name' = "configuration-${name}";
+            in
+            [
+              {
+                name = name';
+                value = config.flake.nixosModuleLists.${parentName} ++ value.moduleList or [ ];
+              }
+            ] ++ concatMapAttrsToList (f name') value.configurations or { };
+        in
+        listToAttrs (concatMapAttrsToList (f "default") nixosData.configurations);
     in
     {
       imports = [
+        ./flake-parts/modules/nixosModuleLists.nix
       ];
-      config.flake.nixosConfigurations.nixos = inputs.nixpkgs.lib.nixosSystem {
-        modules = [
-          config.flake.nixosModules.configuration-nixos
-        ];
-        specialArgs = { inherit self inputs; };
+      config.flake.flakeModules = {
+        nixosModuleLists = ./flake-parts/modules/nixosModuleLists.nix;
       };
-      # replicated in configuration.nix
-      config.flake.nixosModules.configuration-nixos = importModules [
-        inputs.disko.nixosModules.disko
-        inputs.impermanence.nixosModules.impermanence
-        # Include the portable parts of the configuration.
-        config.flake.nixosModules.default
-        # Include the disk partitioning and formatting.
-        config.flake.nixosModules.default-disk
-        # Include the results of the hardware scan.
-        config.flake.nixosModules.default-hardware
+      config.flake.lib = import ./nix/lib;
+      config.flake.nixosConfigurations = lib.mkMerge [
+        (concatMapAttrs'
+          (name: value:
+            let
+              nameMatches = builtins.match "configuration-(.*)" name;
+              name' = builtins.elemAt nameMatches 0;
+              value' = inputs.nixpkgs.lib.nixosSystem {
+                modules = [ value ];
+                specialArgs = { inherit self inputs; };
+              };
+            in
+            if nameMatches != null then [ { name = name'; value = value'; } ] else [ ])
+          config.flake.nixosModules)
       ];
-      config.flake.nixosModules.default = ./portable-configuration.nix;
-      config.flake.nixosModules.default-disk = ./disk-configuration.nix;
-      config.flake.nixosModules.default-disko = ./disko-configuration.nix;
-      config.flake.nixosModules.default-hardware = ./hardware-configuration.nix;
+      config.flake._nixosData = nixosData;
+      config.flake.nixosModules = lib.mkMerge [
+        {
+        }
+        (builtins.mapAttrs
+          (name: imports: { _file = "${toString moduleLocation}#nixosModuleLists.${name}"; inherit imports; })
+          config.flake.nixosModuleLists)
+      ];
+      config.flake.nixosModuleLists = lib.mkMerge [
+        {
+          default = [
+            inputs.disko.nixosModules.disko
+            inputs.impermanence.nixosModules.impermanence
+          ] ++ nixosData.moduleList or [ ];
+        }
+        nixosModuleLists
+      ];
       config.systems = import inputs.systems;
     }
   );

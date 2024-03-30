@@ -122,14 +122,14 @@ in
       boot.kernel.sysctl."kernel.sysrq" = 1;
       boot.kernelParams = [ "sysrq_always_enabled=1" ];
     }
-    # # Enable system greeter.
-    # {
-    #   services.greetd.enable = true;
-    # }
     # Use Wayland.
     {
       services.xserver.displayManager.sddm.wayland.enable = true;
     }
+    # # Enable system greeter.
+    # {
+    #   services.greetd.enable = true;
+    # }
     # KDE Plasma 6 graphical session.
     {
       services.xserver.enable = true;
@@ -322,23 +322,23 @@ in
       virtualisation.podman.enable = true;
       virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
     }
+    # Uncategorized graphical confifguration.
+    (lib.mkIf config.services.xserver.enable {
+      programs.wireshark.package = pkgs.wireshark;
+    })
     # Make the NixOS configuration accessible, with or without flakes.
-    (if lib.inPureEvalMode then
-      if moduleArgs.self or { } ? outPath then
-        {
-          system.extraSystemBuilderCmds = /* lib.mkIf config.system.copySystemConfiguration */ ''
-            ln -s ${lib.escapeShellArg moduleArgs.self.outPath} "$out/configuration-source"'';
-        }
-      else
-        { }
-    else
+    (lib.mkMerge [
       {
         # Copy the NixOS configuration file and link it from the resulting system
         # (/run/current-system/configuration.nix). This is useful in case you
         # accidentally delete configuration.nix.
-        system.copySystemConfiguration = true;
+        system.copySystemConfiguration = !lib.inPureEvalMode; # TODO(Dusk): `true`
       }
-    )
+      (if !(moduleArgs.self or { } ? outPath) then { } else {
+        system.extraSystemBuilderCmds = /* lib.mkIf config.system.copySystemConfiguration */ ''
+          ln -s ${lib.escapeShellArg moduleArgs.self.outPath} "$out/configuration"'';
+      })
+    ])
     {
       # This option defines the first version of NixOS you have installed on this particular machine,
       # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
@@ -357,10 +357,6 @@ in
       #
       # For more information, see `man configuration.nix` or https://nixos.org/manual/nixos/stable/options#opt-system.stateVersion .
       system.stateVersion = "23.11"; # Did you read the comment?
-    }
-    {
-      system.extraSystemBuilderCmds = lib.mkIf config.system.copySystemConfiguration ''
-        ln -s ${lib.escapeShellArg (nixosConfigDir + "/portable-configuration.nix")} "$out/portable-configuration.nix"'';
     }
   ];
 }
