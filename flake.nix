@@ -93,6 +93,7 @@
           default = [
             inputs.disko.nixosModules.disko
             inputs.impermanence.nixosModules.impermanence
+            inputs.home-manager.nixosModules.home-manager
           ] ++ nixosData.moduleList or [ ];
         }
         nixosModuleLists

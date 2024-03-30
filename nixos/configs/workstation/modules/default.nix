@@ -156,18 +156,6 @@
 
       users.mutableUsers = false;
 
-      # Define a user account. Don't forget to set a password with ‘passwd’.
-      users.users.root.hashedPassword = "$y$j9T$cUQllF01PobECG4vm4/Pw/$qDfVrxiI/4i53T54oDhf9rr3ZZpRhAwPFdcZfO.UNmD";
-      users.users.bb010g = {
-        isNormalUser = true;
-        extraGroups = [ "wheel" ]; # Enable ‘sudo’ for the user.
-        hashedPassword = "$y$j9T$cUQllF01PobECG4vm4/Pw/$qDfVrxiI/4i53T54oDhf9rr3ZZpRhAwPFdcZfO.UNmD";
-        packages = [
-          # pkgs.firefox
-          # pkgs.tree
-        ];
-      };
-
       # # Some programs need SUID wrappers, can be configured further or are
       # # started in user sessions.
       # programs.mtr.enable = true;
@@ -177,6 +165,10 @@
       # };
 
       # List services that you want to enable:
+    }
+    # Enable flatpak.
+    {
+      services.flatpak.enable = true;
     }
     # Use compressed swap.
     {
