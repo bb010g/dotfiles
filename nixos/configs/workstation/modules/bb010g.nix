@@ -9,7 +9,6 @@
         home.packages = [
 	  pkgs.bitwarden-cli # Bitwarden
 	  pkgs.bitwarden-desktop # Bitwarden
-	  pkgs.goldwarden # Bitwarden
 	  pkgs.neochat # Matrix
 	  pkgs.telegram-desktop # Telegram
           pkgs.firefox # Web

@@ -236,6 +236,11 @@
         pkgs.uftrace
       ];
     }
+    # Enable the Goldwarden client for the Bitwarden password manager.
+    {
+      programs.goldwarden.enable = true;
+      programs.goldwarden.useSshAgent = true;
+    }
     # Enable direnv.
     {
       programs.direnv.enable = true;
