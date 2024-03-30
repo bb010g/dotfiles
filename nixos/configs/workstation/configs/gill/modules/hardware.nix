@@ -3,11 +3,6 @@
 # to /etc/nixos/configuration.nix instead.
 { config, lib, modulesPath, ... }:
 
-let
-  fromEnv = import (modulesPath + "/../lib/from-env.nix");
-  nixosConfigDir = builtins.dirOf nixosConfigPath;
-  nixosConfigPath = fromEnv "NIXOS_CONFIG" <nixos-config>;
-in
 {
   config = {
     boot.initrd.availableKernelModules = [
@@ -25,6 +20,8 @@ in
     ];
     boot.extraModulePackages = [
     ];
+
+    boot.loader.efi.canTouchEfiVariables = true;
 
     # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
     # (the default) this is the recommended approach. When using systemd-networkd it's

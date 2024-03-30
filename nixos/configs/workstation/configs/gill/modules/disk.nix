@@ -1,10 +1,5 @@
 { config, lib, modulesPath, ... }:
 
-let
-  fromEnv = import (modulesPath + "/../lib/from-env.nix");
-  nixosConfigPath = fromEnv "NIXOS_CONFIG" <nixos-config>;
-  nixosConfigDir = builtins.dirOf nixosConfigPath;
-in
 {
   config = lib.mkMerge [
     # TODO(Dusk): allow defining this in disko
