@@ -174,11 +174,12 @@
         { file = "/var/lib/yggdrasil/keys.json"; /* mode = "0700"; */ }
       ];
     }))
-    (lib.mkIf config.sound.enable {
-      environment.persistence."/stateroot".files = [
-        { file = "/var/lib/alsa/asound.state"; /* mode = "0644"; */ }
-      ];
-    })
+    # # TODO(Dusk): unbreak
+    # (lib.mkIf config.sound.enable {
+    #   environment.persistence."/stateroot".files = [
+    #     { file = "/var/lib/alsa/asound.state"; /* mode = "0644"; */ }
+    #   ];
+    # })
     # systemd {manpage}`machinectl(1)` / {manpage}`systemd-nspawn(1)`
     {
       environment.persistence."/stateroot".directories = [
