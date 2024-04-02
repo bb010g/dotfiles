@@ -9,6 +9,7 @@
       pkgs.bitwarden-desktop # Bitwarden
       pkgs.firefox # Web
       pkgs.neochat # Matrix
+      pkgs.obsidian # Obsidian
       pkgs.sublime-merge # Git
       pkgs.telegram-desktop # Telegram
     ];
