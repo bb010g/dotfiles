@@ -2,7 +2,7 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-{ config, lib, modulesPath, pkgs, ... }@moduleArgs:
+moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
 
 {
   config = lib.mkMerge [
@@ -117,7 +117,13 @@
     }
     # Use Wayland.
     {
+      environment.systemPackages = [
+        pkgs.wl-clipboard
+      ];
       services.xserver.displayManager.sddm.wayland.enable = true;
+      services.xserver.excludePackages = [
+        pkgs.xorg.xorgserver.out
+      ];
     }
     # # Enable system greeter.
     # {
@@ -128,8 +134,8 @@
       environment.systemPackages = [
         pkgs.libsForQt5.polonium # NOTE: Might move to Plasma 6 architecture soon
       ];
-      services.xserver.enable = true;
       services.desktopManager.plasma6.enable = true;
+      services.xserver.enable = true;
     }
     # Uncategorized confifguration.
     {
