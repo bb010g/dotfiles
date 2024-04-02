@@ -4,17 +4,21 @@
   config = {
     home-manager.users.bb010g = (
       { config, lib, pkgs, ... }:
-      
+
       {
         home.packages = [
-	  pkgs.bitwarden-cli # Bitwarden
-	  pkgs.bitwarden-desktop # Bitwarden
-	  pkgs.neochat # Matrix
-	  pkgs.telegram-desktop # Telegram
+          pkgs.bitwarden-cli # Bitwarden
+          pkgs.bitwarden-desktop # Bitwarden
           pkgs.firefox # Web
+          pkgs.neochat # Matrix
+          pkgs.sublime-merge # Git
+          pkgs.telegram-desktop # Telegram
         ];
 
         home.stateVersion = "23.11";
+
+        programs.bat.enable = true;
+        programs.eza.enable = true;
       }
     );
     # Define a user account.

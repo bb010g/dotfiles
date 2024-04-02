@@ -125,6 +125,9 @@
     # }
     # KDE Plasma 6 graphical session.
     {
+      environment.systemPackages = [
+        pkgs.libsForQt5.polonium # NOTE: Might move to Plasma 6 architecture soon
+      ];
       services.xserver.enable = true;
       services.desktopManager.plasma6.enable = true;
     }
@@ -184,6 +187,10 @@
         "nix-command"
         "flakes"
       ];
+    }
+    # Enable unfree packages.
+    {
+      nixpkgs.config.allowUnfree = true;
     }
     # Enable the Cachix binary cache.
     {
