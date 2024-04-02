@@ -18,5 +18,8 @@
     programs.bat.enable = true;
 
     programs.eza.enable = true;
+
+    programs.zellij.enable = true;
+    programs.zellij.enableBashIntegration = true;
   };
 }
