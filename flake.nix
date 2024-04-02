@@ -97,6 +97,7 @@
             inputs.disko.nixosModules.disko
             inputs.impermanence.nixosModules.impermanence
             inputs.home-manager.nixosModules.home-manager
+            { config.home-manager.sharedModules = [ inputs.plasma-manager.homeManagerModules.plasma-manager ]; }
           ] ++ nixosData.moduleList or [ ];
         }
         nixosModuleLists
