@@ -25,27 +25,41 @@
 
   outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (
     let
-      _moduleDataForPath = import ./nix/lib/_moduleDataForPath.nix;
-      # _nixosDataForPath = _moduleDataForPath.withNixosAttrNames;
-      _nixosDataForPath = _moduleDataForPath.withShortBaseNames;
-      # _nixosDataForPath' = _moduleDataForPath.withNixosBaseNames;
-      nixosDataForPath = _nixosDataForPath.moduleDataForPath;
-      # nixosDataForPath' = _nixosDataForPath'.moduleDataForPath;
+      _lib = import ./nix/lib/_lib.nix;
+      homeManagerData = homeManagerDataForPath ./home-manager;
+      homeManagerDataForPath = _lib.dataOfPath.withShortNames.moduleDataForPath;
       nixosData = nixosDataForPath ./nixos;
-      # safeCwd = builtins.filterSource (path: type: !(builtins.elem (builtins.baseNameOf path) [ ".git" "default.nix" "shell.nix" ])) ./.;
-      # nixosData' = nixosDataForPath' safeCwd;
+      nixosDataForPath = _lib.dataOfPath.withShortNames.moduleDataForPath;
     in
     { config, getSystem, inputs, lib, moduleLocation, options, self, ... }:
     let
-      inherit (builtins) attrNames concatMap listToAttrs;
-      concatMapAttrs' = f: attrs: listToAttrs (concatMapAttrsToList f attrs);
-      concatMapAttrsToList = f: attrs:
-        concatMap (attrName: f attrName attrs.${attrName}) (attrNames attrs);
+      inherit (builtins)
+        attrNames
+        concatMap
+        listToAttrs
+        ;
+      inherit (_lib.attrs)
+        concatMapAttrs'
+        concatMapAttrsToList
+        ;
       flakeConfig = config;
       flakeOptions = options;
-      importModules = imports: { inherit imports; };
-
-      # nixosModuleData = builtins.
+      homeManagerModuleLists =
+        let
+          f = parentName: name: value:
+            let
+              name' = "configuration-${name}";
+            in
+            [
+              {
+                name = name';
+                value = config.flake.homeManagerModuleLists.${parentName} ++ value.moduleList or [ ];
+              }
+            ] ++ concatMapAttrsToList (f name') value.configs or { };
+        in
+        listToAttrs (concatMapAttrsToList (f "default") homeManagerData.configs);
+      importModules = _file: imports:
+        { ${if _file != null then "_file" else null} = _file; inherit imports; };
       nixosModuleLists =
         let
           f = parentName: name: value:
@@ -57,50 +71,91 @@
                 name = name';
                 value = config.flake.nixosModuleLists.${parentName} ++ value.moduleList or [ ];
               }
-            ] ++ concatMapAttrsToList (f name') value.configurations or { };
+            ] ++ concatMapAttrsToList (f name') value.configs or { };
         in
-        listToAttrs (concatMapAttrsToList (f "default") nixosData.configurations);
+        listToAttrs (concatMapAttrsToList (f "default") nixosData.configs);
     in
     {
       imports = [
-        ./flake-parts/modules/nixosModuleLists.nix
+        ./flake-parts/modules/home-manager.nix
+        ./flake-parts/modules/nixos.nix
       ];
       config.flake.flakeModules = {
+        home-manager = ./flake-parts/modules/home-manager.nix;
+        homeConfigurations = ./flake-parts/modules/homeConfigurations.nix;
+        homeManagerModules = ./flake-parts/modules/homeManagerModules.nix;
+        nixos = ./flake-parts/modules/nixos.nix;
         nixosModuleLists = ./flake-parts/modules/nixosModuleLists.nix;
       };
+      config.flake.homeConfigurations = lib.mkMerge [
+        (concatMapAttrs'
+          (moduleName: module:
+            let
+              nameMatches = builtins.match "configuration-(.*)" moduleName;
+              configurationName = builtins.elemAt nameMatches 0;
+              configuration = inputs.home-manager.lib.homeManagerConfiguration {
+                # inherit pkgs;
+                modules = [ config.flake.homeManagerModules.externalModules module ];
+                extraSpecialArgs = { inherit self inputs; flakeConfig = config; };
+              };
+            in
+            if nameMatches == null then [ ] else
+              [ { name = moduleName; value = module; } ])
+          config.flake.homeManagerModules)
+      ];
+      config.flake.homeManagerModuleLists = lib.mkMerge [
+        {
+          default = homeManagerData.moduleList or [ ];
+          externalModules = [
+            inputs.plasma-manager.homeManagerModules.plasma-manager
+          ];
+          sharedModules = config.flake.homeManagerModuleLists.externalModules ++
+            config.flake.homeManagerModuleLists.default;
+        }
+        homeManagerModuleLists
+      ];
+      config.flake.homeManagerModules = lib.mkMerge [
+        (builtins.mapAttrs
+          (name: importModules "${toString moduleLocation}#homeManagerModuleLists.${name}")
+          config.flake.homeManagerModuleLists)
+      ];
       config.flake.lib = import ./nix/lib;
       config.flake.nixosConfigurations = lib.mkMerge [
         (concatMapAttrs'
-          (name: value:
+          (moduleName: module:
             let
-              nameMatches = builtins.match "configuration-(.*)" name;
-              name' = builtins.elemAt nameMatches 0;
-              value' = inputs.nixpkgs.lib.nixosSystem {
-                modules = [ value ];
-                specialArgs = { inherit self inputs; };
+              nameMatches = builtins.match "configuration-(.*)" moduleName;
+              configurationName = builtins.elemAt nameMatches 0;
+              configuration = inputs.nixpkgs.lib.nixosSystem {
+                modules = [ config.flake.nixosModules.externalModules module ];
+                specialArgs = { inherit self inputs; flakeConfig = config; };
               };
             in
-            if nameMatches != null then [ { name = name'; value = value'; } ] else [ ])
+            if nameMatches == null then [ ] else
+              [ { name = configurationName; value = configuration; } ])
           config.flake.nixosModules)
       ];
       config.flake._nixosData = nixosData;
-      config.flake.nixosModules = lib.mkMerge [
-        {
-        }
-        (builtins.mapAttrs
-          (name: imports: { _file = "${toString moduleLocation}#nixosModuleLists.${name}"; inherit imports; })
-          config.flake.nixosModuleLists)
-      ];
       config.flake.nixosModuleLists = lib.mkMerge [
         {
-          default = [
+          default = nixosData.moduleList or [ ];
+          externalModules = [
             inputs.disko.nixosModules.disko
             inputs.impermanence.nixosModules.impermanence
             inputs.home-manager.nixosModules.home-manager
-            { config.home-manager.sharedModules = [ inputs.plasma-manager.homeManagerModules.plasma-manager ]; }
-          ] ++ nixosData.moduleList or [ ];
+            {
+              config.home-manager.sharedModules = config.flake.homeManagerModuleLists.sharedModules;
+            }
+          ];
+          sharedModules = config.flake.nixosModuleLists.externalModules ++
+            config.flake.nixosModuleLists.default;
         }
         nixosModuleLists
+      ];
+      config.flake.nixosModules = lib.mkMerge [
+        (builtins.mapAttrs
+          (name: importModules "${toString moduleLocation}#nixosModuleLists.${name}")
+          config.flake.nixosModuleLists)
       ];
       config.systems = import inputs.systems;
     }

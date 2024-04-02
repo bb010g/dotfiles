@@ -124,7 +124,8 @@ in {
   in toFunction (importOr (
     modules: modules
   ) (path + "/${modulesBaseName}.nix")) (mapExistingPathOr moduleListOfDir { } modulesPath);
-  withShortBaseNames = finalLib.__extend__ (final: prev: {
+  withShortNames = finalLib.__extend__ (final: prev: {
+    moduleConfigurationsAttrName = "configs";
     moduleConfigurationsBaseName = "configs";
   });
   withNixosAttrNames = finalLib.__extend__ (final: prev: {

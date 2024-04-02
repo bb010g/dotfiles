@@ -1,7 +1,6 @@
 { self, lib, flake-parts-lib, ... }:
 let
   inherit (lib)
-    mapAttrs
     mkOption
     types
     ;
