@@ -1,24 +1,16 @@
+# NOTE: this isn't POP (Pure Object Prototypes) compliant, but is instead a variation on that theme.
 let
-  inherit (builtins) elemAt length map match removeAttrs replaceStrings toJSON;
-  escape = builtins.escape or (let
-    escape = list: replaceStrings list (map (c: "\\${c}") list);
-  in escape);
-  escapeNixIdentifier = builtins.escapeNixIdentifier or (let
-    escapeNixIdentifier = s:
-      # Regex from https://github.com/NixOS/nix/blob/d048577909e383439c2549e849c5c2f2016c997e/src/libexpr/lexer.l#L91
-      if match "[a-zA-Z_][a-zA-Z0-9_'-]*" s != null
-      then s else escapeNixString s;
-  in escapeNixIdentifier);
-  escapeNixString = builtins.escapeNixString or (let
-    escapeNixString = s: escape ["$"] (toJSON s);
-  in escapeNixString);
-  foldr = builtins.foldr or (let
-    foldr = op: nul: list: let
-      len = length list;
-      foldlAt = n: if n == len then nul else
-        op (elemAt list n) (foldlAt (n + 1));
-    in foldlAt 0;
-  in foldr);
+  inherit (builtins)
+    removeAttrs
+    throw
+    ;
+  inherit (lib.lists)
+    foldr
+    ;
+  inherit (lib.strings)
+    escapeNixIdentifier
+    ;
+  lib = import ./_lib.nix;
 in rec {
   composeProto = this: parent: final: prev: this final (parent final prev);
   composeProtos = foldr composeProto identityProto;

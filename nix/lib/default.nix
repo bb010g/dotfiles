@@ -1,8 +1,15 @@
 let
-  moduleDataForPath = import ./_moduleDataForPath.nix;
-  popLib = import ./_pop.nix;
-  finalLib = {
-    _moduleDataForPath = moduleDataForPath;
-    _pop = popLib;
+  inherit (builtins)
+    ;
+  inherit (_lib.paths)
+    getNixSourceDirEntries
+    readDirEntries
+    ;
+
+  _lib = import ./_lib.nix;
+in {
+  inherit _lib;
+  nixSourceDirEntries = getNixSourceDirEntries {
+    dirEntries = readDirEntries ./.;
   };
-in finalLib
+}
