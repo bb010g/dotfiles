@@ -17,6 +17,9 @@
   inputs.impermanence-contrib.url = "github:rehno-lindeque/nixos-impermanence";
   inputs.nixos-hardware.url = "github:NixOS/nixos-hardware";
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.plasma-manager.inputs.home-manager.follows = "home-manager";
+  inputs.plasma-manager.inputs.nixpkgs.follows = "nixpkgs";
+  inputs.plasma-manager.url = "github:pjones/plasma-manager";
   inputs.systems.flake = false;
   inputs.systems.url = "github:nix-systems/default";
 
