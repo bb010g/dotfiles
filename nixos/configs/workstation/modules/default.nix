@@ -310,6 +310,9 @@
     })
     # Enable Git.
     {
+      environment.systemPackages = [
+        pkgs.git-revise
+      ];
       programs.git.enable = true;
       programs.git.package = pkgs.gitFull;
       programs.git.lfs.enable = true;
