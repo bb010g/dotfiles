@@ -71,7 +71,7 @@ in
         "kwin"."Switch to Desktop 7" = [ "Meta+7" ];
         "kwin"."Switch to Desktop 8" = [ "Meta+8" ];
         "kwin"."Switch to Desktop 9" = [ "Meta+9" ];
-        "kwin"."Switch to Desktop 10" = [ ];
+        "kwin"."Switch to Desktop 10" = [ "Meta+0" ];
         "kwin"."Switch to Desktop 11" = [ ];
         "kwin"."Switch to Desktop 12" = [ ];
         "kwin"."Switch to Desktop 13" = [ ];
