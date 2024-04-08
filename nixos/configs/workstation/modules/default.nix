@@ -231,7 +231,7 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
     {
       environment.systemPackages = [
         pkgs.bat
-        pkgs.diffoscope
+        # pkgs.diffoscope
         pkgs.du-dust
         pkgs.eza
         pkgs.file
