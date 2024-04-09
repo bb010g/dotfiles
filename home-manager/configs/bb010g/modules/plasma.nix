@@ -2,7 +2,7 @@
 
 let
   defaultActivity = "c7f489a1-5c20-4e1c-8e8d-d0e24db7f92c";
-  enablePolonium = true;
+  enablePolonium = false;
 in
 {
   config = {
