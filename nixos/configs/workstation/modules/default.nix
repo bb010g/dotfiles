@@ -179,6 +179,13 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
     {
       services.flatpak.enable = true;
     }
+    (lib.mkIf config.services.flatpak.enable (lib.mkMerge [
+      (lib.mkIf config.services.desktopManager.plasma6.enable {
+        environment.systemPackages = [
+          pkgs.kdePackages.discover
+        ];
+      })
+    ]))
     # Use compressed swap.
     {
       zramSwap.enable = true;
