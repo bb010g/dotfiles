@@ -232,6 +232,10 @@ in
         "plasmashell"."switch to next activity" = [ ];
         "plasmashell"."switch to previous activity" = [ ];
         "plasmashell"."toggle do not disturb" = [ ];
+        "services/org.kde.dolphin.desktop"."_launch" = [ ];
+        "services/org.kde.konsole.desktop"."_launch" = [ "Meta+Return" ];
+        "services/org.kde.krunner.desktop"."RunClipboard" = [ "Meta+Shift+D" "Meta+Shift+F2" ];
+        "services/org.kde.krunner.desktop"."_launch" = [ "Meta+F2" "Meta+D" ];
       }
       (lib.mkIf (!enablePolonium) {
         "kwin"."PoloniumFocusAbove" = [ ];
@@ -413,10 +417,6 @@ in
         # "kglobalshortcutsrc"."mediacontrol"."_k_friendly_name".value = "Media Controller";
         # "kglobalshortcutsrc"."org_kde_powerdevil"."_k_friendly_name".value = "KDE Power Management System";
         # "kglobalshortcutsrc"."plasmashell"."_k_friendly_name".value = "plasmashell";
-        "kglobalshortcutsrc"."services/org.kde.dolphin.desktop"."_launch".value = builtins.concatStringsSep "\t" [ ];
-        "kglobalshortcutsrc"."services/org.kde.konsole.desktop"."_launch".value = builtins.concatStringsSep "\t" [ "Meta+Return" ];
-        "kglobalshortcutsrc"."services/org.kde.krunner.desktop"."RunClipboard".value = builtins.concatStringsSep "\t" [ "Meta+Shift+D" "Meta+Shift+F2" ];
-        "kglobalshortcutsrc"."services/org.kde.krunner.desktop"."_launch".value = builtins.concatStringsSep "\t" [ "Meta+F2" "Meta+D" ];
         # "kwalletrc"."Wallet"."First Use".value = false;
         "kwinrc"."Desktops"."Id_1".value = "7d2e35b4-7776-4263-9ae6-ae2219c0bcdf";
         "kwinrc"."Desktops"."Id_2".value = "fb04f8f2-a8ac-4b7c-93fc-d87341ee5e32";
