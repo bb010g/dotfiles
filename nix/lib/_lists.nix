@@ -1,4 +1,6 @@
 let
+  inherit (_lib.lists)
+    ;
   inherit (builtins)
     attrNames
     concatMap
@@ -6,9 +8,7 @@ let
     length
     listToAttrs
     ;
-  inherit (lib.lists)
-    ;
-  lib = import ./_lib.nix;
+  _lib = import ./_lib.nix;
 in
 {
   foldr = builtins.foldr or (
@@ -22,4 +22,6 @@ in
     in
     foldr
   );
+  optional = cond: elem: if cond then [ elem ] else [ ];
+  optionalNullable = elem: if elem != null then [ elem ] else [ ];
 }

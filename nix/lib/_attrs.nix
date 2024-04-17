@@ -1,13 +1,13 @@
 let
+  inherit (_lib.attrs)
+    concatMapAttrsToList
+    ;
   inherit (builtins)
     attrNames
     concatMap
     listToAttrs
     ;
-  inherit (lib.attrs)
-    concatMapAttrsToList
-    ;
-  lib = import ./_lib.nix;
+  _lib = import ./_lib.nix;
 in
 {
   concatMapAttrs' = f: attrs: listToAttrs (concatMapAttrsToList f attrs);

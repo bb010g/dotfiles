@@ -1,4 +1,35 @@
 let
+  inherit (_lib.fixedPoints)
+    makeExtensible
+    makeInheritable
+    ;
+  inherit (_lib.functions)
+    toFunction
+    ;
+  inherit (_lib.lists)
+    ;
+  inherit (_lib.paths)
+    concatMapDirEntriesToList
+    importOr
+    mapExistingPathOr
+    mapImportOr
+    readDirEntries
+    ;
+  inherit (_lib.pop)
+    composeProto
+    extendObj
+    extensionToProto
+    getProto
+    hookObj
+    identityProto
+    instantiateObj
+    mapMeta
+    setDefaultName
+    ;
+  inherit (_lib.strings)
+    hasPrefix
+    hasSuffix
+    ;
   inherit (builtins)
     attrNames
     concatMap
@@ -10,45 +41,14 @@ let
     stringLength
     substring
     ;
-  inherit (lib.fixedPoints)
-    makeExtensible
-    makeInheritable
-    ;
-  inherit (lib.functions)
-    toFunction
-    ;
-  inherit (lib.lists)
-    ;
-  inherit (lib.paths)
-    concatMapDirEntriesToList
-    importOr
-    mapExistingPathOr
-    mapImportOr
-    readDirEntries
-    ;
-  inherit (lib.pop)
-    composeProto
-    extendObj
-    extensionToProto
-    getProto
-    hookObj
-    identityProto
-    instantiateObj
-    mapMeta
-    setDefaultName
-    ;
-  inherit (lib.strings)
-    hasPrefix
-    hasSuffix
-    ;
   inherit (genericLib)
     concatMapEntriesOfDirToList
     ;
+  _lib = import ./_lib.nix;
   genericLib = {
     concatMapEntriesOfDirToList = pathFn: path:
       concatMapDirEntriesToList pathFn (readDirEntries path);
   };
-  lib = import ./_lib.nix;
 in genericLib // makeInheritable (makeExtensible (finalLib: let
   inherit (finalLib)
     baseNameIsIgnored

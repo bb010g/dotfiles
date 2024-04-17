@@ -124,6 +124,7 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
       services.xserver.excludePackages = [
         pkgs.xorg.xorgserver.out
       ];
+      xdg.portal.xdgOpenUsePortal = true;
     }
     # # Enable system greeter.
     # {
@@ -178,8 +179,20 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
     # Enable flatpak.
     {
       services.flatpak.enable = true;
+      services.flatpak.remotes = [
+        {
+          name = "flathub";
+          location = "https://dl.flathub.org/repo/flathub.flatpakrepo";
+        }
+      ];
+      services.flatpak.uninstallUnmanaged = true;
     }
     (lib.mkIf config.services.flatpak.enable (lib.mkMerge [
+      # Discord (via Vesktop)
+      {
+        programs.vesktop.flatpak.enable = true;
+        programs.vesktop.flatpak.package = { appId = "dev.vencord.Vesktop"; origin = "flathub"; };
+      }
       (lib.mkIf config.services.desktopManager.plasma6.enable {
         environment.systemPackages = [
           pkgs.kdePackages.discover
@@ -338,7 +351,12 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
     # Uncategorized graphical confifguration.
     (lib.mkIf config.services.xserver.enable {
       programs.wireshark.package = pkgs.wireshark;
+      # Discord (via Vesktop)
+      programs.vesktop.enable = true;
     })
+    {
+      nix.settings.auto-optimise-store = lib.mkDefault true;
+    }
     # Make the NixOS configuration accessible, with or without flakes.
     (lib.mkMerge [
       {

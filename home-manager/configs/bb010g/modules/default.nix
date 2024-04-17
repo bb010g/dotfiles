@@ -1,5 +1,8 @@
-{ pkgs, ... }:
+moduleArgs@{ lib, pkgs, ... }:
 
+let
+  flakeConfig = moduleArgs.flakeConfig or null;
+in
 {
   config = {
     home.homeDirectory = "/home/bb010g";
@@ -22,5 +25,12 @@
 
     programs.zellij.enable = true;
     programs.zellij.enableBashIntegration = true;
+
+    # Discord (via Vesktop)
+    services.arrpc.enable =
+      if flakeConfig != null then
+        flakeConfig.programs.vesktop.enable
+      else
+        lib.mkDefault false;
   };
 }

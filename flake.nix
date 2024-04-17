@@ -15,6 +15,7 @@
   inputs.impermanence-contrib.inputs.impermanence.follows = "impermanence";
   inputs.impermanence-contrib.inputs.nixpkgs.follows = "nixpkgs";
   inputs.impermanence-contrib.url = "github:rehno-lindeque/nixos-impermanence";
+  inputs.nix-flatpak.url = "github:gmodena/nix-flatpak";
   inputs.nixos-hardware.url = "github:NixOS/nixos-hardware";
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   inputs.plasma-manager.inputs.home-manager.follows = "home-manager";
@@ -25,11 +26,11 @@
 
   outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } (
     let
-      _lib = import ./nix/lib/_lib.nix;
+      _flakeLib = import ./nix/lib/_lib.nix;
       homeManagerData = homeManagerDataForPath ./home-manager;
-      homeManagerDataForPath = _lib.dataOfPath.withShortNames.moduleDataForPath;
+      homeManagerDataForPath = _flakeLib.dataOfPath.withShortNames.moduleDataForPath;
       nixosData = nixosDataForPath ./nixos;
-      nixosDataForPath = _lib.dataOfPath.withShortNames.moduleDataForPath;
+      nixosDataForPath = _flakeLib.dataOfPath.withShortNames.moduleDataForPath;
     in
     { config, getSystem, inputs, lib, moduleLocation, options, self, ... }:
     let
@@ -38,12 +39,14 @@
         concatMap
         listToAttrs
         ;
-      inherit (_lib.attrs)
+      inherit (_flakeLib.attrs)
         concatMapAttrs'
         concatMapAttrsToList
         ;
       flakeConfig = config;
+      flakeInputs = inputs;
       flakeOptions = options;
+      flakeSelf = self;
       homeManagerModuleLists =
         let
           f = parentName: name: value:
@@ -96,7 +99,7 @@
               configuration = inputs.home-manager.lib.homeManagerConfiguration {
                 # inherit pkgs;
                 modules = [ config.flake.homeManagerModules.externalModules module ];
-                extraSpecialArgs = { inherit self inputs; flakeConfig = config; };
+                extraSpecialArgs = { inherit _flakeLib flakeConfig flakeOptions flakeInputs flakeSelf; };
               };
             in
             if nameMatches == null then [ ] else
@@ -107,6 +110,7 @@
         {
           default = homeManagerData.moduleList or [ ];
           externalModules = [
+            inputs.nix-flatpak.homeManagerModules.nix-flatpak
             inputs.plasma-manager.homeManagerModules.plasma-manager
           ];
           sharedModules = config.flake.homeManagerModuleLists.externalModules ++
@@ -128,7 +132,9 @@
               configurationName = builtins.elemAt nameMatches 0;
               configuration = inputs.nixpkgs.lib.nixosSystem {
                 modules = [ config.flake.nixosModules.externalModules module ];
-                specialArgs = { inherit self inputs; flakeConfig = config; };
+                specialArgs = {
+                  inherit _flakeLib flakeConfig flakeInputs flakeOptions flakeSelf;
+                };
               };
             in
             if nameMatches == null then [ ] else
@@ -142,6 +148,7 @@
           externalModules = [
             inputs.disko.nixosModules.disko
             inputs.impermanence.nixosModules.impermanence
+            inputs.nix-flatpak.nixosModules.nix-flatpak
             inputs.home-manager.nixosModules.home-manager
             {
               config.home-manager.sharedModules = config.flake.homeManagerModuleLists.sharedModules;
