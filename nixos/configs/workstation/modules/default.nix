@@ -133,6 +133,7 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
     # KDE Plasma 6 graphical session.
     {
       environment.systemPackages = [
+        pkgs.kdePackages.kjournald # systemd journal
         pkgs.libsForQt5.polonium # NOTE: Might move to Plasma 6 architecture soon
       ];
       services.desktopManager.plasma6.enable = true;
@@ -293,6 +294,7 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
         pkgs.nixos-firewall-tool
         pkgs.nixos-option
         pkgs.nixpkgs-hammering
+        pkgs.nvd
       ];
       programs.direnv.nix-direnv.enable = true;
     }
@@ -325,6 +327,12 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
       programs.htop.enable = true;
       programs.htop.settings = {
       };
+    }
+    # Enable the bottom process monitor.
+    {
+      environment.systemPackages = [
+        pkgs.bottom
+      ];
     }
     # Enable standalone Neovim.
     (lib.mkIf (!config.programs.neovim.enable) {
