@@ -120,7 +120,7 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
       environment.systemPackages = [
         pkgs.wl-clipboard
       ];
-      services.xserver.displayManager.sddm.wayland.enable = true;
+      services.displayManager.sddm.wayland.enable = true;
       services.xserver.excludePackages = [
         pkgs.xorg.xorgserver.out
       ];
