@@ -133,6 +133,7 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
     # KDE Plasma 6 graphical session.
     {
       environment.systemPackages = [
+        pkgs.foot # terminal
         pkgs.kdePackages.kjournald # systemd journal
         pkgs.libsForQt5.polonium # NOTE: Might move to Plasma 6 architecture soon
       ];
@@ -358,6 +359,9 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
     }
     # Uncategorized graphical confifguration.
     (lib.mkIf config.services.xserver.enable {
+      environment.systemPackages = [
+        pkgs.foot
+      ];
       programs.wireshark.package = pkgs.wireshark;
       # Discord (via Vesktop)
       programs.vesktop.enable = true;
