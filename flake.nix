@@ -11,7 +11,8 @@
   inputs.flake-parts.url = "github:hercules-ci/flake-parts";
   inputs.home-manager.inputs.nixpkgs.follows = "nixpkgs";
   inputs.home-manager.url = "github:nix-community/home-manager";
-  inputs.impermanence.url = "github:nix-community/impermanence";
+  # inputs.impermanence.url = "github:nix-community/impermanence";
+  inputs.impermanence.url = "github:bb010g/nix-impermanence/f/method";
   inputs.impermanence-contrib.inputs.impermanence.follows = "impermanence";
   inputs.impermanence-contrib.inputs.nixpkgs.follows = "nixpkgs";
   inputs.impermanence-contrib.url = "github:rehno-lindeque/nixos-impermanence";
