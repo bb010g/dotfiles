@@ -8,12 +8,26 @@
   # Configure permament stateroot over impermanent sysroot
   config = lib.mkMerge [
     {
+      environment.persistence."/configroot".bindfs.mountPoints.ignoreExistingEmpties = true;
+      environment.persistence."/configroot".bindfs.mountPoints.method = "empty";
       environment.persistence."/configroot".persistentStoragePath = "/configroot";
+      environment.persistence."/spoolroot".bindfs.mountPoints.ignoreExistingEmpties = true;
+      environment.persistence."/spoolroot".bindfs.mountPoints.method = "empty";
       environment.persistence."/spoolroot".persistentStoragePath = "/spoolroot";
+      environment.persistence."/stateroot".bindfs.mountPoints.ignoreExistingEmpties = true;
+      environment.persistence."/stateroot".bindfs.mountPoints.method = "empty";
       environment.persistence."/stateroot".persistentStoragePath = "/stateroot";
+      environment.persistence."/logroot".bindfs.mountPoints.ignoreExistingEmpties = true;
+      environment.persistence."/logroot".bindfs.mountPoints.method = "empty";
       environment.persistence."/logroot".persistentStoragePath = "/logroot";
+      environment.persistence."/cacheroot".bindfs.mountPoints.ignoreExistingEmpties = true;
+      environment.persistence."/cacheroot".bindfs.mountPoints.method = "empty";
       environment.persistence."/cacheroot".persistentStoragePath = "/cacheroot";
+      environment.persistence."/tmproot".bindfs.mountPoints.ignoreExistingEmpties = true;
+      environment.persistence."/tmproot".bindfs.mountPoints.method = "empty";
       environment.persistence."/tmproot".persistentStoragePath = "/tmproot";
+      # environment.persistence."/runroot".bindfs.mountPoints.ignoreExistingEmpties = true;
+      # environment.persistence."/runroot".bindfs.mountPoints.method = "empty";
       # environment.persistence."/runroot".enable = false;
       # environment.persistence."/runroot".persistentStoragePath = "/";
     }
