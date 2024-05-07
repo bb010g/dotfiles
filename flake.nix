@@ -16,6 +16,8 @@
   inputs.impermanence-contrib.inputs.impermanence.follows = "impermanence";
   inputs.impermanence-contrib.inputs.nixpkgs.follows = "nixpkgs";
   inputs.impermanence-contrib.url = "github:rehno-lindeque/nixos-impermanence";
+  inputs.neovim.inputs.nixpkgs.follows = "nixpkgs";
+  inputs.neovim.url = "github:neovim/neovim?dir=contrib";
   inputs.nix-flatpak.url = "github:gmodena/nix-flatpak";
   inputs.nixos-hardware.url = "github:NixOS/nixos-hardware";
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
