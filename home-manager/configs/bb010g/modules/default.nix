@@ -34,6 +34,8 @@ in
       workspaces = true;
     };
 
+    programs.bash.enable = true;
+
     programs.bat.enable = true;
 
     programs.eza.enable = true;
