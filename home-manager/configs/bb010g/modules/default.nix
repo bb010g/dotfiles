@@ -1,7 +1,7 @@
 moduleArgs@{ lib, pkgs, ... }:
 
 let
-  flakeConfig = moduleArgs.flakeConfig or null;
+  nixosConfig = moduleArgs.nixosConfig or null;
 in
 {
   config = {
@@ -176,8 +176,8 @@ in
 
     # Discord (via Vesktop)
     services.arrpc.enable =
-      if flakeConfig != null then
-        flakeConfig.programs.vesktop.enable
+      if nixosConfig != null then
+        nixosConfig.programs.vesktop.enable
       else
         lib.mkDefault false;
   };

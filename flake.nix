@@ -153,6 +153,8 @@
             inputs.home-manager.nixosModules.home-manager
             {
               config.home-manager.sharedModules = config.flake.homeManagerModuleLists.sharedModules;
+              config.home-manager.extraSpecialArgs =
+                { inherit _flakeLib flakeConfig flakeOptions flakeInputs flakeSelf; };
             }
           ];
           sharedModules = config.flake.nixosModuleLists.externalModules ++
