@@ -173,7 +173,6 @@ in
     };
 
     programs.zellij.enable = true;
-    programs.zellij.enableBashIntegration = true;
 
     # Discord (via Vesktop)
     services.arrpc.enable =
