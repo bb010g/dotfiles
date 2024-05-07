@@ -19,6 +19,21 @@ in
 
     home.username = "bb010g";
 
+    programs.atuin.enable = true;
+    programs.atuin.settings.update_check = false;
+    programs.atuin.settings = {
+      dialect = "us";
+      dotfiles.enabled = false;
+      exit_mode = "return-query";
+      filter_mode = "global";
+      filter_mode_shell_up_key_binding = "session";
+      search_mode = "skim";
+      search_mode_shell_up_key_binding = "prefix";
+      style = "compact";
+      sync.records = true;
+      workspaces = true;
+    };
+
     programs.bat.enable = true;
 
     programs.eza.enable = true;
