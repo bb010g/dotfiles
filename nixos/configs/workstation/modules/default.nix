@@ -225,8 +225,8 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
       environment.systemPackages = [
         pkgs.cachix
       ];
-      nix.settings.extra-substituters = [ "https://nix-community.cachix.org" ];
-      nix.settings.extra-trusted-public-keys = [ "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" ];
+      nix.settings.extra-substituters = [ "https://nix-community.cachix.org" "https://devenv.cachix.org" "https://bb010g.cachix.org" ];
+      nix.settings.extra-trusted-public-keys = [ "bb010g.cachix.org-1:djBep9/0fi6Lmm5s3kHo/XHfvkWtVSIKxVrCIGdk9LA=" "devenv.cachix.org-1:w1cLUi8dv3hnoSPGAuibQv+f9TZLr6cv/Hm9XgU50cw=" "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=" ];
       services.cachix-agent.enable = true;
     }
     # Enable Ed, the standard text editor.
