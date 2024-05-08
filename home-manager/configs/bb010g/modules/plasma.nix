@@ -232,8 +232,8 @@ in
         "plasmashell"."switch to next activity" = [ ];
         "plasmashell"."switch to previous activity" = [ ];
         "plasmashell"."toggle do not disturb" = [ ];
+        "services/org.codeberg.dnkl.foot.desktop"."_launch" = [ "Meta+Return" ];
         "services/org.kde.dolphin.desktop"."_launch" = [ ];
-        "services/org.kde.konsole.desktop"."_launch" = [ "Meta+Return" ];
         "services/org.kde.krunner.desktop"."RunClipboard" = [ "Meta+Shift+D" "Meta+Shift+F2" ];
         "services/org.kde.krunner.desktop"."_launch" = [ "Meta+F2" "Meta+D" ];
       }
@@ -503,5 +503,116 @@ in
     programs.plasma.overrideConfigExclude = [
       "baloofilerc"
     ];
+    # programs.plasma.globalAppletConfigs = {
+    #   "org.kde.panel" = { };
+    #   "org.kde.plasma.digitalclock" = { };
+    #   "org.kde.plasma.kickoff" = { };
+    #   "org.kde.plasma.marginsseparator" = { };
+    #   "org.kde.plasma.pager" = { };
+    #   "org.kde.plasma.showdesktop" = { };
+    #   "org.kde.plasma.systemtray" = { };
+    #   "org.kde.plasma.taskmanager" = { };
+    # };
+    # programs.plasma.panels = [
+    #   {
+    #     location = "top";
+    #     height = 44;
+    #     floating = false;
+    #     offset = 0;
+    #     alignment = "center";
+    #     hiding = "none";
+    #     widgets = [
+    #       {
+    #         name = "org.kde.plasma.pager";
+    #         config = { };
+    #       }
+    #     ];
+    #   }
+    # ];
+    # programs.plasma.panels = [
+    #   {
+    #     alignment = "center";
+    #     config = {
+    #       Applets = {
+    #         "6" = {
+    #           immutability = "1";
+    #           plugin = "org.kde.plasma.marginsseparator";
+    #         };
+    #       };
+    #       activityId = "";
+    #       formfactor = "2";
+    #       immutability = "1";
+    #       lastScreen = "0";
+    #       location = "3";
+    #       plugin = "org.kde.panel";
+    #       wallpaperplugin = "org.kde.image";
+    #     };
+    #     floating = false;
+    #     formFactor = "horizontal";
+    #     height = 44;
+    #     hiding = "none";
+    #     id = 2;
+    #     length = 2288;
+    #     lengthMode = "fill";
+    #     location = "top";
+    #     locked = false;
+    #     maximumLength = 1920;
+    #     minimumLength = 1920;
+    #     objectName = "";
+    #     offset = 0;
+    #     screen = 0;
+    #     type = "org.kde.panel";
+    #     version = "";
+    #     wallpaperMode = "";
+    #     wallpaperPlugin = "org.kde.image";
+    #     widgets = [
+    #       {
+    #         # id = 26;
+    #         name = "org.kde.plasma.kickoff";
+    #         # config.ConfigDialog.DialogHeight = "540";
+    #         # config.ConfigDialog.DialogWidth = "720";
+    #         config.PreloadWeight = "100";
+    #         config.popupHeight = "510";
+    #         config.popupWidth = "647";
+    #       }
+    #       {
+    #         # id = 4;
+    #         name = "org.kde.plasma.pager";
+    #         # config.ConfigDialog.DialogHeight = "540";
+    #         # config.ConfigDialog.DialogWidth = "720";
+    #       }
+    #       {
+    #         # id = 31;
+    #         name = "org.kde.plasma.taskmanager";
+    #         # config.ConfigDialog.DialogHeight = "540";
+    #         # config.ConfigDialog.DialogWidth = "720";
+    #       }
+    #       {
+    #         # id = 6;
+    #         name = "org.kde.plasma.marginsseparator";
+    #         config = { };
+    #       }
+    #       {
+    #         # id = 7;
+    #         name = "org.kde.plasma.systemtray";
+    #         config.PreloadWeight = "80";
+    #         config.SystrayContainmentId = "8";
+    #       }
+    #       {
+    #         # id = 19;
+    #         name = "org.kde.plasma.digitalclock";
+    #         config.Appearance.fontWeight = "400";
+    #         config.PreloadWeight = "60";
+    #         config.popupHeight = "450";
+    #         config.popupWidth = "560";
+    #       }
+    #       {
+    #         # id = 20;
+    #         name = "org.kde.plasma.showdesktop";
+    #         config = { };
+    #       }
+    #     ];
+    #   }
+    # ];
   };
 }
