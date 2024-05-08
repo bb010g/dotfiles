@@ -134,12 +134,19 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
     {
       environment.systemPackages = [
         pkgs.foot # terminal
-        pkgs.kdePackages.kjournald # systemd journal
         pkgs.libsForQt5.polonium # NOTE: Might move to Plasma 6 architecture soon
       ];
       services.desktopManager.plasma6.enable = true;
       services.xserver.enable = true;
     }
+    # KDE Plasma system utilities
+    (lib.mkIf config.services.desktopManager.plasma6.enable {
+      environment.systemPackages = [
+        pkgs.hotspot # Linux perf
+        pkgs.kdePackages.kjournald # systemd journal
+        pkgs.systemdgenie # systemd service & login session management
+      ];
+    })
     # Uncategorized confifguration.
     {
       boot.initrd.systemd.emergencyAccess = config.users.users.root.hashedPassword;
@@ -271,6 +278,10 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
         pkgs.uftrace
       ];
     }
+    # Enable the sysprof profiling daemon.
+    (lib.mkIf config.services.xserver.enable {
+      services.sysprof.enable = true;
+    })
     # Enable the Goldwarden client for the Bitwarden password manager.
     {
       programs.goldwarden.enable = true;
