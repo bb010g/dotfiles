@@ -135,6 +135,7 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
       environment.systemPackages = [
         pkgs.foot # terminal
         pkgs.libsForQt5.polonium # NOTE: Might move to Plasma 6 architecture soon
+        pkgs.quota # pkgs.unixtools.quota # dependency of Disk Quota widget
       ];
       services.desktopManager.plasma6.enable = true;
       services.xserver.enable = true;
@@ -276,6 +277,7 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
         pkgs.ripgrep
         pkgs.strace
         pkgs.uftrace
+        pkgs.units
       ];
     }
     # Enable the sysprof profiling daemon.
