@@ -232,11 +232,16 @@ in
         "plasmashell"."switch to next activity" = [ ];
         "plasmashell"."switch to previous activity" = [ ];
         "plasmashell"."toggle do not disturb" = [ ];
-        "services/org.codeberg.dnkl.foot.desktop"."_launch" = [ "Meta+Return" ];
         "services/org.kde.dolphin.desktop"."_launch" = [ ];
         "services/org.kde.krunner.desktop"."RunClipboard" = [ "Meta+Shift+D" "Meta+Shift+F2" ];
         "services/org.kde.krunner.desktop"."_launch" = [ "Meta+F2" "Meta+D" ];
       }
+      (lib.mkIf (!config.programs.foot.enable) {
+        "services/org.kde.konsole.desktop"."_launch" = [ "Meta+Return" ];
+      })
+      (lib.mkIf config.programs.foot.enable {
+        "services/org.codeberg.dnkl.foot.desktop"."_launch" = [ "Meta+Return" ];
+      })
       (lib.mkIf (!enablePolonium) {
         "kwin"."PoloniumFocusAbove" = [ ];
         "kwin"."PoloniumFocusBelow" = [ ];
