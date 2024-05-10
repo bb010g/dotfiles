@@ -1,8 +1,7 @@
-moduleArgs@{ config, lib, ... }:
+{ config, inputs ? { }, lib, ... }:
 
 let
-  flakeInputs = moduleArgs.flakeInputs or { };
-  neovimInput = flakeInputs.neovim or null;
+  neovimInput = inputs.neovim or null;
 in
 {
   config = {

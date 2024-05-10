@@ -1,7 +1,8 @@
-{ config, ... }:
+{ config, homeManagerModules ? { }, ... }:
 
 {
   config = {
+    home-manager.users.bb010g = homeManagerModules.configuration-bb010g or { };
     # Define a user account.
     users.users.bb010g = {
       isNormalUser = true;

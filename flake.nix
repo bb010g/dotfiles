@@ -47,7 +47,6 @@
         concatMapAttrsToList
         ;
       flakeConfig = config;
-      flakeInputs = inputs;
       flakeOptions = options;
       flakeSelf = self;
       homeManagerModuleLists =
@@ -102,7 +101,9 @@
               configuration = inputs.home-manager.lib.homeManagerConfiguration {
                 # inherit pkgs;
                 modules = [ config.flake.homeManagerModules.externalModules module ];
-                extraSpecialArgs = { inherit _flakeLib flakeConfig flakeOptions flakeInputs flakeSelf; };
+                extraSpecialArgs = {
+                  inherit _flakeLib flakeConfig flakeOptions flakeSelf inputs;
+                };
               };
             in
             if nameMatches == null then [ ] else
@@ -136,7 +137,8 @@
               configuration = inputs.nixpkgs.lib.nixosSystem {
                 modules = [ config.flake.nixosModules.externalModules module ];
                 specialArgs = {
-                  inherit _flakeLib flakeConfig flakeInputs flakeOptions flakeSelf;
+                  inherit _flakeLib flakeConfig flakeOptions flakeSelf inputs;
+                  inherit (config.flake) homeManagerModuleLists homeManagerModules;
                 };
               };
             in
@@ -155,8 +157,9 @@
             inputs.home-manager.nixosModules.home-manager
             {
               config.home-manager.sharedModules = config.flake.homeManagerModuleLists.sharedModules;
-              config.home-manager.extraSpecialArgs =
-                { inherit _flakeLib flakeConfig flakeOptions flakeInputs flakeSelf; };
+              config.home-manager.extraSpecialArgs = {
+                inherit _flakeLib flakeConfig flakeOptions flakeSelf inputs;
+              };
             }
           ];
           sharedModules = config.flake.nixosModuleLists.externalModules ++
