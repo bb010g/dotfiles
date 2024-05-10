@@ -379,6 +379,10 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
       # Discord (via Vesktop)
       programs.vesktop.enable = true;
     })
+    # Enable debuginfod.
+    {
+      services.nixseparatedebuginfod.enable = true;
+    }
     {
       nix.settings.auto-optimise-store = lib.mkDefault true;
     }
