@@ -133,9 +133,15 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
     # KDE Plasma 6 graphical session.
     {
       environment.systemPackages = [
+        # pkgs.aha # `aha(1)` # dependency of Info Center
+        # pkgs.clinfo # `clinfo(1)` # dependency of Info Center
         pkgs.foot # terminal
+        # pkgs.glxinfo # `glxinfo(1)`, `eglinfo(1)` # dependency of Info Center
         pkgs.libsForQt5.polonium # NOTE: Might move to Plasma 6 architecture soon
+        # pkgs.pciutils # `lspci(1)` # dependency of Info Center
         pkgs.quota # pkgs.unixtools.quota # dependency of Disk Quota widget
+        # pkgs.vulkan-tools # `vulkaninfo(1)` # dependency of Info Center
+        # pkgs.wayland-utils # `wayland-info(1)` # dependency of Info Center
       ];
       services.desktopManager.plasma6.enable = true;
       services.xserver.enable = true;
