@@ -14,6 +14,14 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
     {
       boot.loader.systemd-boot.enable = true;
     }
+    # Use the latest Linux kernel.
+    (lib.mkDefault {
+      boot.kernelPackages = pkgs.linuxPackages_latest;
+    })
+    # Use the latest supported ZFS kernel.
+    (lib.mkIf (config.boot.supportedFilesystems.zfs or false || config.boot.initrd.supportedFilesystems.zfs or false) {
+      boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
+    })
     # Configure networking.
     {
       assertions = [
