@@ -123,6 +123,11 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
       boot.kernel.sysctl."kernel.sysrq" = 1;
       boot.kernelParams = [ "sysrq_always_enabled=1" ];
     }
+    # Configure I/O schedulers.
+    {
+      boot.kernelModules = [ "bfq" ];
+      services.udev.optimalSchedulers = true;
+    }
     # Use Wayland.
     {
       environment.systemPackages = [

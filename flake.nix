@@ -21,6 +21,9 @@
   inputs.nix-flatpak.url = "github:gmodena/nix-flatpak";
   inputs.nixos-hardware.url = "github:NixOS/nixos-hardware";
   inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.nur-ilya-fedin.inputs.flake-compat.follows = "flake-compat";
+  inputs.nur-ilya-fedin.inputs.nixpkgs.follows = "nixpkgs";
+  inputs.nur-ilya-fedin.url = "github:ilya-fedin/nur-repository";
   inputs.plasma-manager.inputs.home-manager.follows = "home-manager";
   inputs.plasma-manager.inputs.nixpkgs.follows = "nixpkgs";
   inputs.plasma-manager.url = "github:pjones/plasma-manager";
@@ -155,6 +158,7 @@
             inputs.impermanence.nixosModules.impermanence
             inputs.nix-flatpak.nixosModules.nix-flatpak
             inputs.home-manager.nixosModules.home-manager
+            inputs.nur-ilya-fedin.nixosModules.io-scheduler # `services.udev.optimalSchedulers`
             {
               config.home-manager.sharedModules = config.flake.homeManagerModuleLists.sharedModules;
               config.home-manager.extraSpecialArgs = {
