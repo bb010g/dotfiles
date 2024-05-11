@@ -125,8 +125,8 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
     }
     # Configure I/O schedulers.
     {
-      boot.kernelModules = [ "bfq" ];
-      services.udev.optimalSchedulers = true;
+      services.udev.ioSchedulers.enable = true;
+      boot.initrd.services.udev.ioSchedulers.enable = true;
     }
     # Use Wayland.
     {

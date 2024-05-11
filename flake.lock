@@ -201,46 +201,6 @@
         "type": "github"
       }
     },
-    "nixpkgs-croscore": {
-      "locked": {
-        "lastModified": 1680893028,
-        "narHash": "sha256-m5MoAnI5y9Nh6aFeGitTGRUJ3dJ6GMS0LzH1pjh4ROI=",
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "a6ab4bfac4447bd550a5d20da282881136c31c4a",
-        "type": "github"
-      },
-      "original": {
-        "owner": "NixOS",
-        "repo": "nixpkgs",
-        "rev": "a6ab4bfac4447bd550a5d20da282881136c31c4a",
-        "type": "github"
-      }
-    },
-    "nur-ilya-fedin": {
-      "inputs": {
-        "flake-compat": [
-          "flake-compat"
-        ],
-        "nixpkgs": [
-          "nixpkgs"
-        ],
-        "nixpkgs-croscore": "nixpkgs-croscore"
-      },
-      "locked": {
-        "lastModified": 1714783047,
-        "narHash": "sha256-kIIIiE0R4E8YJDw5ZIfACrf3q5HijWp73gdGtx03CNM=",
-        "owner": "ilya-fedin",
-        "repo": "nur-repository",
-        "rev": "e1bf1712d93c3c345539144bf888df37c0990f4f",
-        "type": "github"
-      },
-      "original": {
-        "owner": "ilya-fedin",
-        "repo": "nur-repository",
-        "type": "github"
-      }
-    },
     "plasma-manager": {
       "inputs": {
         "home-manager": [
@@ -276,7 +236,6 @@
         "nix-flatpak": "nix-flatpak",
         "nixos-hardware": "nixos-hardware",
         "nixpkgs": "nixpkgs",
-        "nur-ilya-fedin": "nur-ilya-fedin",
         "plasma-manager": "plasma-manager",
         "systems": "systems_2"
       }
