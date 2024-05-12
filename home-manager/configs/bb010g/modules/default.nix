@@ -27,6 +27,7 @@ in
       exit_mode = "return-query";
       filter_mode = "global";
       filter_mode_shell_up_key_binding = "session";
+      local_timeout = 10; # default: 5
       search_mode = "skim";
       search_mode_shell_up_key_binding = "prefix";
       style = "compact";
