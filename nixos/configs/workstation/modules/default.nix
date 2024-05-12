@@ -2,8 +2,11 @@
 # your system. Help is available in the configuration.nix(5) man page, on
 # https://search.nixos.org/options and in the NixOS manual (`nixos-help`).
 
-moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
+moduleArgs@{ config, lib, modulesPath, pkgs, utils, ... }:
 
+let
+  utils = moduleArgs.utils // import ../../../lib/utils.nix { inherit config lib pkgs utils; };
+in
 {
   config = lib.mkMerge [
     # Use systemd in initrd.
@@ -125,8 +128,16 @@ moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
     }
     # Configure I/O schedulers.
     {
-      services.udev.ioSchedulers.enable = true;
       boot.initrd.services.udev.ioSchedulers.enable = true;
+      services.udev.ioSchedulers.enable = true;
+
+      # Counteract ZFS setting I/O scheduler to none for spinning HDDs with `zfs_member`s
+      services.udev.extraRules = lib.mkIf config.boot.supportedFilesystems.zfs or false (lib.mkMerge [
+        (lib.mkIf config.services.udev.ioSchedulers.drives.hdd.enable (lib.mkAfter ''
+          # re-set I/O scheduler for rotating HDDs with ZFS partitions
+          ACTION=="add|change", KERNEL=="sd[a-z]*[0-9]*", ENV{DEVTYPE}=="partition", ENV{ID_FS_TYPE}=="zfs_member", ATTR{../queue/rotational}=="1", ATTR{../queue/scheduler}=${utils.escapeUdevString config.services.udev.ioSchedulers.drives.hdd.scheduler}
+        ''))
+      ]);
     }
     # Use Wayland.
     {

@@ -1,17 +1,26 @@
-{ config, lib, pkgs, ... }:
+moduleArgs@{ config, lib, options, pkgs, utils, ... }:
 
 let
   inherit (lib)
-    escape
+    attrNames
+    concatMapStringsSep
+    escapeNixIdentifier
+    filter
+    literalExpression
+    mapAttrs
+    mapAttrsToList
     mkEnableOption
     mkIf
     mkMerge
     mkOption
+    subtractLists
     types
+    ;
+  inherit (utils)
+    escapeUdevString
     ;
   cfg = config.services.udev;
   drivesCfg = cfg.ioSchedulers.drives;
-  escapeUdevString = s: "\"${escape [ "\"" ] s}\"";
   initrdCfg = config.boot.initrd.services.udev;
   initrdDrivesCfg = initrdCfg.ioSchedulers.drives;
   initrdIoSchedulersUdevRules = pkgs.writeTextFile {
@@ -33,15 +42,81 @@ let
   };
   mkIoSchedulerDisableDriveOption = name:
     mkDisableOption "I/O scheduler udev rules for ${name}";
-  mkIoSchedulerEnabledOption = name: mkOption {
-    type = types.bool;
-    default = false;
-    defaultText = "`true` if the ${name} I/O scheduler is enabled";
-    description = "True if the ${name} I/O scheduler is enabled";
-  };
+  rootConfig = config;
+  utils = moduleArgs.utils // import ../../../lib/utils.nix { inherit config lib pkgs utils; };
 in
 {
   options = {
+    boot.ioSchedulers = mkOption {
+      default = { };
+      example = literalExpression ''
+        {
+          bfq.enable = true;
+          bore.enable = lib.mkForce false;
+        }
+      '';
+      type = types.attrsOf (types.submodule ({ config, name, ... }: {
+        options = {
+          enable = mkOption {
+            type = types.bool;
+            default = false;
+            defaultText = "`true` if this I/O scheduler is enabled";
+            example = literalExpression ''lib.mkForce false'';
+            description = ''
+              Whether this I/O scheduler is enabled. This may be used together
+              with `lib.mkForce` to explicitly disable support.
+            '';
+          };
+          kernelModules = mkOption {
+            type = types.listOf types.str;
+            # based on `elevator_change()` in `@linux//block/elevator.c`
+            default = [ ];
+            example = [ name ];
+            description = ''
+              A set of kernel modules needed to use this I/O scheduler.
+            '';
+          };
+        };
+      }));
+      description = ''
+        Supported I/O schedulers and their state. This may be used together with
+        `lib.mkForce` to explicitly disable support for specific I/O schedulers,
+        e.g. to disable BORE with an unsupported kernel.
+      '';
+    };
+    boot.initrd.ioSchedulers = mkOption {
+      default = { };
+      example = options.boot.ioSchedulers.example;
+      type = types.attrsOf (types.submodule ({ config, name, ... }: let
+        ioSchedulerOptions = options.boot.ioSchedulers.type.getSubOptions options.boot.ioSchedulers.loc;
+      in {
+        options = {
+          enable = mkOption {
+            inherit (ioSchedulerOptions.enable) example type;
+            default = false;
+            defaultText = "`true` if this I/O scheduler is enabled in initrd";
+            description = ''
+              Whether this I/O scheduler is enabled in initrd. This may be used
+              together with `lib.mkForce` to explicitly disable support.
+            '';
+          };
+          kernelModules = mkOption {
+            inherit (ioSchedulerOptions.kernelModules) type;
+            # based on `elevator_change()` in `@linux//block/elevator.c`
+            default = [ ];
+            example = [ name ];
+            description = ''
+              A set of kernel modules needed to use this I/O scheduler in
+              initrd.
+            '';
+          };
+        };
+      }));
+      description = ''
+        Supported I/O schedulers and their state in initrd.
+      '';
+    };
+
     services.udev = {
       ioSchedulers = {
         enable = mkEnableOption "I/O scheduler udev rules";
@@ -54,10 +129,6 @@ in
             Thus they are read and applied as essential initrd rules.
           '';
         };
-
-        bfq.enabled = mkIoSchedulerEnabledOption "BFQ";
-        kyber.enabled = mkIoSchedulerEnabledOption "kyber";
-        mq-deadline.enabled = mkIoSchedulerEnabledOption "mq-deadline";
 
         drives.hdd.enable = mkIoSchedulerDisableDriveOption "spinning HDDs";
         drives.hdd.rules = mkInternalRulesOption ''
@@ -107,10 +178,6 @@ in
           '';
         };
 
-        bfq.enabled = mkIoSchedulerEnabledOption "BFQ";
-        kyber.enabled = mkIoSchedulerEnabledOption "kyber";
-        mq-deadline.enabled = mkIoSchedulerEnabledOption "mq-deadline";
-
         drives.hdd.enable = mkIoSchedulerDisableDriveOption
           "spinning HDDs to include in the initrd *only*";
         drives.hdd.rules = mkInternalRulesOption ''
@@ -149,32 +216,57 @@ in
     };
   };
   config = mkMerge [
+    {
+      boot.ioSchedulers.bfq.kernelModules = [ "bfq" ];
+      boot.ioSchedulers.mq-deadline.kernelModules = [ "mq-deadline" ];
+      boot.ioSchedulers.kyber.kernelModules = [ "kyber" ];
+      boot.initrd.ioSchedulers.bfq.kernelModules = [ "bfq" ];
+      boot.initrd.ioSchedulers.mq-deadline.kernelModules = [ "mq-deadline" ];
+      boot.initrd.ioSchedulers.kyber.kernelModules = [ "kyber" ];
+    }
+    {
+      assertions =
+        let
+          initrdIoSchedulers = config.boot.initrd.ioSchedulers;
+          initrdEnabledIoSchedulerNames = filter
+            (name: initrdIoSchedulers.${name}.enable)
+            (attrNames initrdIoSchedulers);
+          ioSchedulers = config.boot.ioSchedulers;
+          enabledIoSchedulerNames = filter
+            (name: ioSchedulers.${name}.enable)
+            (attrNames ioSchedulers);
+          missingIoSchedulerNames =
+            subtractLists initrdEnabledIoSchedulerNames enabledIoSchedulerNames;
+        in
+        [
+          {
+            assertion = missingIoSchedulerNames == [ ];
+            message = ''
+              The ‘boot.initrd.ioSchedulers.<name>.enable’ option is true
+              while the ‘boot.ioSchedulers.<name>.enable’ option is false
+              for the following names: ${concatMapStringsSep escapeNixIdentifier " " missingIoSchedulerNames}'';
+          }
+        ];
+      boot.initrd.availableKernelModules = mkMerge (
+        mapAttrsToList
+          (name: cfg': mkIf cfg'.enable cfg'.kernelModules)
+          config.boot.initrd.ioSchedulers
+      );
+      boot.ioSchedulers = mapAttrs
+        (name: cfg': mkIf cfg'.enable { enable = true; })
+        config.boot.initrd.ioSchedulers;
+    }
     (mkIf drivesCfg.hdd.enable {
       services.udev.ioSchedulers.rules = drivesCfg.hdd.rules;
-      services.udev.ioSchedulers.bfq.enabled =
-        mkIf (drivesCfg.hdd.scheduler == "bfq") true;
-      services.udev.ioSchedulers.mq-deadline.enabled =
-        mkIf (drivesCfg.hdd.scheduler == "mq-deadline") true;
-      services.udev.ioSchedulers.kyber.enabled =
-        mkIf (drivesCfg.hdd.scheduler == "kyber") true;
+      boot.ioSchedulers.${drivesCfg.hdd.scheduler}.enable = true;
     })
     (mkIf drivesCfg.nvme.enable {
       services.udev.ioSchedulers.rules = drivesCfg.nvme.rules;
-      services.udev.ioSchedulers.bfq.enabled =
-        mkIf (drivesCfg.nvme.scheduler == "bfq") true;
-      services.udev.ioSchedulers.mq-deadline.enabled =
-        mkIf (drivesCfg.nvme.scheduler == "mq-deadline") true;
-      services.udev.ioSchedulers.kyber.enabled =
-        mkIf (drivesCfg.nvme.scheduler == "kyber") true;
+      boot.ioSchedulers.${drivesCfg.nvme.scheduler}.enable = true;
     })
     (mkIf drivesCfg.ssd.enable {
       services.udev.ioSchedulers.rules = drivesCfg.ssd.rules;
-      services.udev.ioSchedulers.bfq.enabled =
-        mkIf (drivesCfg.ssd.scheduler == "bfq") true;
-      services.udev.ioSchedulers.mq-deadline.enabled =
-        mkIf (drivesCfg.ssd.scheduler == "mq-deadline") true;
-      services.udev.ioSchedulers.kyber.enabled =
-        mkIf (drivesCfg.ssd.scheduler == "kyber") true;
+      boot.ioSchedulers.${drivesCfg.ssd.scheduler}.enable = true;
     })
     (mkIf cfg.ioSchedulers.enable {
       services.udev.packages = mkIf (cfg.ioSchedulers.rules != "")
@@ -183,32 +275,17 @@ in
     (mkIf initrdDrivesCfg.hdd.enable {
       boot.initrd.services.udev.ioSchedulers.rules =
         initrdDrivesCfg.hdd.rules;
-      boot.initrd.services.udev.ioSchedulers.bfq.enabled =
-        mkIf (initrdDrivesCfg.hdd.scheduler == "bfq") true;
-      boot.initrd.services.udev.ioSchedulers.mq-deadline.enabled =
-        mkIf (initrdDrivesCfg.hdd.scheduler == "mq-deadline") true;
-      boot.initrd.services.udev.ioSchedulers.kyber.enabled =
-        mkIf (initrdDrivesCfg.hdd.scheduler == "kyber") true;
+      boot.initrd.ioSchedulers.${initrdDrivesCfg.hdd.scheduler}.enable = true;
     })
     (mkIf initrdDrivesCfg.nvme.enable {
       boot.initrd.services.udev.ioSchedulers.rules =
         initrdDrivesCfg.nvme.rules;
-      boot.initrd.services.udev.ioSchedulers.bfq.enabled =
-        mkIf (initrdDrivesCfg.nvme.scheduler == "bfq") true;
-      boot.initrd.services.udev.ioSchedulers.mq-deadline.enabled =
-        mkIf (initrdDrivesCfg.nvme.scheduler == "mq-deadline") true;
-      boot.initrd.services.udev.ioSchedulers.kyber.enabled =
-        mkIf (initrdDrivesCfg.nvme.scheduler == "kyber") true;
+      boot.initrd.ioSchedulers.${initrdDrivesCfg.nvme.scheduler}.enable = true;
     })
     (mkIf initrdDrivesCfg.ssd.enable {
       boot.initrd.services.udev.ioSchedulers.rules =
         initrdDrivesCfg.ssd.rules;
-      boot.initrd.services.udev.ioSchedulers.bfq.enabled =
-        mkIf (initrdDrivesCfg.ssd.scheduler == "bfq") true;
-      boot.initrd.services.udev.ioSchedulers.mq-deadline.enabled =
-        mkIf (initrdDrivesCfg.ssd.scheduler == "mq-deadline") true;
-      boot.initrd.services.udev.ioSchedulers.kyber.enabled =
-        mkIf (initrdDrivesCfg.ssd.scheduler == "kyber") true;
+      boot.initrd.ioSchedulers.${initrdDrivesCfg.ssd.scheduler}.enable = true;
     })
     (mkIf initrdCfg.ioSchedulers.enable {
       boot.initrd.extraUdevRulesCommands = mkIf
@@ -217,20 +294,9 @@ in
         ''
           cp -v ${initrdIoSchedulersUdevRules}/etc/udev/rules.d/*.rules "$out"/
         '';
-      boot.initrd.availableKernelModules = mkMerge [
-        (mkIf initrdCfg.ioSchedulers.bfq.enabled [ "bfq" ])
-        (mkIf initrdCfg.ioSchedulers.mq-deadline.enabled [ "mq-deadline" ])
-        (mkIf initrdCfg.ioSchedulers.kyber.enabled [ "kyber" ])
-      ];
       boot.initrd.services.udev.packages = mkIf
         (initrdCfg.ioSchedulers.rules != "")
         [ initrdIoSchedulersUdevRules ];
-      services.udev.ioSchedulers.bfq.enabled =
-        mkIf initrdCfg.ioSchedulers.bfq.enabled true;
-      services.udev.ioSchedulers.mq-deadline.enabled =
-        mkIf initrdCfg.ioSchedulers.mq-deadline.enabled true;
-      services.udev.ioSchedulers.kyber.enabled =
-        mkIf initrdCfg.ioSchedulers.kyber.enabled true;
     })
   ];
 }
