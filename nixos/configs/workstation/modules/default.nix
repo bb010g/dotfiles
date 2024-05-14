@@ -242,6 +242,7 @@ in
     # Use compressed swap.
     {
       zramSwap.enable = true;
+      zramSwap.algorithm = "zstd";
     }
     # Use XDG directories.
     {
