@@ -406,6 +406,7 @@ in
     (lib.mkIf config.services.xserver.enable {
       environment.systemPackages = [
         pkgs.foot
+        pkgs.qdirstat
       ];
       programs.wireshark.package = pkgs.wireshark;
       # Discord (via Vesktop)
