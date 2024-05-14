@@ -5,6 +5,6 @@ let
 in
 {
   config = lib.mkIf cfg.enable {
-    services.displayManager.sddm.enable = lib.mkDefault true;
+    # services.displayManager.sddm.enable = lib.mkDefault true;
   };
 }

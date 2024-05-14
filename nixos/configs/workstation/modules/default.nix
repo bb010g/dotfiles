@@ -167,6 +167,7 @@ in
         # pkgs.vulkan-tools # `vulkaninfo(1)` # dependency of Info Center
         # pkgs.wayland-utils # `wayland-info(1)` # dependency of Info Center
       ];
+      programs.loginGreeters.tuigreet.enable = true;
       services.desktopManager.plasma6.enable = true;
       services.xserver.enable = true;
     }
