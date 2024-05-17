@@ -10,9 +10,12 @@ in
     home.packages = [
       pkgs.bitwarden-cli # Bitwarden
       pkgs.bitwarden-desktop # Bitwarden
+      pkgs.element-desktop-wayland or (builtins.trace "WARNING: pkgs.element-desktop-wayland is no longer available" pkgs.element-desktop) # Matrix
       pkgs.firefox # Web
+      pkgs.iamb # Matrix
       pkgs.neochat # Matrix
       pkgs.obsidian # Obsidian
+      pkgs.signal-desktop # Signal
       pkgs.sublime-merge # Git
       pkgs.telegram-desktop # Telegram
     ];
