@@ -391,7 +391,9 @@ in
     # Enable Git.
     {
       environment.systemPackages = [
+        pkgs.git-dive
         pkgs.git-revise
+        pkgs.git-stack
       ];
       programs.git.enable = true;
       programs.git.package = pkgs.gitFull;

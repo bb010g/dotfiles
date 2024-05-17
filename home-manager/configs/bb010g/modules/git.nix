@@ -3,7 +3,9 @@
 {
   config = {
     home.packages = lib.mkIf config.programs.git.enable [
+      pkgs.git-dive
       pkgs.git-revise
+      pkgs.git-stack
     ];
 
     programs.git.difftastic.enable = true;
