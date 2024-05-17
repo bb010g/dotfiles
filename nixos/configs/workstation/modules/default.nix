@@ -434,6 +434,16 @@ in
           ln -s ${lib.escapeShellArg moduleArgs.self.outPath} "$out/configuration"'';
       })
     ])
+    # Configure Squeezelite
+    {
+      # TODO(me@bb010g.com): introduce {option}`services.squeezelite.package`
+      environment.systemPackages = [
+        (if config.services.squeezelite.pulseAudio then pkgs.squeezelite-pulse else pkgs.squeezelite)
+      ];
+      services.squeezelite.pulseAudio = lib.mkIf (config.hardware.pulseaudio.enable || config.services.pipewire.pulse.enable) (
+        lib.mkDefault true
+      );
+    }
   ];
 }
 # vim: set sta et sw=2 ts=8:

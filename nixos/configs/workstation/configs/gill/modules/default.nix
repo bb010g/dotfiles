@@ -1,10 +1,13 @@
-{ ... }:
+{ config, ... }:
 
 {
   config = {
     home-manager.users.bb010g.config.home.stateVersion = "23.11";
 
     networking.hostName = "gill"; # Define your hostname. Resurrection.
+
+    # # Can't enable yet due to user-level PipeWire.
+    # services.squeezelite.enable = true;
 
     # This option defines the first version of NixOS you have installed on this particular machine,
     # and is used to maintain compatibility with application data (e.g. databases) created on older NixOS versions.
