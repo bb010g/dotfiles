@@ -181,5 +181,8 @@ in
         nixosConfig.programs.vesktop.enable
       else
         lib.mkDefault false;
+
+    services.kdeconnect.enable = true;
+    services.kdeconnect.indicator = lib.mkDefault true;
   };
 }

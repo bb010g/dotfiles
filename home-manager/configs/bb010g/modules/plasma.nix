@@ -619,5 +619,6 @@ in
     #     ];
     #   }
     # ];
+    services.kdeconnect.indicator = lib.mkIf config.services.kdeconnect.enable false;
   };
 }
