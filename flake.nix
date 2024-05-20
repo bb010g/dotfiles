@@ -16,11 +16,12 @@
   inputs.impermanence-contrib.inputs.impermanence.follows = "impermanence";
   inputs.impermanence-contrib.inputs.nixpkgs.follows = "nixpkgs";
   inputs.impermanence-contrib.url = "github:rehno-lindeque/nixos-impermanence";
-  inputs.neovim.inputs.nixpkgs.follows = "nixpkgs";
-  inputs.neovim.url = "github:neovim/neovim?dir=contrib";
+  inputs.neovim.flake = false;
+  inputs.neovim.url = "github:neovim/neovim";
   inputs.nix-flatpak.url = "github:gmodena/nix-flatpak";
   inputs.nixos-hardware.url = "github:NixOS/nixos-hardware";
-  inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
+  inputs.nixpkgs.url = "github:bb010g/nixpkgs/nixos-unstable";
+  # inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
   inputs.plasma-manager.inputs.home-manager.follows = "home-manager";
   inputs.plasma-manager.inputs.nixpkgs.follows = "nixpkgs";
   inputs.plasma-manager.url = "github:pjones/plasma-manager";
