@@ -3,9 +3,14 @@
 {
   config = {
     home.packages = lib.mkIf config.programs.git.enable [
+      pkgs.git-branchless
+      pkgs.git-branchstack
       pkgs.git-dive
+      pkgs.git-ps-rs
       pkgs.git-revise
+      pkgs.git-series
       pkgs.git-stack
+      pkgs.revup
     ];
 
     programs.git.difftastic.enable = true;
