@@ -139,6 +139,12 @@ in
         ''))
       ]);
     }
+    # Configure ZFS ARC.
+    (lib.mkIf config.boot.supportedFilesystems.zfs or false {
+      boot.extraModprobeConfig = ''
+        options zfs zfs_arc_sys_free=${builtins.toString (3 * 1024 * 1024 * 1024)}
+      '';
+    })
     # Use Wayland.
     {
       environment.systemPackages = [
