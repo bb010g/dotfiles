@@ -8,16 +8,16 @@ in
     home.homeDirectory = "/home/bb010g";
 
     home.packages = [
-      pkgs.bitwarden-cli # Bitwarden
-      pkgs.bitwarden-desktop # Bitwarden
-      pkgs.element-desktop-wayland or (builtins.trace "WARNING: pkgs.element-desktop-wayland is no longer available" pkgs.element-desktop) # Matrix
-      pkgs.firefox # Web
-      pkgs.iamb # Matrix
-      pkgs.neochat # Matrix
-      pkgs.obsidian # Obsidian
-      pkgs.signal-desktop # Signal
-      pkgs.sublime-merge # Git
-      pkgs.telegram-desktop # Telegram
+      pkgs.bitwarden-cli # password manager (Bitwarden client, CLI)
+      pkgs.bitwarden-desktop # password manager (Bitwarden client, GUI)
+      pkgs.element-desktop-wayland or (builtins.trace "WARNING: pkgs.element-desktop-wayland is no longer available" pkgs.element-desktop) # instant messenger (Matrix client, GUI)
+      pkgs.firefox # web browser (GUI)
+      pkgs.iamb # instant messenger (Matrix client, GUI)
+      pkgs.neochat # instant messenger (Matrix client, GUI)
+      pkgs.obsidian # information manager (text files, GUI)
+      pkgs.signal-desktop # instant messenger (Signal client, GUI)
+      pkgs.sublime-merge # version control (Git, GUI)
+      pkgs.telegram-desktop # instant messenger (Telegram client, GUI)
     ];
 
     home.username = "bb010g";
