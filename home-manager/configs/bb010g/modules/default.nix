@@ -8,6 +8,7 @@ in
     home.homeDirectory = "/home/bb010g";
 
     home.packages = [
+      pkgs.beeper # instant messenger (Beeper client, GUI)
       pkgs.bitwarden-cli # password manager (Bitwarden client, CLI)
       pkgs.bitwarden-desktop # password manager (Bitwarden client, GUI)
       pkgs.element-desktop-wayland or (builtins.trace "WARNING: pkgs.element-desktop-wayland is no longer available" pkgs.element-desktop) # instant messenger (Matrix client, GUI)
