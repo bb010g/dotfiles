@@ -12,7 +12,6 @@ in
       pkgs.bitwarden-cli # password manager (Bitwarden client, CLI)
       pkgs.bitwarden-desktop # password manager (Bitwarden client, GUI)
       pkgs.element-desktop-wayland or (builtins.trace "WARNING: pkgs.element-desktop-wayland is no longer available" pkgs.element-desktop) # instant messenger (Matrix client, GUI)
-      pkgs.firefox # web browser (GUI)
       pkgs.iamb # instant messenger (Matrix client, GUI)
       pkgs.neochat # instant messenger (Matrix client, GUI)
       pkgs.obsidian # information manager (text files, GUI)
@@ -45,6 +44,8 @@ in
 
     programs.eza.enable = true;
 
+    programs.firefox.enable = true; # web browser (GUI)
+
     programs.foot.enable = true;
     programs.foot.settings = {
       key-bindings.font-decrease = "Control+Alt+minus Control+Alt+KP_Subtract";
@@ -58,6 +59,8 @@ in
       main.font = "monospace:size=10";
       scrollback.lines = 10000;
     };
+
+    programs.git.enable = true; # version control (CLI)
 
     programs.vscode.enable = true;
     programs.vscode.extensions = [

@@ -1,8 +1,11 @@
 { config, lib, pkgs, ... }:
 
+let
+  cfg = config.programs.git;
+in
 {
   config = {
-    home.packages = lib.mkIf config.programs.git.enable [
+    home.packages = lib.mkIf cfg.enable [
       pkgs.git-branchless
       pkgs.git-branchstack
       pkgs.git-dive
@@ -14,7 +17,6 @@
     ];
 
     programs.git.difftastic.enable = true;
-    programs.git.enable = true;
     # <ansiColor>: black, red, green, yellow, blue, magenta, cyan, white
     # <color>: normal, #<rrggbb>, <ansiColor>, default, bright<ansiColor>, <256-color>
     # <basicAttribute>: bold, dim, italic, ul, blink, reverse, strike

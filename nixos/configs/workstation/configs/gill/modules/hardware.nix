@@ -32,6 +32,9 @@ in
 
     boot.loader.efi.canTouchEfiVariables = true;
 
+    # Enables non-free firmware on devices not recognized by `nixos-generate-config`.
+    hardware.enableRedistributableFirmware = lib.mkDefault true;
+
     # Enables DHCP on each ethernet and wireless interface. In case of scripted networking
     # (the default) this is the recommended approach. When using systemd-networkd it's
     # still possible to use this option, but it's recommended to use it in conjunction
@@ -39,10 +42,9 @@ in
     networking.useDHCP = lib.mkDefault true;
     # networking.interfaces.eno1.useDHCP = lib.mkDefault true;
 
-    # Enables non-free firmware on devices not recognized by `nixos-generate-config`.
-    hardware.enableRedistributableFirmware = lib.mkDefault true;
-
     nixpkgs.hostPlatform = lib.mkDefault "x86_64-linux";
+
+    programs.firefox.preferences."browser.tabs.unloadOnLowMemory" = true;
   };
 }
 # vim: set sta et sw=2 ts=8:

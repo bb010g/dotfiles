@@ -404,6 +404,10 @@ in
       virtualisation.podman.enable = true;
       virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
     }
+    # Enable the Firefox web browser.
+    (lib.mkIf config.services.xserver.enable {
+      programs.firefox.enable = true;
+    })
     # Uncategorized graphical confifguration.
     (lib.mkIf config.services.xserver.enable {
       environment.systemPackages = [
@@ -411,7 +415,7 @@ in
         pkgs.qdirstat
       ];
       programs.wireshark.package = pkgs.wireshark;
-      # Discord (via Vesktop)
+      # instant messenger (Discord, via Vesktop, GUI)
       programs.vesktop.enable = true;
     })
     # Enable debuginfod.
