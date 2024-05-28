@@ -191,5 +191,9 @@ in
 
     services.kdeconnect.enable = true;
     services.kdeconnect.indicator = lib.mkDefault true;
+
+    services.squeezelite.enable = true;
+    services.squeezelite.audioBackend.pulseAudio.enable = true;
+    services.squeezelite.extraArgs = "-s banks-media.mouse-grue.ts.net -W";
   };
 }
