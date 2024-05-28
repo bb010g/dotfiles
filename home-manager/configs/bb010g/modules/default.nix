@@ -11,7 +11,6 @@ in
       pkgs.beeper # instant messenger (Beeper client, GUI)
       pkgs.bitwarden-cli # password manager (Bitwarden client, CLI)
       pkgs.bitwarden-desktop # password manager (Bitwarden client, GUI)
-      pkgs.element-desktop # instant messenger (Matrix client, GUI)
       pkgs.iamb # instant messenger (Matrix client, TUI)
       pkgs.neochat # instant messenger (Matrix client, GUI)
       pkgs.obsidian # information manager (text files, GUI)
@@ -42,9 +41,14 @@ in
 
     programs.bat.enable = true;
 
+    # instant messenger (Matrix client, GUI)
+    programs.element-desktop.enable = true;
+    programs.element-desktop.desktopEntry.enableWayland = true;
+
     programs.eza.enable = true;
 
-    programs.firefox.enable = true; # web browser (GUI)
+    # web browser (GUI)
+    programs.firefox.enable = true;
 
     programs.foot.enable = true;
     programs.foot.settings = {
@@ -60,7 +64,8 @@ in
       scrollback.lines = 10000;
     };
 
-    programs.git.enable = true; # version control (CLI)
+    # version control (CLI)
+    programs.git.enable = true;
 
     programs.vscode.enable = true;
     programs.vscode.extensions = [
