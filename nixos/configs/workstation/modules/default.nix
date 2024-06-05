@@ -308,6 +308,7 @@ in
         pkgs.progress
         pkgs.ripgrep
         pkgs.strace
+        pkgs.tree
         pkgs.uftrace
         pkgs.units
       ];
