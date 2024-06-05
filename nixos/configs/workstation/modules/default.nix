@@ -285,6 +285,14 @@ in
     # Configure shell niceties.
     {
       programs.bash.blesh.enable = true;
+      # # waiting on https://github.com/akinomyoga/ble.sh/issues/456
+      # programs.bash.interactiveShellInit = lib.mkMerge [
+      #   (lib.mkIf config.programs.bash.blesh.enable ''
+      #     if [[ -n ''${BLE_VERSION-} ]]; then
+      #       bleopt …
+      #     fi
+      #   '');
+      # ];
       # environment.systemPackages = [
       #   pkgs.atuin
       # ];
