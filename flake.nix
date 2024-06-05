@@ -36,7 +36,7 @@
       nixosData = nixosDataForPath ./nixos;
       nixosDataForPath = _flakeLib.dataOfPath.withShortNames.moduleDataForPath;
     in
-    { config, getSystem, inputs, lib, moduleLocation, options, self, ... }:
+    flakeModuleArgs@{ config, getSystem, inputs, lib, moduleLocation, options, self, ... }:
     let
       inherit (builtins)
         attrNames
@@ -138,7 +138,7 @@
               configuration = inputs.nixpkgs.lib.nixosSystem {
                 modules = [ config.flake.nixosModules.externalModules module ];
                 specialArgs = {
-                  inherit _flakeLib flakeConfig flakeOptions flakeSelf inputs;
+                  inherit _flakeLib flakeConfig flakeModuleArgs flakeOptions flakeSelf inputs;
                   inherit (config.flake) homeManagerModuleLists homeManagerModules;
                 };
               };
@@ -156,12 +156,16 @@
             inputs.impermanence.nixosModules.impermanence
             inputs.nix-flatpak.nixosModules.nix-flatpak
             inputs.home-manager.nixosModules.home-manager
-            {
-              config.home-manager.sharedModules = config.flake.homeManagerModuleLists.sharedModules;
+            (nixosModuleArgs@{ config, lib, options, pkgs, ... }: {
+              config.home-manager.sharedModules = flakeConfig.flake.homeManagerModuleLists.sharedModules;
               config.home-manager.extraSpecialArgs = {
-                inherit _flakeLib flakeConfig flakeOptions flakeSelf inputs;
+                inherit _flakeLib flakeConfig flakeModuleArgs flakeOptions flakeSelf inputs nixosModuleArgs;
+                # nixosConfig = config; # already passed by home-manager
+                nixosLib = lib;
+                nixosOptions = options;
+                nixosPkgs = pkgs;
               };
-            }
+            })
           ];
           sharedModules = config.flake.nixosModuleLists.externalModules ++
             config.flake.nixosModuleLists.default;
