@@ -47,9 +47,15 @@ in
 
       systemd.user.services.squeezelite = {
         Unit = {
-          After = [
-            "network.target"
-            "sound.target"
+          After = lib.mkMerge [
+            [
+              "network.target"
+              "sound.target"
+            ]
+            (lib.mkIf cfg.audioBackend.pulseAudio.enable [
+              "pulseaudio.socket"
+              "pipewire-pulse.socket"
+            ])
           ];
           Description = "Squeezelite headless player for Lyrion Music Server";
           Documentation = "man:squeezelite(5)";
