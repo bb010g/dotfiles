@@ -164,12 +164,16 @@
         {
           default = nixosData.moduleList or [ ];
           externalModules =
+            config.flake.nixosModuleLists.externalModules-lix ++
             config.flake.nixosModuleLists.externalModules-main ++
             config.flake.nixosModuleLists.externalModules-home-manager;
           externalModules-home-manager = [
             inputs.home-manager.nixosModules.home-manager
 
             config.flake.nixosModules.home-manager-flakeIntegration
+          ];
+          externalModules-lix = [
+            inputs.lix-module.nixosModules.default
           ];
           externalModules-main = [
             inputs.disko.nixosModules.disko
