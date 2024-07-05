@@ -5,7 +5,10 @@
 moduleArgs@{ config, lib, modulesPath, pkgs, utils, ... }:
 
 let
-  utils = moduleArgs.utils // import ../../../lib/utils.nix { inherit config lib pkgs utils; };
+  callPackageWith' = autoArgs: fn: args:
+    fn (builtins.intersectAttrs (lib.functionArgs fn) autoArgs // args);
+  moduleArgs' = moduleArgs // { inherit utils; };
+  utils = moduleArgs.utils // callPackageWith' moduleArgs' (import ../../../lib/utils.nix) { };
 in
 {
   config = lib.mkMerge [

@@ -1,8 +1,7 @@
-moduleArgs@{ config, lib, pkgs, ... }:
+{ config, lib, nixosConfig ? null, pkgs, ... }:
 
 let
   cfg = config.programs.firefox;
-  nixosConfig = moduleArgs.nixosConfig or null;
   nixosCfg = nixosConfig.programs.firefox;
 in
 {
@@ -10,7 +9,5 @@ in
     (lib.mkIf (nixosCfg != null) {
       programs.firefox.package = nixosCfg.finalPackage;
     })
-    {
-    }
   ];
 }

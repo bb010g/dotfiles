@@ -1,8 +1,5 @@
-moduleArgs@{ lib, pkgs, ... }:
+{ lib, nixosConfig ? null, pkgs, ... }:
 
-let
-  nixosConfig = moduleArgs.nixosConfig or null;
-in
 {
   config = {
     home.homeDirectory = "/home/bb010g";
@@ -188,11 +185,7 @@ in
     programs.zellij.enable = true;
 
     # Discord (via Vesktop)
-    services.arrpc.enable =
-      if nixosConfig != null then
-        nixosConfig.programs.vesktop.enable
-      else
-        lib.mkDefault false;
+    services.arrpc.enable = lib.mkIf (nixosConfig != null) nixosConfig.programs.vesktop.enable;
 
     services.kdeconnect.enable = true;
     services.kdeconnect.indicator = lib.mkDefault true;
