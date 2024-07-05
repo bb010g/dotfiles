@@ -419,6 +419,10 @@ in
     }
     # Enable the Podman container engine.
     {
+      systemd.services."user@" = {
+        serviceConfig.Delegate = [ "cpu cpuacct cpuset memory pids" ];
+        overrideStrategy = "asDropin";
+      };
       virtualisation.podman.enable = true;
       virtualisation.podman.defaultNetwork.settings.dns_enabled = true;
     }
