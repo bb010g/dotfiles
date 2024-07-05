@@ -169,16 +169,7 @@
           externalModules-home-manager = [
             inputs.home-manager.nixosModules.home-manager
 
-            (nixosModuleArgs@{ config, lib, options, pkgs, ... }: {
-              config.home-manager.sharedModules = flakeConfig.flake.homeManagerModuleLists.sharedModules;
-              config.home-manager.extraSpecialArgs = {
-                inherit _flakeLib flakeConfig flakeModuleArgs flakeOptions flakeSelf inputs nixosModuleArgs;
-                # nixosConfig = config; # already passed by home-manager
-                nixosLib = lib;
-                nixosOptions = options;
-                nixosPkgs = pkgs;
-              };
-            })
+            config.flake.nixosModules.home-manager-flakeIntegration
           ];
           externalModules-main = [
             inputs.disko.nixosModules.disko
@@ -194,6 +185,18 @@
         (builtins.mapAttrs
           (name: importModules "${toString moduleLocation}#nixosModuleLists.${name}")
           config.flake.nixosModuleLists)
+        {
+          home-manager-flakeIntegration = nixosModuleArgs@{ config, lib, options, pkgs, ... }: {
+            config.home-manager.sharedModules = flakeConfig.flake.homeManagerModuleLists.sharedModules;
+            config.home-manager.extraSpecialArgs = {
+              inherit _flakeLib flakeConfig flakeModuleArgs flakeOptions flakeSelf inputs nixosModuleArgs;
+              # nixosConfig = config; # already passed by home-manager
+              nixosLib = lib;
+              nixosOptions = options;
+              nixosPkgs = pkgs;
+            };
+          };
+        }
       ];
       config.systems = import inputs.systems;
     }
