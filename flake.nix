@@ -163,11 +163,12 @@
       config.flake.nixosModuleLists = lib.mkMerge [
         {
           default = nixosData.moduleList or [ ];
-          externalModules = [
-            inputs.disko.nixosModules.disko
-            inputs.impermanence.nixosModules.impermanence
-            inputs.nix-flatpak.nixosModules.nix-flatpak
+          externalModules =
+            config.flake.nixosModuleLists.externalModules-main ++
+            config.flake.nixosModuleLists.externalModules-home-manager;
+          externalModules-home-manager = [
             inputs.home-manager.nixosModules.home-manager
+
             (nixosModuleArgs@{ config, lib, options, pkgs, ... }: {
               config.home-manager.sharedModules = flakeConfig.flake.homeManagerModuleLists.sharedModules;
               config.home-manager.extraSpecialArgs = {
@@ -178,6 +179,11 @@
                 nixosPkgs = pkgs;
               };
             })
+          ];
+          externalModules-main = [
+            inputs.disko.nixosModules.disko
+            inputs.impermanence.nixosModules.impermanence
+            inputs.nix-flatpak.nixosModules.nix-flatpak
           ];
           sharedModules = config.flake.nixosModuleLists.externalModules ++
             config.flake.nixosModuleLists.default;
