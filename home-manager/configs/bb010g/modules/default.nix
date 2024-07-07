@@ -187,7 +187,7 @@
     # Discord (via Vesktop)
     services.arrpc.enable = lib.mkIf (nixosConfig != null) nixosConfig.programs.vesktop.enable;
 
-    services.kdeconnect.enable = true;
+    services.kdeconnect.enable = lib.mkDefault true;
     services.kdeconnect.indicator = lib.mkDefault true;
 
     services.squeezelite.enable = true;

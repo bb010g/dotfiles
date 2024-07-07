@@ -2,14 +2,13 @@
 
 let
   cfg = config.services.kdeconnect;
-  nixosCfg = nixosConfig.services.kdeconnect;
+  nixosCfg = nixosConfig.programs.kdeconnect;
 in
 {
   config = lib.mkMerge [
     (lib.mkIf (nixosConfig != null) {
-      services.kdeconnect.package = lib.mkIf nixosConfig.services.desktopManager.plasma6.enable (
-        lib.mkDefault pkgs.kdePackages.kdeconnect-kde
-      );
+      services.kdeconnect.enable = lib.mkIf nixosCfg.enable false;
+      services.kdeconnect.package = nixosCfg.package;
     })
   ];
 }
