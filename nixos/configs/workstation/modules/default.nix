@@ -60,6 +60,8 @@ in
       # # Or disable the firewall altogether.
       # networking.firewall.enable = false;
 
+      networking.firewall.allowPing = lib.mkDefault true;
+
       programs.wireshark.enable = true;
 
       services.avahi.enable = true;
