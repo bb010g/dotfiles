@@ -1,8 +1,8 @@
 {
   description = "woah NixOS configuration";
 
-  nixConfig.extra-substituters = "https://nix-community.cachix.org";
-  nixConfig.extra-trusted-public-keys = "nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=";
+  nixConfig.extra-substituters = "https://cache.lix.systems https://nix-community.cachix.org";
+  nixConfig.extra-trusted-public-keys = "cache.lix.systems:aBnZUw8zA7H35Cz2RyKFVs3H4PlGTLawyY5KRbvJR8o= nix-community.cachix.org-1:mB9FSh9qf2dCimDSUo8Zy7bkq5CX+/rkCWyvRCYg3Fs=";
 
   inputs.disko.inputs.nixpkgs.follows = "nixpkgs";
   inputs.disko.url = "github:nix-community/disko";
@@ -174,6 +174,8 @@
           ];
           externalModules-lix = [
             inputs.lix-module.nixosModules.default
+
+            config.flake.nixosModules.lix-substituters
           ];
           externalModules-main = [
             inputs.disko.nixosModules.disko
@@ -199,6 +201,10 @@
               nixosOptions = options;
               nixosPkgs = pkgs;
             };
+          };
+          lix-substituters = {
+            config.nix.settings.extra-substituters = [ "https://cache.lix.systems" ];
+            config.nix.settings.extra-trusted-public-keys = [ "cache.lix.systems:aBnZUw8zA7H35Cz2RyKFVs3H4PlGTLawyY5KRbvJR8o=" ];
           };
         }
       ];
