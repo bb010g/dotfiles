@@ -188,6 +188,10 @@ in
         pkgs.systemdgenie # systemd service & login session management
       ];
     })
+    # Enable KDE Connect.
+    {
+      programs.kdeconnect.enable = true;
+    }
     # Uncategorized confifguration.
     {
       boot.initrd.systemd.emergencyAccess = config.users.users.root.hashedPassword;
