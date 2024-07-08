@@ -359,7 +359,6 @@ in
         pkgs.nix-melt
         pkgs.nix-output-monitor
         pkgs.nix-search-cli
-        pkgs.nix-top
         pkgs.nixfmt-rfc-style or pkgs.nixfmt
         pkgs.nixos-firewall-tool
         pkgs.nixos-option
