@@ -254,5 +254,5 @@ in
       })
     ]))
   ];
-  meta.maintainers = [ lib.maintainers.bb010g ];
+  meta.maintainers = [ ];
 }
