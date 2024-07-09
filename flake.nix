@@ -154,7 +154,9 @@
               nameMatches = builtins.match "configuration-(.*)" moduleName;
               configurationName = builtins.elemAt nameMatches 0;
               configuration = inputs.nixpkgs.lib.nixosSystem {
-                modules = [ config.flake.nixosModules.externalModules module ];
+                modules = [ config.flake.nixosModules.externalModules ] ++
+                  lib.optionals (configurationName != "nixzed") [ config.flake.nixosModules.impermanence-contrib ] ++
+                  [ module ];
                 specialArgs = {
                   inherit _flakeLib flakeConfig flakeModuleArgs flakeOptions flakeSelf inputs;
                   inherit (config.flake) homeManagerModuleLists homeManagerModules;
@@ -187,6 +189,9 @@
             inputs.disko.nixosModules.disko
             inputs.impermanence.nixosModules.impermanence
             inputs.nix-flatpak.nixosModules.nix-flatpak
+          ];
+          impermanence-contrib = [
+            nixos/modules/_impermanence-contrib/default.nix
           ];
           sharedModules = config.flake.nixosModuleLists.externalModules ++
             config.flake.nixosModuleLists.default;
