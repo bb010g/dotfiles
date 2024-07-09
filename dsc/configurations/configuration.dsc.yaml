@@ -1,0 +1,86 @@
+# yaml-language-server: $schema=https://aka.ms/configuration-dsc-schema/0.2
+properties:
+  assertions:
+    - resource: Microsoft.Windows.Developer/OsVersion
+      directives: { allowPrerelease: true, description: "verify min OS version requirement" }
+      settings:
+        MinVersion: "10.0.22000" # Windows 11 22H2
+  resources:
+    # - resource: Microsoft.DSC/Assertion
+    #   directives: { description: "assertions" }
+    #   settings:
+    #     $schema: https://raw.githubusercontent.com/PowerShell/DSC/main/schemas/2023/08/config/document.json
+    #     resources:
+    #       - name: "verify min OS version requirement"
+    #         type: Microsoft.Windows.Developer/OsVersion
+    #         properties:
+    #           MinVersion: "10.0.22000"
+    - resource: Microsoft.Windows.Developer/UserAccessControl
+      id: userAccessControl
+      directives: { allowPrerelease: true, description: "configure User Access Control" }
+      settings:
+        AdminConsentPromptBehavior: "RequireConsentOnSecureDesktop"
+    - resource: Microsoft.Windows.Developer/DeveloperMode
+      id: developerMode
+      dependsOn:
+        - userAccessControl
+      directives: { allowPrerelease: true, description: "enable Developer Mode" }
+      settings:
+        Ensure: Present
+    - resource: Microsoft.WinGet.DSC/WinGetUserSettings
+      id: wingetUserSettings
+      directives: { allowPrerelease: true, description: "enable the winget feature enableSelfElevate" }
+      settings:
+        Settings:
+          $schema: https://aka.ms/winget-settings.schema.json
+          experimentalFeatures:
+            configuration: true
+            configuration03: true
+            configureExport: true
+            configureSelfElevate: true
+    - resource: ComputerManagementDsc/PowerShellExecutionPolicy
+      id: powerShellLocalMachineExecutionPolicy
+      dependsOn:
+        - userAccessControl
+      directives: { description: "configure PowerShell execution policy for the local machine" }
+      settings:
+        ExecutionPolicyScope: "LocalMachine"
+        ExecutionPolicy: "RemoteSigned"
+    - resource: ComputerManagementDsc/PowerShellExecutionPolicy
+      id: powerShellCurrentUserExecutionPolicy
+      dependsOn:
+        - userAccessControl
+      directives: { description: "configure PowerShell execution policy for the current user" }
+      settings:
+        ExecutionPolicyScope: "CurrentUser"
+        ExecutionPolicy: "Unrestricted"
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: justPackage
+      dependsOn:
+        - wingetUserSettings
+      directives: { allowPrerelease: true, description: "install just" }
+      settings:
+        Id: Casey.Just
+        Source: winget
+        UseLatest: true
+    - resource: Microsoft.WinGet.DSC/WinGetPackage
+      id: gsudoPackage
+      dependsOn:
+        - userAccessControl
+        - wingetUserSettings
+      directives: { allowPrerelease: true, description: "install gsudo" }
+      settings:
+        Id: gerardog.gsudo
+        Source: winget
+        UseLatest: true
+    - resource: PSResourceGet.Bootstrap/BootstrapPSResourceGet
+      id: psResourceGet
+      dependsOn:
+        - wingetUserSettings
+        - powerShellCurrentUserExecutionPolicy
+      directives: { description: "install PSResourceGet" }
+      settings:
+        IsSingleInstance: "Yes"
+        ModuleScope: "AllUsers"
+        Version: "1.0.5"
+  configurationVersion: 0.2.0
