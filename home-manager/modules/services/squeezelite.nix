@@ -63,6 +63,9 @@ in
         };
         Service = {
           ExecStart = "${finalProgramPath} -N %S/${stateDir}/player-name ${cfg.extraArgs}";
+          Restart = "on-failed";
+          RestartMaxDelaySec = 30;
+          RestartSteps = 20;
           StateDirectory = stateDir;
           Type = "exec";
         };
