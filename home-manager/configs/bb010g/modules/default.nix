@@ -193,5 +193,7 @@
     services.squeezelite.enable = true;
     services.squeezelite.audioBackend.pulseAudio.enable = true;
     services.squeezelite.extraArgs = "-s banks-media.mouse-grue.ts.net -W";
+
+    systemd.user.startServices = "sd-switch";
   };
 }
