@@ -620,5 +620,14 @@ in
     #   }
     # ];
     services.kdeconnect.indicator = lib.mkIf config.services.kdeconnect.enable false;
+    # systemd.user.services.plasma-plasmashell = {
+    #   Unit = {
+    #     Before = [ "tray.target" ];
+    #     PropagatesReloadTo = [ "tray.target" ];
+    #     PropagatesStopTo = [ "tray.target" ];
+    #     ReloadPropagatedFrom = [ "tray.target" ];
+    #     Wants = [ "tray.target" ];
+    #   };
+    # };
   };
 }
