@@ -1,17 +1,17 @@
+prevLib: finalLib:
 let
-  inherit (_lib.fixedPoints)
+  inherit (builtins)
+    ;
+  inherit (finalLib.fixedPoints)
     makeExtensibleHook
     makeInheritableHook
     ;
-  inherit (_lib.pop)
+  inherit (finalLib.pop)
     extendObj
     extensionToProto
     hookObj
     instantiateObj
     ;
-  inherit (builtins)
-    ;
-  _lib = import ./_lib.nix;
 in
 {
   makeExtensible = mkFinal:

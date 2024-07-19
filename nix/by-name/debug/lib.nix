@@ -1,13 +1,13 @@
+prevLib: finalLib:
 let
-  inherit (_lib.debug)
-    warn
-    ;
   inherit (builtins)
     elem
     getEnv
     trace
     ;
-  _lib = import ./_lib.nix;
+  inherit (finalLib.debug)
+    warn
+    ;
 in
 {
   # From <nixpkgs/lib/trivial.nix>

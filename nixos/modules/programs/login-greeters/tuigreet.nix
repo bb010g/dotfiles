@@ -1,9 +1,6 @@
-{ config, lib, options, pkgs, ... }:
+{ config, flakeLib, lib, options, pkgs, ... }:
 
 let
-  inherit (_lib.attrs)
-    concatMapAttrsToList
-    ;
   inherit (builtins)
     map
     typeOf
@@ -26,7 +23,9 @@ let
   inherit (lib.generators)
     toPretty
     ;
-  _lib = import ../../../../nix/lib/_lib.nix;
+  inherit (flakeLib.attrs)
+    concatMapAttrsToList
+    ;
   cfg = config.programs.loginGreeters.tuigreet;
   displayManagerCfg = config.services.displayManager;
   displayManagerOpts = options.services.displayManager;

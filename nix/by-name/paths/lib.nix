@@ -1,9 +1,19 @@
+prevLib: finalLib:
 let
-  inherit (_lib.attrs)
+  inherit (builtins)
+    attrNames
+    baseNameOf
+    filter
+    filterSource
+    mapAttrs
+    pathExists
+    readDir
+    ;
+  inherit (finalLib.attrs)
     concatMapAttrs'
     concatMapAttrsToList
     ;
-  inherit (_lib.paths)
+  inherit (finalLib.paths)
     baseOfNixSourceBaseName
     ignoredBaseNamePrefix
     isIgnoredBaseName
@@ -14,22 +24,12 @@ let
     pathFnToDirEntryFn
     pathFnToSourceFn
     ;
-  inherit (_lib.strings)
+  inherit (finalLib.strings)
     hasPrefix
     hasSuffix
     removePrefix
     removeSuffix
     ;
-  inherit (builtins)
-    attrNames
-    baseNameOf
-    filter
-    filterSource
-    mapAttrs
-    pathExists
-    readDir
-    ;
-  _lib = import ./_lib.nix;
   builtinPath = builtins.path;
   isNixSourcePathFilter = pathFilters.isNixSource;
 in

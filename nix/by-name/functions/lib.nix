@@ -1,5 +1,8 @@
+prevLib: finalLib:
 let
-  inherit (_lib.functions)
+  inherit (builtins)
+    ;
+  inherit (finalLib.functions)
     flip2
     flip1_1
     flip1_1_1
@@ -8,9 +11,6 @@ let
     flip1_1_1_1_1_1
     isFunction
     ;
-  inherit (builtins)
-    ;
-  _lib = import ./_lib.nix;
   builtinIsFunction = builtins.isFunction;
 in
 {

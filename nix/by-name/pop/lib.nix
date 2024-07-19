@@ -1,16 +1,16 @@
 # NOTE: this isn't POP (Pure Object Prototypes) compliant, but is instead a variation on that theme.
+prevLib: finalLib:
 let
-  inherit (_lib.lists)
-    foldr
-    ;
-  inherit (_lib.strings)
-    escapeNixIdentifier
-    ;
   inherit (builtins)
     removeAttrs
     throw
     ;
-  _lib = import ./_lib.nix;
+  inherit (finalLib.lists)
+    foldr
+    ;
+  inherit (finalLib.strings)
+    escapeNixIdentifier
+    ;
 in rec {
   composeProto = this: parent: final: prev: this final (parent final prev);
   composeProtos = foldr composeProto identityProto;

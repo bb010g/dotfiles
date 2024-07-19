@@ -1,8 +1,5 @@
-moduleArgs@{ config, lib, modulesPath, pkgs, utils, ... }:
+moduleArgs@{ config, lib, modulesPath, pkgs, ... }:
 
-let
-  utils = moduleArgs.utils // import ../../../lib/utils.nix { inherit config lib pkgs utils; };
-in
 {
   config = lib.mkMerge [
     {

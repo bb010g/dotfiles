@@ -1,27 +1,57 @@
-let
-  _flakeLib = import ./nix/lib/_lib.nix;
-  homeManagerData = homeManagerDataForPath ./home-manager;
-  homeManagerDataForPath = _flakeLib.dataOfPath.withShortNames.moduleDataForPath;
-  nixosData = nixosDataForPath ./nixos;
-  nixosDataForPath = _flakeLib.dataOfPath.withShortNames.moduleDataForPath;
-in
 flakeModuleArgs@{ config, getSystem, inputs, lib, moduleLocation, options, self, ... }:
 let
-  inherit (builtins)
-    attrNames
-    concatMap
-    listToAttrs
-    ;
-  inherit (_flakeLib.attrs)
-    concatMapAttrs'
-    concatMapAttrsToList
-    ;
+  inherit (builtins) attrNames concatMap listToAttrs;
+  inherit (flakeLib.attrs) concatMapAttrs' concatMapAttrsToList;
+  byName = import nix/by-name/byName/lib.nix { } { inherit byName; } // {
+    config.importNamedDirEntries =
+      let
+        inherit (byName) byNameLib lib;
+        inherit (lib) pipe;
+        importNamedDirEntries =
+          config: name: nameEntry: namedDirEntries:
+          let
+            final = pipe { inherit namedDirEntries; namedEntries = { }; }
+              config.namedDirEntriesImporters;
+          in
+          assert final.namedDirEntries == { };
+          final.namedEntries;
+      in
+      importNamedDirEntries;
+    config.namedDirEntriesImporters =
+      let
+        inherit (byName) byNameLib lib;
+        inherit (lib) import mapAttr removeAttr;
+        mapNamedDirEntry =
+          namedBaseName: f: acc:
+          let
+            inherit (acc) namedDirEntries;
+            namedDirEntry = namedDirEntries.${namedBaseName};
+            namedDirEntries' = removeAttr namedBaseName namedDirEntries;
+            acc' = acc // {
+              namedDirEntries = namedDirEntries';
+            };
+          in
+          if namedDirEntries ? ${namedBaseName} then f namedDirEntry acc' else acc;
+      in
+      [
+        (mapNamedDirEntry "lib.nix" ({ path, ... }: mapAttr "namedEntries" (namedEntries: namedEntries // {
+          lib = import path { inherit byName; } flakeLib;
+        })))
+      ];
+    nameDirEntries = byName.lib.readDirEntries ./nix/by-name;
+    nameEntries = byName.byNameLib.importNameDirEntries byName.config byName.nameDirEntries;
+    transposedNameEntries = byName.lib.transposeAttrs byName.nameEntries;
+  };
   flakeConfig = config;
+  flakeLib = byName.transposedNameEntries.lib or { };
   flakeOptions = options;
   flakeSelf = self;
+  homeManagerData = homeManagerDataForPath ./home-manager;
+  homeManagerDataForPath = flakeLib.dataOfPath.withShortNames.moduleDataForPath;
   homeManagerModuleLists =
     let
-      f = parentName: name: value:
+      f =
+        parentName: name: value:
         let
           name' = "configuration-${name}";
         in
@@ -35,9 +65,12 @@ let
     listToAttrs (concatMapAttrsToList (f "default") homeManagerData.configs);
   importModules = _file: imports:
     { ${if _file != null then "_file" else null} = _file; inherit imports; };
+  nixosData = nixosDataForPath ./nixos;
+  nixosDataForPath = flakeLib.dataOfPath.withShortNames.moduleDataForPath;
   nixosModuleLists =
     let
-      f = parentName: name: value:
+      f =
+        parentName: name: value:
         let
           name' = "configuration-${name}";
         in
@@ -46,7 +79,8 @@ let
             name = name';
             value = config.flake.nixosModuleLists.${parentName} ++ value.moduleList or [ ];
           }
-        ] ++ concatMapAttrsToList (f name') value.configs or { };
+        ]
+        ++ concatMapAttrsToList (f name') value.configs or { };
     in
     listToAttrs (concatMapAttrsToList (f "default") nixosData.configs);
 in
@@ -55,6 +89,7 @@ in
     ./flake-parts/modules/home-manager.nix
     ./flake-parts/modules/nixos.nix
   ];
+  config.flake.byName = byName;
   config.flake.flakeModules = {
     home-manager = ./flake-parts/modules/home-manager.nix;
     homeConfigurations = ./flake-parts/modules/homeConfigurations.nix;
@@ -63,22 +98,21 @@ in
     nixosModuleLists = ./flake-parts/modules/nixosModuleLists.nix;
   };
   config.flake.homeConfigurations = lib.mkMerge [
-    (concatMapAttrs'
-      (moduleName: module:
-        let
-          nameMatches = builtins.match "configuration-(.*)" moduleName;
-          configurationName = builtins.elemAt nameMatches 0;
-          configuration = inputs.home-manager.lib.homeManagerConfiguration {
-            # inherit pkgs;
-            modules = [ config.flake.homeManagerModules.externalModules module ];
-            extraSpecialArgs = {
-              inherit _flakeLib flakeConfig flakeOptions flakeSelf inputs;
-            };
+    (concatMapAttrs' (
+      moduleName: module:
+      let
+        nameMatches = builtins.match "configuration-(.*)" moduleName;
+        configurationName = builtins.elemAt nameMatches 0;
+        configuration = inputs.home-manager.lib.homeManagerConfiguration {
+          # inherit pkgs;
+          modules = [ config.flake.homeManagerModules.externalModules module ];
+          extraSpecialArgs = {
+            inherit flakeLib flakeConfig flakeOptions flakeSelf inputs;
           };
-        in
-        if nameMatches == null then [ ] else
-          [ { name = moduleName; value = module; } ])
-      config.flake.homeManagerModules)
+        };
+      in
+      if nameMatches == null then [ ] else [ { name = moduleName; value = module; } ]
+    ) config.flake.homeManagerModules)
   ];
   config.flake.homeManagerModuleLists = lib.mkMerge [
     {
@@ -87,45 +121,46 @@ in
         inputs.nix-flatpak.homeManagerModules.nix-flatpak
         inputs.plasma-manager.homeManagerModules.plasma-manager
       ];
-      sharedModules = config.flake.homeManagerModuleLists.externalModules ++
-        config.flake.homeManagerModuleLists.default;
+      sharedModules =
+        config.flake.homeManagerModuleLists.externalModules
+        ++ config.flake.homeManagerModuleLists.default;
     }
     homeManagerModuleLists
   ];
   config.flake.homeManagerModules = lib.mkMerge [
-    (builtins.mapAttrs
-      (name: importModules "${toString moduleLocation}#homeManagerModuleLists.${name}")
-      config.flake.homeManagerModuleLists)
+    (builtins.mapAttrs (
+      name: importModules "${toString moduleLocation}#homeManagerModuleLists.${name}"
+    ) config.flake.homeManagerModuleLists)
   ];
-  config.flake.lib = import ./nix/lib;
+  config.flake.lib = flakeLib;
   config.flake.nixosConfigurations = lib.mkMerge [
-    (concatMapAttrs'
-      (moduleName: module:
-        let
-          nameMatches = builtins.match "configuration-(.*)" moduleName;
-          configurationName = builtins.elemAt nameMatches 0;
-          configuration = inputs.nixpkgs.lib.nixosSystem {
-            modules = [ config.flake.nixosModules.externalModules ] ++
-              lib.optionals (configurationName != "nixzed") [ config.flake.nixosModules.impermanence-contrib ] ++
-              [ module ];
-            specialArgs = {
-              inherit _flakeLib flakeConfig flakeModuleArgs flakeOptions flakeSelf inputs;
-              inherit (config.flake) homeManagerModuleLists homeManagerModules;
-            };
+    (concatMapAttrs' (
+      moduleName: module:
+      let
+        nameMatches = builtins.match "configuration-(.*)" moduleName;
+        configurationName = builtins.elemAt nameMatches 0;
+        configuration = inputs.nixpkgs.lib.nixosSystem {
+          modules =
+            [ config.flake.nixosModules.externalModules ]
+            ++ lib.optionals (configurationName != "nixzed") [ config.flake.nixosModules.impermanence-contrib ]
+            ++ [ module ];
+          specialArgs = {
+            inherit flakeLib flakeConfig flakeModuleArgs flakeOptions flakeSelf inputs;
+            inherit (config.flake) homeManagerModuleLists homeManagerModules;
           };
-        in
-        if nameMatches == null then [ ] else
-          [ { name = configurationName; value = configuration; } ])
-      config.flake.nixosModules)
+        };
+      in
+      if nameMatches == null then [ ] else [ { name = configurationName; value = configuration; } ]
+    ) config.flake.nixosModules)
   ];
   config.flake._nixosData = nixosData;
   config.flake.nixosModuleLists = lib.mkMerge [
     {
       default = nixosData.moduleList or [ ];
       externalModules =
-        config.flake.nixosModuleLists.externalModules-lix ++
-        config.flake.nixosModuleLists.externalModules-main ++
-        config.flake.nixosModuleLists.externalModules-home-manager;
+        config.flake.nixosModuleLists.externalModules-lix
+        ++ config.flake.nixosModuleLists.externalModules-main
+        ++ config.flake.nixosModuleLists.externalModules-home-manager;
       externalModules-home-manager = [
         inputs.home-manager.nixosModules.home-manager
 
@@ -140,24 +175,24 @@ in
         inputs.disko.nixosModules.disko
         inputs.impermanence.nixosModules.impermanence
         inputs.nix-flatpak.nixosModules.nix-flatpak
+        # ({ config, ... }: { config.assertions = [ { assertion = config.nixpkgs.overlays == [ ]; message = "Overlays were provided to Nixpkgs: ${lib.generators.toPretty { allowPrettyValues = true; } config.nixpkgs.overlays}"; } ]; })
       ];
-      impermanence-contrib = [
-        nixos/modules/_impermanence-contrib/default.nix
-      ];
-      sharedModules = config.flake.nixosModuleLists.externalModules ++
-        config.flake.nixosModuleLists.default;
+      impermanence-contrib = [ nixos/modules/_impermanence-contrib/default.nix ];
+      sharedModules =
+        config.flake.nixosModuleLists.externalModules
+        ++ config.flake.nixosModuleLists.default;
     }
     nixosModuleLists
   ];
   config.flake.nixosModules = lib.mkMerge [
-    (builtins.mapAttrs
-      (name: importModules "${toString moduleLocation}#nixosModuleLists.${name}")
-      config.flake.nixosModuleLists)
+    (builtins.mapAttrs (
+      name: importModules "${toString moduleLocation}#nixosModuleLists.${name}"
+    ) config.flake.nixosModuleLists)
     {
       home-manager-flakeIntegration = nixosModuleArgs@{ config, lib, options, pkgs, ... }: {
         config.home-manager.sharedModules = flakeConfig.flake.homeManagerModuleLists.sharedModules;
         config.home-manager.extraSpecialArgs = {
-          inherit _flakeLib flakeConfig flakeModuleArgs flakeOptions flakeSelf inputs nixosModuleArgs;
+          inherit flakeLib flakeConfig flakeModuleArgs flakeOptions flakeSelf inputs nixosModuleArgs;
           # nixosConfig = config; # already passed by home-manager
           nixosLib = lib;
           nixosOptions = options;
@@ -176,9 +211,7 @@ in
       config = {
         allowUnfree = true;
       };
-      overlays = [
-        inputs.lix-module.overlays.default
-      ];
+      overlays = [ inputs.lix-module.overlays.default ];
     };
     config.legacyPackages.nixpkgs = lib.dontRecurseIntoAttrs pkgs;
   };

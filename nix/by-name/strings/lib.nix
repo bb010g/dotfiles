@@ -1,9 +1,5 @@
+prevLib: finalLib:
 let
-  inherit (_lib.strings)
-    escape
-    escapeNixString
-    validateSubstring
-    ;
   inherit (builtins)
     isPath
     map
@@ -14,7 +10,11 @@ let
     throw
     toJSON
     ;
-  _lib = import ./_lib.nix;
+  inherit (finalLib.strings)
+    escape
+    escapeNixString
+    validateSubstring
+    ;
 in
 {
   escape = builtins.escape or (

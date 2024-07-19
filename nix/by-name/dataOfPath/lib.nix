@@ -1,35 +1,5 @@
+prevLib: finalLib:
 let
-  inherit (_lib.fixedPoints)
-    makeExtensible
-    makeInheritable
-    ;
-  inherit (_lib.functions)
-    toFunction
-    ;
-  inherit (_lib.lists)
-    ;
-  inherit (_lib.paths)
-    concatMapDirEntriesToList
-    importOr
-    mapExistingPathOr
-    mapImportOr
-    readDirEntries
-    ;
-  inherit (_lib.pop)
-    composeProto
-    extendObj
-    extensionToProto
-    getProto
-    hookObj
-    identityProto
-    instantiateObj
-    mapMeta
-    setDefaultName
-    ;
-  inherit (_lib.strings)
-    hasPrefix
-    hasSuffix
-    ;
   inherit (builtins)
     attrNames
     concatMap
@@ -41,16 +11,46 @@ let
     stringLength
     substring
     ;
+  inherit (finalLib.fixedPoints)
+    makeExtensible
+    makeInheritable
+    ;
+  inherit (finalLib.functions)
+    toFunction
+    ;
+  inherit (finalLib.lists)
+    ;
+  inherit (finalLib.paths)
+    concatMapDirEntriesToList
+    importOr
+    mapExistingPathOr
+    mapImportOr
+    readDirEntries
+    ;
+  inherit (finalLib.pop)
+    composeProto
+    extendObj
+    extensionToProto
+    getProto
+    hookObj
+    identityProto
+    instantiateObj
+    mapMeta
+    setDefaultName
+    ;
+  inherit (finalLib.strings)
+    hasPrefix
+    hasSuffix
+    ;
   inherit (genericLib)
     concatMapEntriesOfDirToList
     ;
-  _lib = import ./_lib.nix;
   genericLib = {
     concatMapEntriesOfDirToList = pathFn: path:
       concatMapDirEntriesToList pathFn (readDirEntries path);
   };
-in genericLib // makeInheritable (makeExtensible (finalLib: let
-  inherit (finalLib)
+in genericLib // makeInheritable (makeExtensible (finalDataOfPath: let
+  inherit (finalDataOfPath)
     baseNameIsIgnored
     baseNameIsNix
     concatMapNixSourcePathsOfDirToList
@@ -124,16 +124,16 @@ in {
   in toFunction (importOr (
     modules: modules
   ) (path + "/${modulesBaseName}.nix")) (mapExistingPathOr moduleListOfDir { } modulesPath);
-  withShortNames = finalLib.__extend__ (final: prev: {
+  withShortNames = finalDataOfPath.__extend__ (final: prev: {
     moduleConfigurationsAttrName = "configs";
     moduleConfigurationsBaseName = "configs";
   });
-  withNixosAttrNames = finalLib.__extend__ (final: prev: {
+  withNixosAttrNames = finalDataOfPath.__extend__ (final: prev: {
     moduleConfigurationsAttrName = "nixosConfigurations";
     moduleListAttrName = "nixosModuleList";
     modulesPathAttrName = "nixosModulesPath";
   });
-  # withNixosBaseNames = (makeStaticObj finalLib).__extend__ (final: prev: {
+  # withNixosBaseNames = (makeStaticObj finalDataOfPath).__extend__ (final: prev: {
   #   moduleConfigurationsBaseName = "nixos-configurations";
   #   moduleDataBaseName = "nixos";
   #   moduleListBaseName = "nixos-module-list";

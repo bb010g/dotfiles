@@ -1,6 +1,5 @@
+prevLib: finalLib:
 let
-  inherit (_lib.lists)
-    ;
   inherit (builtins)
     attrNames
     concatMap
@@ -8,7 +7,8 @@ let
     length
     listToAttrs
     ;
-  _lib = import ./_lib.nix;
+  inherit (finalLib.lists)
+    ;
 in
 {
   foldr = builtins.foldr or (
