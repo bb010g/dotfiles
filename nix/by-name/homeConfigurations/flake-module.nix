@@ -1,3 +1,4 @@
+{ ... }:
 { lib, flake-parts-lib, moduleLocation, ... }:
 let
   inherit (lib)

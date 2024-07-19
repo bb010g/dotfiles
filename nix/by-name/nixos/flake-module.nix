@@ -1,0 +1,6 @@
+{ flakeModules, ... }:
+{
+  imports = [
+    flakeModules.nixosModuleLists
+  ];
+}

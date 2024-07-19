@@ -34,6 +34,9 @@ let
           if namedDirEntries ? ${namedBaseName} then f namedDirEntry acc' else acc;
       in
       [
+        (mapNamedDirEntry "flake-module.nix" ({ path, ... }: mapAttr "namedEntries" (namedEntries: namedEntries // {
+          flakeModule = importModules path [ (import path { flakeModules = byName.transposedNameEntries.flakeModule; }) ];
+        })))
         (mapNamedDirEntry "lib.nix" ({ path, ... }: mapAttr "namedEntries" (namedEntries: namedEntries // {
           lib = import path { inherit byName; } flakeLib;
         })))
@@ -89,17 +92,11 @@ let
 in
 {
   imports = [
-    ./flake-parts/modules/home-manager.nix
-    ./flake-parts/modules/nixos.nix
+    byName.transposedNameEntries.flakeModule.home-manager
+    byName.transposedNameEntries.flakeModule.nixos
   ];
   config.flake.byName = byName;
-  config.flake.flakeModules = {
-    home-manager = ./flake-parts/modules/home-manager.nix;
-    homeConfigurations = ./flake-parts/modules/homeConfigurations.nix;
-    homeManagerModules = ./flake-parts/modules/homeManagerModules.nix;
-    nixos = ./flake-parts/modules/nixos.nix;
-    nixosModuleLists = ./flake-parts/modules/nixosModuleLists.nix;
-  };
+  config.flake.flakeModules = byName.transposedNameEntries.flakeModule or [ ];
   config.flake.homeConfigurations = lib.mkMerge [
     (concatMapAttrs' (
       moduleName: module:
