@@ -37,6 +37,9 @@ let
         (mapNamedDirEntry "lib.nix" ({ path, ... }: mapAttr "namedEntries" (namedEntries: namedEntries // {
           lib = import path { inherit byName; } flakeLib;
         })))
+        (mapNamedDirEntry "nixpkgs-overlay.nix" ({ path, ... }: mapAttr "namedEntries" (namedEntries: namedEntries // {
+          nixpkgsOverlay = import path flakeModuleArgs;
+        })))
       ];
     nameDirEntries = byName.lib.readDirEntries ./nix/by-name;
     nameEntries = byName.byNameLib.importNameDirEntries byName.config byName.nameDirEntries;
@@ -205,13 +208,19 @@ in
       };
     }
   ];
+  config.flake.overlays = byName.transposedNameEntries.nixpkgsOverlay or [ ];
   config.perSystem = { config, pkgs, system, ... }: {
     config._module.args.pkgs = import inputs.nixpkgs {
       inherit system;
       config = {
         allowUnfree = true;
       };
-      overlays = [ inputs.lix-module.overlays.default ];
+      overlays = [
+        inputs.lix-module.overlays.default
+        flakeConfig.flake.overlays.neovim
+        flakeConfig.flake.overlays.neovim-stable
+        flakeConfig.flake.overlays.neovim-unstable
+      ];
     };
     config.legacyPackages.nixpkgs = lib.dontRecurseIntoAttrs pkgs;
   };

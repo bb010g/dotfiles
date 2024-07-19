@@ -1,3 +1,4 @@
+{ ... }:
 finalPkgs: prevPkgs:
 let
   inherit (finalPkgs)

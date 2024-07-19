@@ -1,3 +1,4 @@
+{ ... }:
 finalPkgs: prevPkgs:
 if prevPkgs ? neovim-stable-unwrapped then {
 } else {
