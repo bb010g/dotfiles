@@ -170,5 +170,17 @@ in
       };
     }
   ];
+  config.perSystem = { config, pkgs, system, ... }: {
+    config._module.args.pkgs = import inputs.nixpkgs {
+      inherit system;
+      config = {
+        allowUnfree = true;
+      };
+      overlays = [
+        inputs.lix-module.overlays.default
+      ];
+    };
+    config.legacyPackages.nixpkgs = lib.dontRecurseIntoAttrs pkgs;
+  };
   config.systems = import inputs.systems;
 }
