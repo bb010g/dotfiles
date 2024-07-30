@@ -21,6 +21,7 @@ let
       let
         inherit (byName) byNameLib lib;
         inherit (lib) import mapAttr removeAttr;
+        lib' = transposedNameEntries'.lib;
         mapNamedDirEntry =
           namedBaseName: f: acc:
           let
@@ -32,21 +33,32 @@ let
             };
           in
           if namedDirEntries ? ${namedBaseName} then f namedDirEntry acc' else acc;
+        transposedNameEntries' = byName.transposedNameEntries // { inherit inputs; };
       in
       [
         (mapNamedDirEntry "flake-module.nix" ({ path, ... }: mapAttr "namedEntries" (namedEntries: namedEntries // {
-          flakeModule = importModules path [ (import path { flakeModules = byName.transposedNameEntries.flakeModule; }) ];
+          flakeModule = importModules path [ (import path transposedNameEntries') ];
         })))
         (mapNamedDirEntry "lib.nix" ({ path, ... }: mapAttr "namedEntries" (namedEntries: namedEntries // {
-          lib = import path { inherit byName; } flakeLib;
+          lib = import path { inherit byName; } lib';
         })))
         (mapNamedDirEntry "nixpkgs-overlay.nix" ({ path, ... }: mapAttr "namedEntries" (namedEntries: namedEntries // {
-          nixpkgsOverlay = import path flakeModuleArgs;
+          nixpkgsOverlay = import path transposedNameEntries';
         })))
       ];
+    config.transposedNameEntryNames = {
+      flakeModule = "flakeModules";
+      nixpkgsOverlay = "nixpkgsOverlays";
+    };
     nameDirEntries = byName.lib.readDirEntries ./nix/by-name;
     nameEntries = byName.byNameLib.importNameDirEntries byName.config byName.nameDirEntries;
-    transposedNameEntries = byName.lib.transposeAttrs byName.nameEntries;
+    transposedNameEntries =
+      let
+        namesCfg = byName.config.transposedNameEntryNames or { };
+      in
+      byName.lib.concatMapAttrs'
+        (name: value: [ { inherit value; name = namesCfg.${name} or name; } ])
+        (byName.lib.transposeAttrs byName.nameEntries);
   };
   flakeConfig = config;
   flakeLib = byName.transposedNameEntries.lib or { };
@@ -92,11 +104,11 @@ let
 in
 {
   imports = [
-    byName.transposedNameEntries.flakeModule.home-manager
-    byName.transposedNameEntries.flakeModule.nixos
+    byName.transposedNameEntries.flakeModules.home-manager
+    byName.transposedNameEntries.flakeModules.nixos
   ];
   config.flake.byName = byName;
-  config.flake.flakeModules = byName.transposedNameEntries.flakeModule or { };
+  config.flake.flakeModules = byName.transposedNameEntries.flakeModules or { };
   config.flake.homeConfigurations = lib.mkMerge [
     (concatMapAttrs' (
       moduleName: module:
@@ -205,7 +217,7 @@ in
       };
     }
   ];
-  config.flake.overlays = byName.transposedNameEntries.nixpkgsOverlay or { };
+  config.flake.overlays = byName.transposedNameEntries.nixpkgsOverlays or { };
   config.perSystem = { config, pkgs, system, ... }: {
     config._module.args.pkgs = import inputs.nixpkgs {
       inherit system;
