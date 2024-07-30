@@ -96,7 +96,7 @@ in
     byName.transposedNameEntries.flakeModule.nixos
   ];
   config.flake.byName = byName;
-  config.flake.flakeModules = byName.transposedNameEntries.flakeModule or [ ];
+  config.flake.flakeModules = byName.transposedNameEntries.flakeModule or { };
   config.flake.homeConfigurations = lib.mkMerge [
     (concatMapAttrs' (
       moduleName: module:
@@ -205,7 +205,7 @@ in
       };
     }
   ];
-  config.flake.overlays = byName.transposedNameEntries.nixpkgsOverlay or [ ];
+  config.flake.overlays = byName.transposedNameEntries.nixpkgsOverlay or { };
   config.perSystem = { config, pkgs, system, ... }: {
     config._module.args.pkgs = import inputs.nixpkgs {
       inherit system;
