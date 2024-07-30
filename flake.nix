@@ -99,7 +99,7 @@
               if namedDirEntries ? ${namedBaseName} then f namedDirEntry acc' else acc;
           in
           [
-            (mapNamedDirEntry "flake-module.nix" (
+            (mapNamedDirEntry "flakeModule.nix" (
               { path, ... }:
               mapAttr "namedEntries" (
                 namedEntries: namedEntries // { flakeModule = importModules path [ (import' path) ]; }
@@ -111,11 +111,41 @@
                 namedEntries: namedEntries // { lib = import path { inherit byName; } lib'; }
               )
             ))
-            (mapNamedDirEntry "nixpkgs-overlay.nix" (
+            (mapNamedDirEntry "nixpkgsOverlay.nix" (
               { path, ... }:
               mapAttr "namedEntries" (namedEntries: namedEntries // { nixpkgsOverlay = import' path; })
             ))
           ];
+        # by-name/<name>/package.nix -> packagesByName.<name>
+        # by-name/<name>/<resource>.nix -> <resource>sByName.<name>
+        # by-name/<name>/<resource>.nix -> resourcesByName.<name>.<resource>
+        # by-name/<name>/<resource-name>.nix -> byResourceNameByName.<name>.<resource-name>
+        # by-name/<name>/<resource-name>.nix -> byNameByResourceName.<resource-name>s.<name>
+        # by-name/<name>/package.nix -> byNameByResourceName.packages.<name>
+
+        # by-name/<name>/<named>.nix -> namedByName.<name>.<named>
+        # by-name/<name>/<named>.nix -> nameByNamed.<named>s.<name>
+        # by-name/<name>/package.nix -> nameByNamed.packages.<name>
+
+        # by-name/<name>/<type>.nix -> typedByName.<name>.<type>
+        # by-name/<name>/<type>.nix -> namedByType.<type>s.<name>
+        # by-name/<name>/package.nix -> namedByType.packages.<name>
+
+        # by-name/<name>/* -> dirEntriesByName.<name>
+        # by-name/<name>/<type>.nix ->
+
+        # by-name/<name>/package.nix -> by-name.named.packages.<name>
+        # by-name/<name>/package.nix -> by-name.names.<name>.package
+
+        # Maybe the non-transposed structure shouldn't be returned at all.
+
+        # by-name/<name>/<resource>.nix -> namedResources.<name>.<resource>
+        # by-name/hello/package.nix -> valueByTypeNameByName.hello.package
+        # helloTypedValues = valueByTypeByName.hello
+        # by-name/hello/package.nix -> valueByNameByType.package.hello
+        # packageDataByName = valueByNameByType.package
+        # by-name/hello/package.nix -> namedDataByType.package.hello
+        # namedPackageData = namedDataByType.package
         config.transposedNameEntryNames = {
           flakeModule = "flakeModules";
           nixpkgsOverlay = "nixpkgsOverlays";
