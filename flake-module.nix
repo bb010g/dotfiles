@@ -1,65 +1,8 @@
-flakeModuleArgs@{ config, getSystem, inputs, lib, moduleLocation, options, self, ... }:
+flakeModuleArgs@{ byName, config, getSystem, inputs, lib, moduleLocation, options, self, ... }:
 let
   inherit (builtins) attrNames concatMap listToAttrs;
   inherit (flakeLib.attrs) concatMapAttrs' concatMapAttrsToList;
-  byName = import nix/by-name/byName/lib.nix { } { inherit byName; } // {
-    config.importNamedDirEntries =
-      let
-        inherit (byName) byNameLib lib;
-        inherit (lib) pipe;
-        importNamedDirEntries =
-          config: name: nameEntry: namedDirEntries:
-          let
-            final = pipe { inherit namedDirEntries; namedEntries = { }; }
-              config.namedDirEntriesImporters;
-          in
-          assert final.namedDirEntries == { };
-          final.namedEntries;
-      in
-      importNamedDirEntries;
-    config.namedDirEntriesImporters =
-      let
-        inherit (byName) byNameLib lib;
-        inherit (lib) import mapAttr removeAttr;
-        lib' = transposedNameEntries'.lib;
-        mapNamedDirEntry =
-          namedBaseName: f: acc:
-          let
-            inherit (acc) namedDirEntries;
-            namedDirEntry = namedDirEntries.${namedBaseName};
-            namedDirEntries' = removeAttr namedBaseName namedDirEntries;
-            acc' = acc // {
-              namedDirEntries = namedDirEntries';
-            };
-          in
-          if namedDirEntries ? ${namedBaseName} then f namedDirEntry acc' else acc;
-        transposedNameEntries' = byName.transposedNameEntries // { inherit inputs; };
-      in
-      [
-        (mapNamedDirEntry "flake-module.nix" ({ path, ... }: mapAttr "namedEntries" (namedEntries: namedEntries // {
-          flakeModule = importModules path [ (import path transposedNameEntries') ];
-        })))
-        (mapNamedDirEntry "lib.nix" ({ path, ... }: mapAttr "namedEntries" (namedEntries: namedEntries // {
-          lib = import path { inherit byName; } lib';
-        })))
-        (mapNamedDirEntry "nixpkgs-overlay.nix" ({ path, ... }: mapAttr "namedEntries" (namedEntries: namedEntries // {
-          nixpkgsOverlay = import path transposedNameEntries';
-        })))
-      ];
-    config.transposedNameEntryNames = {
-      flakeModule = "flakeModules";
-      nixpkgsOverlay = "nixpkgsOverlays";
-    };
-    nameDirEntries = byName.lib.readDirEntries ./nix/by-name;
-    nameEntries = byName.byNameLib.importNameDirEntries byName.config byName.nameDirEntries;
-    transposedNameEntries =
-      let
-        namesCfg = byName.config.transposedNameEntryNames or { };
-      in
-      byName.lib.concatMapAttrs'
-        (name: value: [ { inherit value; name = namesCfg.${name} or name; } ])
-        (byName.lib.transposeAttrs byName.nameEntries);
-  };
+  inherit (flakeLib.byName.lib) importModules;
   flakeConfig = config;
   flakeLib = byName.transposedNameEntries.lib or { };
   flakeOptions = options;
@@ -81,8 +24,6 @@ let
         ] ++ concatMapAttrsToList (f name') value.configs or { };
     in
     listToAttrs (concatMapAttrsToList (f "default") homeManagerData.configs);
-  importModules = _file: imports:
-    { ${if _file != null then "_file" else null} = _file; inherit imports; };
   nixosData = nixosDataForPath ./nixos;
   nixosDataForPath = flakeLib.dataOfPath.withShortNames.moduleDataForPath;
   nixosModuleLists =

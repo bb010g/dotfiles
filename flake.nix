@@ -46,6 +46,100 @@
   inputs.systems.flake = false;
   inputs.systems.url = "github:nix-systems/default";
 
-  outputs = inputs: inputs.flake-parts.lib.mkFlake { inherit inputs; } ./flake-module.nix;
+  outputs =
+    inputs:
+    let
+      inherit (byName)
+        byNameLib
+        config
+        lib
+        nameDirEntries
+        nameEntries
+        transposedNameEntries
+        ;
+      inherit (byNameLib) importNameDirEntries;
+      inherit (lib)
+        concatMapAttrs'
+        import
+        importModules
+        mapAttr
+        pipe
+        readDirEntries
+        removeAttr
+        transposeAttrs
+        ;
+      byName = builtins.import ./nix/by-name/byName/lib.nix { } { inherit byName; } // {
+        config.importNamedDirEntries =
+          let
+            importNamedDirEntries =
+              config: name: nameEntry: namedDirEntries:
+              let
+                final = pipe {
+                  inherit namedDirEntries;
+                  namedEntries = { };
+                } config.namedDirEntriesImporters;
+              in
+              assert final.namedDirEntries == { };
+              final.namedEntries;
+          in
+          importNamedDirEntries;
+        config.namedDirEntriesImporters =
+          let
+            lib' = transposedNameEntries'.lib;
+            mapNamedDirEntry =
+              namedBaseName: f: acc:
+              let
+                inherit (acc) namedDirEntries;
+                namedDirEntry = namedDirEntries.${namedBaseName};
+                namedDirEntries' = removeAttr namedBaseName namedDirEntries;
+                acc' = acc // {
+                  namedDirEntries = namedDirEntries';
+                };
+              in
+              if namedDirEntries ? ${namedBaseName} then f namedDirEntry acc' else acc;
+          in
+          [
+            (mapNamedDirEntry "flake-module.nix" (
+              { path, ... }:
+              mapAttr "namedEntries" (
+                namedEntries: namedEntries // { flakeModule = importModules path [ (import' path) ]; }
+              )
+            ))
+            (mapNamedDirEntry "lib.nix" (
+              { path, ... }:
+              mapAttr "namedEntries" (
+                namedEntries: namedEntries // { lib = import path { inherit byName; } lib'; }
+              )
+            ))
+            (mapNamedDirEntry "nixpkgs-overlay.nix" (
+              { path, ... }:
+              mapAttr "namedEntries" (namedEntries: namedEntries // { nixpkgsOverlay = import' path; })
+            ))
+          ];
+        config.transposedNameEntryNames = {
+          flakeModule = "flakeModules";
+          nixpkgsOverlay = "nixpkgsOverlays";
+        };
+        nameDirEntries = readDirEntries ./nix/by-name;
+        nameEntries = importNameDirEntries config nameDirEntries;
+        transposedNameEntries =
+          let
+            namesCfg = config.transposedNameEntryNames or { };
+          in
+          concatMapAttrs' (name: value: [
+            {
+              inherit value;
+              name = namesCfg.${name} or name;
+            }
+          ]) (transposeAttrs nameEntries);
+      };
+      import' = path: import path transposedNameEntries';
+      specialArgs.byName = byName;
+      specialArgs' = {
+        inherit inputs;
+      } // specialArgs;
+      transposedNameEntries' = specialArgs' // transposedNameEntries;
+    in
+    inputs.flake-parts.lib.mkFlake { inherit inputs specialArgs; } ./flake-module.nix;
 }
 # vim: set sta et sw=2 ts=8:

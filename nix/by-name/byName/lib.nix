@@ -45,6 +45,7 @@ let
     hasSuffix
     id
     import
+    importModules
     importPath
     isAttrs
     isNull
@@ -272,6 +273,10 @@ in
         id
       );
     import = builtins.import;
+    importModules = _file: imports: {
+      ${if _file != null then "_file" else null} = _file;
+      inherit imports;
+    };
     importPath =
       path:
       let
