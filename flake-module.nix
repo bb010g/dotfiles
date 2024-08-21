@@ -1,10 +1,11 @@
 flakeModuleArgs@{ byName, config, getSystem, inputs, lib, moduleLocation, options, self, ... }:
 let
   inherit (builtins) attrNames concatMap listToAttrs;
-  inherit (flakeLib.attrs) concatMapAttrs' concatMapAttrsToList;
-  inherit (flakeLib.byName.lib) importModules;
+  inherit (flakeLib.attrs) concatMapAttrsToList zipMapAttrsWith;
+  inherit (flakeLib.lists) head length;
+  inherit (flakeLib.byName.supportLib.modules) importModules;
   flakeConfig = config;
-  flakeLib = byName.transposedNameEntries.lib or { };
+  flakeLib = byName.lib.protos.instantiateProto (byName.lib.protos.pipeProtos (byName.lib.attrs.attrValues byName.collections.lib or { })) { builtinsProto = prevBuiltins: finalBuiltins: { inherit (byName.lib) builtins; }; };
   flakeOptions = options;
   flakeSelf = self;
   homeManagerData = homeManagerDataForPath ./home-manager;
@@ -45,13 +46,13 @@ let
 in
 {
   imports = [
-    byName.transposedNameEntries.flakeModules.home-manager
-    byName.transposedNameEntries.flakeModules.nixos
+    byName.collections.flakeModules.home-manager
+    byName.collections.flakeModules.nixos
   ];
   config.flake.byName = byName;
-  config.flake.flakeModules = byName.transposedNameEntries.flakeModules or { };
+  config.flake.flakeModules = byName.collections.flakeModules or { };
   config.flake.homeConfigurations = lib.mkMerge [
-    (concatMapAttrs' (
+    (zipMapAttrsWith (name: values: assert length values == 1; head values) (
       moduleName: module:
       let
         nameMatches = builtins.match "configuration-(.*)" moduleName;
@@ -64,7 +65,7 @@ in
           };
         };
       in
-      if nameMatches == null then [ ] else [ { name = moduleName; value = module; } ]
+      { ${if nameMatches != null then configurationName else null} = configuration; }
     ) config.flake.homeManagerModules)
   ];
   config.flake.homeManagerModuleLists = lib.mkMerge [
@@ -87,7 +88,7 @@ in
   ];
   config.flake.lib = flakeLib;
   config.flake.nixosConfigurations = lib.mkMerge [
-    (concatMapAttrs' (
+    (zipMapAttrsWith (name: values: assert length values == 1; head values) (
       moduleName: module:
       let
         nameMatches = builtins.match "configuration-(.*)" moduleName;
@@ -103,7 +104,7 @@ in
           };
         };
       in
-      if nameMatches == null then [ ] else [ { name = configurationName; value = configuration; } ]
+      { ${if nameMatches != null then configurationName else null} = configuration; }
     ) config.flake.nixosModules)
   ];
   config.flake._nixosData = nixosData;
@@ -158,7 +159,7 @@ in
       };
     }
   ];
-  config.flake.overlays = byName.transposedNameEntries.nixpkgsOverlays or { };
+  config.flake.overlays = byName.collections.nixpkgsOverlays or { };
   config.perSystem = { config, pkgs, system, ... }: {
     config._module.args.pkgs = import inputs.nixpkgs {
       inherit system;

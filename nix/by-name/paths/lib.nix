@@ -1,3 +1,4 @@
+{ ... }:
 prevLib: finalLib:
 let
   inherit (builtins)
@@ -32,19 +33,17 @@ let
     ;
   builtinPath = builtins.path;
   isNixSourcePathFilter = pathFilters.isNixSource;
-in
-{
-  baseOfIgnoredBaseName = removePrefix ignoredBaseNamePrefix;
-  baseOfNixSourceBaseName = removeSuffix ".nix";
-  concatMapDirEntries' = pathFn: dirEntries:
+  lib.paths.baseOfIgnoredBaseName = removePrefix ignoredBaseNamePrefix;
+  lib.paths.baseOfNixSourceBaseName = removeSuffix ".nix";
+  lib.paths.concatMapDirEntries' = pathFn: dirEntries:
     concatMapAttrs' (pathFnToDirEntryFn pathFn) dirEntries;
-  concatMapDirEntriesToList = pathFn: dirEntries:
+  lib.paths.concatMapDirEntriesToList = pathFn: dirEntries:
     concatMapAttrsToList (pathFnToDirEntryFn pathFn) dirEntries;
-  filterDirEntries = pathFilter: dirEntries:
+  lib.paths.filterDirEntries = pathFilter: dirEntries:
     filter (pathFnToDirEntryFn pathFilter) dirEntries;
-  filterPath = pathFilter: path:
+  lib.paths.filterPath = pathFilter: path:
     filterSource (pathFnToSourceFn pathFilter) path;
-  # getNixSourceDirEntries =
+  # lib.paths.getNixSourceDirEntries =
   #   args@{
   #     dirEntries,
   #     ...
@@ -59,29 +58,30 @@ in
   #       if name != null then [ { inherit name; value = dirEntry'; } ] else [ ];
   #   in
   #   concatMapAttrs' dirEntryFn dirEntries;
-  getPath = args: builtinPath (
+  lib.paths.getPath = args: builtinPath (
     if args ? filter then
       args // { filter = pathFnToSourceFn args.filter; }
     else
       args
   );
-  ignoredBaseNamePrefix = "_";
-  importOr = default: path: mapExistingPathOr import default path;
-  isIgnoredBaseName = hasPrefix ignoredBaseNamePrefix;
-  isNixSourceBaseName = hasSuffix ".nix";
-  mapExistingPathOr = f: default: path: if pathExists path then f path else default;
-  mapImportOr = f: default: path: mapExistingPathOr (path: f (import path)) default path;
-  mkDirEntries = path: dir:
+  lib.paths.ignoredBaseNamePrefix = "_";
+  lib.paths.importOr = default: path: mapExistingPathOr import default path;
+  lib.paths.isIgnoredBaseName = hasPrefix ignoredBaseNamePrefix;
+  lib.paths.isNixSourceBaseName = hasSuffix ".nix";
+  lib.paths.mapExistingPathOr = f: default: path: if pathExists path then f path else default;
+  lib.paths.mapImportOr = f: default: path: mapExistingPathOr (path: f (import path)) default path;
+  lib.paths.mkDirEntries = path: dir:
     mapAttrs (baseName: type: { inherit type; path = path + "/${baseName}"; }) dir;
-  pathFnToDirEntryFn = pathFn: (
+  lib.paths.pathFnToDirEntryFn = pathFn: (
     baseName: dirEntry@{ path, type, ... }: pathFn baseName path type
   );
-  pathFnToSourceFn = pathFn: (
+  lib.paths.pathFnToSourceFn = pathFn: (
     path: type: pathFn (baseNameOf path) path type
   );
-  pathFilters.isNixSource = baseName: path: type:
+  lib.paths.pathFilters.isNixSource = baseName: path: type:
     !(isIgnoredBaseName baseName) && (type == "directory" || isNixSourceBaseName baseName);
-  readDirEntries = path: mkDirEntries path (readDir path);
-  # walkDirEntries = walker: path:
+  lib.paths.readDirEntries = path: mkDirEntries path (readDir path);
+  # lib.paths.walkDirEntries = walker: path:
   #   concatMapAttrs
-}
+in
+prevLib // { paths = prevLib.paths or { } // lib.paths; }

@@ -10,468 +10,290 @@
 
 prevLib: finalLib:
 let
-  inherit (byName) byNameLib lib;
-  inherit (lib)
-    abort
-    apply
-    attrNames
-    attrValues
-    attrsToList
-    baseNameOf
-    break
-    concatMap
-    concatMapAttrs'
-    concatMapAttrsToList
+  inherit (finalLib) builtins;
+  inherit (finalLib.attrs) filterAttrs mapAttrs removeAttrs;
+  inherit (finalLib.bools) false true;
+  inherit (finalLib.byName)
+    importNameDirEntries
+    importNameDirEntry
+    importNamedDirEntries
+    isIgnoredDirEntry
+    supportLib
+    supportLibProto
+    ;
+  inherit (finalLib.derivations)
     derivation
     derivationStrict
-    dirOf
-    escape
-    escapeNixString
     fetchGit
     fetchMercurial
     fetchTarball
     fetchTree
-    filter
-    filterAttrs
-    filterMap
-    filterMapAttrs
-    foldl'
-    foldlAttrs'
-    fromJSON
-    fromTOML
-    getAttr
-    getDefaultedAttr
-    hasPrefix
-    hasSuffix
-    id
-    import
-    importModules
-    importPath
-    isAttrs
-    isNull
-    isPath
-    listToAttrs
-    map
-    mapAttr
-    mapAttrOr
-    mapAttrOrElse
-    mapAttrs
-    mapAttrsRecursiveCond
-    mapAttrsToList
-    mapDefaultedAttr
-    mapFilter
-    mapFilterAttrs
-    mapNull
-    mapNullable
-    mapOptionalAttr
-    match
-    nameValuePair
-    partition
-    partitionAttr
-    partitionAttrOr
-    partitionAttrOrElse
-    partitionAttrs
-    pathExists
-    pipe
-    readDir
-    readDirEntries
-    readDirEntry
-    readFile
-    readFileType
-    removeAttr
-    removeAttrs
-    removePrefix
-    removeSuffix
-    replaceStrings
-    stringLength
-    substring
-    throw
-    toJSON
-    toString
-    transposeAttrs
-    updateAttrs
-    validateString
-    zipAttrsWith
+    placeholder
     ;
-  inherit (finalLib) byName;
-in
-{
-  byNameLib = {
-    importNamedDirEntries =
-      let
-        inherit (byNameLib) isIgnored;
+  inherit (finalLib.evaluation) abort break throw;
+  inherit (finalLib.filesystem) import readDirEntries scopedImport;
+  inherit (finalLib.lists) map;
+  inherit (finalLib.nulls)
+    filterNullable
+    ifNull
+    isNull
+    mapNullable
+    null
+    visitNullable
+    ;
+  inherit (finalLib.protos) composeProtos identityProto instantiateProto;
+  inherit (finalLib.strings) baseNameOf dirOf hasPrefix;
+  inherit (finalLib.values) fromTOML toString;
 
-        importNamedDirEntries =
-          config: name: nameDirEntry: namedDirEntries:
-          config.importNamedDirEntries config name nameDirEntry (
-            filterAttrs (namedBaseName: namedDirEntry: !(isIgnored namedBaseName namedDirEntry)) namedDirEntries
-          );
-      in
-      importNamedDirEntries;
-
-    importNameDirEntry =
-      let
-        inherit (byNameLib) importNameDirEntry importNamedDirEntries;
-        importNameDirEntries =
-          config: name: nameDirEntry:
-          importNamedDirEntries config name nameDirEntry (readDirEntries nameDirEntry.path);
-      in
-      importNameDirEntries;
-
-    importNameDirEntries =
-      let
-        inherit (byNameLib) importNameDirEntry;
-        importNameDirEntries =
-          config: nameDirEntries:
-          mapAttrs (name: nameDirEntry: importNameDirEntry config name nameDirEntry) nameDirEntries;
-      in
-      importNameDirEntries;
-
-    isIgnored =
-      let
-        isIgnored = baseName: dirEntry: isIgnoredBaseName baseName;
-        isIgnoredBaseName = hasPrefix "_";
-      in
-      isIgnored;
+  currentLib = prevLib // {
+    byName = prevByName // lib.byName;
   };
-  lib = {
-    abort = builtins.abort;
-    apply = f: value: f value;
-    attrNames = builtins.attrNames;
-    attrValues = builtins.attrValues;
-    attrsToList =
-      builtins.attrsToList or (
-        let
-          attrsToList = attrs: mapAttrsToList (name: value: { inherit name value; }) attrs;
-        in
-        attrsToList
-      );
-    baseNameOf = builtins.baseNameOf;
-    break = builtins.break;
-    concatMap = builtins.concatMap;
-    concatMapAttrs' = f: attrs: listToAttrs (concatMapAttrsToList f attrs);
-    concatMapAttrsToList =
-      builtins.concatMapAttrsToList or (
-        let
-          concatMapAttrsToList = f: attrs: concatMap (name: f name attrs.${name}) (attrNames attrs);
-        in
-        concatMapAttrsToList
-      );
-    derivation = builtins.derivation;
-    derivationStrict = builtins.derivationStrict;
-    dirOf = builtins.dirOf;
-    escape =
-      builtins.escape or (
-        let
-          escape = list: str: replaceStrings list (map (c: "\\${c}") list) str;
-        in
-        escape
-      );
-    escapeNixString =
-      builtins.escapeNixString or (
-        let
-          escapeNixString = s: escape [ "$" ] (toJSON s);
-        in
-        escapeNixString
-      );
-    fetchGit = builtins.fetchGit;
-    fetchMercurial = builtins.fetchMercurial;
-    fetchTarball = builtins.fetchTarball;
-    fetchTree = builtins.fetchTree;
-    filter = builtins.filter;
-    filterAttrs =
-      builtins.filterAttrs or (
-        let
-          filterAttrs =
-            pred: attrs: removeAttrs (filter (name: !(pred name attrs.${name})) (attrNames attrs)) attrs;
-        in
-        filterAttrs
-      );
-    filterMap =
-      builtins.filterMap or (
-        let
-          filterMap =
-            pred: f: list:
-            concatMap (
-              value:
+
+  lib.byName.instantiateConfigurationProto =
+    configurationProto:
+    instantiateProto (
+      prevByName: finalByName:
+      let
+        inherit (finalByName)
+          collections
+          configuration
+          entriesByName
+          lib
+          metadata
+          nameDirEntriesByName
+          ;
+        inherit (lib.attrs)
+          attrNames
+          concatMapAttrsToList
+          mapAttrs
+          mapAttrsToList
+          zipAttrsWith
+          zipMapAttrsWith
+          ;
+        inherit (lib.evaluation) throw;
+        inherit (lib.lists)
+          concatMap
+          filter
+          map
+          head
+          length
+          ;
+        inherit (lib.filesystem) import pathExists;
+        inherit (lib.functions) identity;
+        inherit (lib.nulls)
+          filterNullable
+          ifNull
+          isNull
+          mapNullable
+          null
+          visitNullable
+          ;
+        inherit (lib.protos) instantiateProto;
+        inherit (lib.strings) concatStringsSep escapeNixIdentifier;
+        inherit (lib.values) toJson;
+        baseNameConfigurationMetadata = metadata.baseNameConfigurations;
+        collectionConfigurations = configuration.collections or { };
+        entryConfigurationMetadata = metadata.entryConfigurations;
+        getSingleton =
+          list:
+          assert length list == 1;
+          head list;
+      in
+      prevByName
+      // {
+        collections =
+          zipAttrsWith (collectionName: values: zipAttrsWith (name: values: getSingleton values) values)
+            (
+              concatMapAttrsToList (
+                name: entries:
+                mapAttrsToList (entryName: entry: {
+                  ${entryConfigurationMetadata.${entryName}.collectionName}.${name} = entry;
+                }) entries
+              ) entriesByName
+            );
+        configuration =
+          let
+            configurationBase = { };
+            defaultedConfiguration = instantiateProto defaultedConfigurationProto configurationBase;
+            defaultedConfigurationProto = composeProtos (configurationProto { inherit lib; }) (
+              prevConfiguration: finalConfiguration:
+              prevConfiguration
+              // {
+                collections = {
+                  byNameConfigurations.entries.byNameConfiguration.suffixes.".nix".import =
+                    byName@{ lib, ... }: named@{ ... }: { path, ... }: import path byName named;
+                };
+                configurationPath = mapNullable (path: path + "/by-name.nix") finalConfiguration.path;
+                outputs = byName@{ ... }: byName;
+                path = null;
+              }
+            );
+          in
+          visitNullable defaultedConfiguration (
+            configurationPath:
+            instantiateProto (composeProtos (import configurationPath {
+              inherit lib;
+            }) defaultedConfigurationProto) configurationBase
+          ) (mapNullable (filterNullable pathExists) defaultedConfiguration.configurationPath);
+        lib = supportLib;
+        nameDirEntriesByName = configuration.readNameDirEntries configuration.path;
+        # TODO: one collection name maps to many entry names, and a name must have at most one entry per collection
+        entriesByName =
+          let
+            prevEntriesByName =
+              zipAttrsWith (name: entries: zipAttrsWith (name: entries: getSingleton entries) entries)
+                (
+                  concatMapAttrsToList (
+                    entryName:
+                    { entryConfiguration, ... }:
+                    mapAttrsToList (name: entry: { ${name}.${entryName} = entry; }) entryConfiguration.values or { }
+                  ) entryConfigurationMetadata
+                );
+            nameDirEntryToEntry =
+              name: nameDirEntry:
               let
-                value' = f value;
+                byNameConfiguration = entries.byNameConfiguration or { };
+                byNameCollectionsConfiguration = byNameConfiguration.collections or { };
+                dirEntries = readDirEntries nameDirEntry.path;
+                dirEntryNames = filter (baseName: !(isIgnoredDirEntry baseName dirEntries.${baseName})) (
+                  attrNames dirEntries
+                );
+                entries = zipAttrsWith (entryName: entries: getSingleton entries) (
+                  map (
+                    baseName:
+                    let
+                      inherit (baseNameConfigurationMetadatum)
+                        collectionName
+                        entryName
+                        suffix
+                        suffixConfiguration
+                        ;
+                      baseNameConfigurationMetadatum =
+                        baseNameConfigurationMetadata.${baseName}
+                          or (throw "Unknown by-name entry base name: ${toJson baseName}");
+                      byNameCollectionConfiguration = byNameCollectionsConfiguration.${collectionName} or { };
+                      byNameEntryConfiguration = (byNameCollectionConfiguration.entries or { }).${entryName} or { };
+                      byNameSuffixConfiguration = (byNameEntryConfiguration.suffixes or { }).${suffix} or { };
+                      dirEntry = dirEntries.${baseName};
+                      importDirEntry =
+                        if entryName != "byNameConfiguration" && byNameSuffixConfiguration ? import then
+                          byNameSuffixConfiguration.import
+                        else
+                          suffixConfiguration.import;
+                    in
+                    if prevEntries ? ${entryName} then
+                      throw "by-name entry value `entriesByName.${escapeNixIdentifier name}.${escapeNixIdentifier entryName}` is declared through both configuration for collection `${escapeNixIdentifier collectionName}` and a file ${toJson baseName}"
+                    else
+                      {
+                        ${entryName} = importDirEntry finalByName {
+                          inherit
+                            byNameConfiguration
+                            byNameCollectionConfiguration
+                            byNameEntryConfiguration
+                            byNameSuffixConfiguration
+                            collectionName
+                            entries
+                            entryName
+                            name
+                            suffix
+                            ;
+                        } dirEntry;
+                      }
+                  ) dirEntryNames
+                );
+                prevEntries = prevEntriesByName.${name} or { };
               in
-              if pred value' then [ value' ] else [ ]
-            ) list;
-        in
-        filterMap
-      );
-    filterMapAttrs =
-      builtins.filterMapAttrs or (
-        let
-          filterMapAttrs =
-            pred: f: attrs:
-            filterAttrs pred (mapAttrs f attrs);
-        in
-        filterMapAttrs
-      );
-    foldl' = builtins.foldl';
-    foldlAttrs' =
-      builtins.foldlAttrs' or (
-        let
-          foldlAttrs' =
-            op: nul: attrs:
-            foldl' (cur: name: op cur name attrs.${name}) nul (attrNames attrs);
-        in
-        foldlAttrs'
-      );
-    fromJSON = builtins.fromJSON;
-    fromTOML = builtins.fromTOML;
-    getAttr = builtins.getAttr;
-    getDefaultedAttr =
-      name: default: attrs:
-      attrs.${name} or default;
-    hasPrefix =
-      prefix:
-      let
-        prefix' = validateString (msg: "hasPrefix: The first argument ${msg}") prefix;
-        prefixLength = stringLength prefix';
-      in
-      str:
-      let
-        strLength = stringLength str;
-      in
-      prefixLength <= strLength && substring 0 prefixLength str == prefix';
-    hasSuffix =
-      suffix:
-      let
-        suffix' = validateString (msg: "hasSuffix: The first argument ${msg}") suffix;
-        suffixLength = stringLength suffix';
-      in
-      str:
-      let
-        strLength = stringLength str;
-        substrLength = strLength - suffixLength;
-      in
-      suffixLength <= strLength && substring substrLength suffixLength str == suffix';
-    id =
-      builtins.id or (
-        let
-          /**
-            Return the argument.
+              if prevEntries != { } then prevEntries // entries else entries;
+          in
+          prevEntriesByName // mapAttrs nameDirEntryToEntry nameDirEntriesByName;
+        metadata.baseNameConfigurations =
+          zipAttrsWith
+            (
+              fileName: baseNameConfigurationMetadata:
+              if length baseNameConfigurationMetadata > 1 then
+                throw "by-name base name ${toJson fileName} maps to multiple collection entries instead of at most one collection entry: ${
+                  concatStringsSep ", " (
+                    map (
+                      {
+                        collectionName,
+                        entryName,
+                        suffix,
+                        ...
+                      }:
+                      "`collections.${escapeNixIdentifier collectionName}.entries.${escapeNixIdentifier entryName}.suffixes.${escapeNixIdentifier suffix}`"
+                    ) baseNameConfigurationMetadata
+                  )
+                }"
+              else
+                head baseNameConfigurationMetadata
+            )
+            (
+              concatMapAttrsToList (
+                entryName: entryConfigurationMetadata:
+                mapAttrsToList (suffix: suffixConfiguration: {
+                  "${entryName}${suffix}" = entryConfigurationMetadata // {
+                    inherit entryName suffix suffixConfiguration;
+                  };
+                }) entryConfigurationMetadata.entryConfiguration.suffixes or { }
+              ) entryConfigurationMetadata
+            );
+        metadata.entryConfigurations =
+          zipAttrsWith
+            (
+              entryName: entryConfigurationMetadata:
+              if length entryConfigurationMetadata > 1 then
+                throw "by-name entry `${escapeNixIdentifier entryName}` maps to multiple collections instead of at most one collection: ${
+                  concatStringsSep ", " (
+                    map (
+                      { collectionName, ... }:
+                      "`collections.${escapeNixIdentifier collectionName}.entries.${escapeNixIdentifier entryName}`"
+                    ) entryConfigurationMetadata
+                  )
+                }"
+              else
+                head entryConfigurationMetadata
+            )
+            (
+              concatMapAttrsToList (
+                collectionName: collectionConfiguration:
+                mapAttrsToList (entryName: entryConfiguration: {
+                  ${entryName} = {
+                    inherit collectionConfiguration collectionName entryConfiguration;
+                  };
+                }) collectionConfiguration.entries or { }
+              ) collectionConfigurations
+            );
+        outputs = configuration.outputs finalByName;
+      }
+    ) { };
 
-            # Inputs
+  lib.byName.importNamedDirEntries =
+    config: name: nameDirEntry: namedDirEntries:
+    config.importNamedDirEntries config name nameDirEntry (
+      filterAttrs (
+        namedBaseName: namedDirEntry: !(isIgnoredDirEntry namedBaseName namedDirEntry)
+      ) namedDirEntries
+    );
 
-            `f`
+  lib.byName.importNameDirEntry =
+    config: name: nameDirEntry:
+    importNamedDirEntries config name nameDirEntry (readDirEntries nameDirEntry.path);
 
-            : Value to return
+  lib.byName.importNameDirEntries =
+    config: nameDirEntries:
+    mapAttrs (name: nameDirEntry: importNameDirEntry config name nameDirEntry) nameDirEntries;
 
-            # Type
+  lib.byName.isIgnoredDirEntry =
+    let
+      isIgnoredBaseName = hasPrefix "_";
+      lib.byName.isIgnoredDirEntry = baseName: dirEntry: isIgnoredBaseName baseName;
+    in
+    lib.byName.isIgnoredDirEntry;
 
-            ```
-            id :: a -> a
-            ```
-          */
-          id = value: value;
-        in
-        id
-      );
-    import = builtins.import;
-    importModules = _file: imports: {
-      ${if _file != null then "_file" else null} = _file;
-      inherit imports;
-    };
-    importPath =
-      path:
-      let
-        defaultPath = path + "/default.nix";
-      in
-      if pathExists defaultPath then
-        defaultPath
-      else if pathExists path then
-        path
-      else
-        null;
-    isAttrs = builtins.isAttrs;
-    isNull = builtins.isNull;
-    isPath = builtins.isPath;
-    listToAttrs = builtins.listToAttrs;
-    map = builtins.map;
-    mapAttr =
-      name: f: attrs:
-      attrs // { ${name} = f attrs.${name}; };
-    mapAttrOr =
-      name: default: f: attrs:
-      if attrs ? ${name} then attrs // { ${name} = f attrs.${name}; } else default;
-    mapAttrOrElse =
-      name: defaultFn: f: attrs:
-      if attrs ? ${name} then attrs // { ${name} = f attrs.${name}; } else defaultFn attrs;
-    mapAttrs = builtins.mapAttrs;
-    mapAttrsRecursiveCond =
-      cond: f: attrs:
-      let
-        recurse =
-          path:
-          mapAttrs (
-            name: value:
-            if isAttrs value && cond value then recurse (path ++ [ name ]) value else f (path ++ [ name ]) value
-          );
-      in
-      recurse [ ] attrs;
-    mapAttrsToList =
-      builtins.mapAttrsToList or (
-        let
-          mapAttrsToList = f: attrs: map (name: f name attrs.${name}) (attrNames attrs);
-        in
-        mapAttrsToList
-      );
-    mapDefaultedAttr =
-      name: default: f: attrs:
-      attrs // { ${name} = f attrs.${name} or default; };
-    mapFilter =
-      builtins.mapFilter or (
-        let
-          mapFilter =
-            f: pred: list:
-            map f (filter pred list);
-        in
-        mapFilter
-      );
-    mapFilterAttrs =
-      builtins.mapFilterAttrs or (
-        let
-          mapFilterAttrs =
-            f: pred: attrs:
-            mapAttrs f (filterAttrs pred attrs);
-        in
-        mapFilterAttrs
-      );
-    mapNull = default: value: if value == null then default else value;
-    mapNullable = f: value: if value != null then f value else null;
-    mapOptionalAttr =
-      name: f: attrs:
-      if attrs ? ${name} then attrs // { ${name} = f attrs.${name}; } else attrs;
-    match = builtins.match;
-    nameValuePair = name: value: { inherit name value; };
-    partition = builtins.partition;
-    partitionAttr = name: attrs: {
-      right = attrs.${name};
-      wrong = removeAttr name attrs;
-    };
-    partitionAttrOr =
-      name: default: attrs:
-      if attrs ? ${name} then
-        {
-          right = attrs.${name};
-          wrong = removeAttr name attrs;
-        }
-      else
-        default;
-    partitionAttrOrElse =
-      name: defaultFn: attrs:
-      if attrs ? ${name} then
-        {
-          right = attrs.${name};
-          wrong = removeAttr name attrs;
-        }
-      else
-        defaultFn attrs;
-    partitionAttrs =
-      builtins.partitionAttrs or (
-        let
-          partitionAttrs =
-            pred: attrs:
-            let
-              inherit (partition (name: pred name attrs.${name}) (attrNames attrs)) right wrong;
-            in
-            {
-              right = removeAttrs wrong attrs;
-              wrong = removeAttrs right attrs;
-            };
-        in
-        partitionAttrs
-      );
-    pathExists = builtins.pathExists;
-    pipe = foldl' (value: f: f value);
-    readDir = builtins.readDir;
-    readDirEntries =
-      builtins.readDirEntries or (
-        let
-          readDirEntries =
-            path:
-            mapAttrs (baseName: type: {
-              inherit type;
-              path = path + "/${baseName}";
-            }) (readDir path);
-        in
-        readDirEntries
-      );
-    readDirEntry =
-      builtins.readDirEntry or (
-        let
-          readDirEntry = path: {
-            inherit path;
-            type = readFileType path;
-          };
-        in
-        readDirEntry
-      );
-    readFile = builtins.readFile;
-    readFileType = builtins.readFileType;
-    removeAttr = name: attrs: removeAttrs [ name ] attrs;
-    removeAttrs =
-      let
-        builtinRemoveAttrs = builtins.removeAttrs;
-        removeAttrs = names: attrs: builtinRemoveAttrs attrs names;
-      in
-      removeAttrs;
-    removePrefix =
-      prefix:
-      let
-        prefix' = validateString (msg: "removePrefix: The first argument ${msg}") prefix;
-        prefixLength = stringLength prefix';
-      in
-      str:
-      let
-        strLength = stringLength str;
-        substrLength = strLength - prefixLength;
-      in
-      if prefixLength <= strLength && substring 0 prefixLength str == prefix' then
-        substring prefixLength substrLength str
-      else
-        null;
-    removeSuffix =
-      suffix:
-      let
-        suffix' = validateString (msg: "removeSuffix: The first argument ${msg}") suffix;
-        suffixLength = stringLength suffix';
-      in
-      str:
-      let
-        strLength = stringLength str;
-        substrLength = strLength - suffixLength;
-      in
-      if suffixLength <= strLength && substring substrLength suffixLength str == suffix' then
-        substring 0 substrLength str
-      else
-        null;
-    replaceStrings = builtins.replaceStrings;
-    stringLength = builtins.stringLength;
-    substring = builtins.substring;
-    throw = builtins.throw;
-    toJSON = builtins.toJSON;
-    toString = builtins.toString;
-    transposeAttrs =
-      attrs:
-      zipAttrsWith (
-        innerName: innerValues:
-        mapFilterAttrs (outerName: outerValue: outerValue.${innerName}) (
-          outerName: outerValue: outerValue ? ${innerName}
-        ) attrs
-      ) (attrValues attrs);
-    updateAttrs = newAttrs: attrs: attrs // newAttrs;
-    validateString =
-      msgFn: str:
-      if isPath str then
-        throw (msgFn ''${escapeNixString (toString str)} is a path value, but only strings are supported.'')
-      else
-        str;
-    zipAttrsWith = builtins.zipAttrsWith;
-  };
-}
+  lib.byName.supportLib = supportLibProto currentLib finalLib;
+
+  lib.byName.supportLibProto = prevByName.supportLibProto or (import ./_supportLib.nix);
+
+  prevByName = prevLib.byName or { };
+in
+currentLib

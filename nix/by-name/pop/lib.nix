@@ -1,33 +1,46 @@
 # NOTE: this isn't POP (Pure Object Prototypes) compliant, but is instead a variation on that theme.
+{ ... }:
 prevLib: finalLib:
 let
-  inherit (builtins)
+  inherit (finalLib.attrs)
     removeAttrs
+    ;
+  inherit (finalLib.evaluation)
     throw
     ;
   inherit (finalLib.lists)
     foldr
     ;
+  inherit (finalLib.pop)
+    composeProto
+    extendObj'
+    extendObj''
+    getMeta
+    getProtoOfMeta
+    identityProto
+    mapMeta
+    setDefaultNameOfMeta
+    setNameOfMeta
+    ;
   inherit (finalLib.strings)
     escapeNixIdentifier
     ;
-in rec {
-  composeProto = this: parent: final: prev: this final (parent final prev);
-  composeProtos = foldr composeProto identityProto;
-  extensionToProto = extension: final: prev: prev // extension final prev;
-  getMeta = obj: obj.__meta__ or {
+  lib.pop.composeProto = this: parent: final: prev: this final (parent final prev);
+  lib.pop.composeProtos = foldr composeProto identityProto;
+  lib.pop.extensionToProto = extension: final: prev: prev // extension final prev;
+  lib.pop.getMeta = obj: obj.__meta or {
     base = { };
     proto = final: prev: prev // obj;
     name = "attrs";
   };
-  getProto = obj: getProtoOfMeta (getMeta obj);
-  getProtoOfMeta = meta: meta.proto or (throw "getProto can't handle object ${
+  lib.pop.getProto = obj: getProtoOfMeta (getMeta obj);
+  lib.pop.getProtoOfMeta = meta: meta.proto or (throw "getProto can't handle object ${
     if meta ? name then escapeNixIdentifier meta.name else "<unknown>"
   }");
-  getTopProtoOfMeta = meta: final: prev: prev // { __meta__ = meta; };
-  extendObj = proto: obj: extendObj' null proto obj;
-  extendObj' = extendObj'' (meta: meta);
-  extendObj'' = metaF: hookProto: proto: obj:
+  lib.pop.getTopProtoOfMeta = meta: final: prev: prev // { __meta = meta; };
+  lib.pop.extendObj = proto: obj: extendObj' null proto obj;
+  lib.pop.extendObj' = extendObj'' (meta: meta);
+  lib.pop.extendObj'' = metaF: hookProto: proto: obj:
     let
       bareMeta = getMeta obj;
       base = bareMeta.base;
@@ -41,27 +54,28 @@ in rec {
       else
         if proto' != null then proto' else identityProto;
       bareObj = hookedProto obj' base;
-      obj' = bareObj // { __meta__ = metaF (bareObj.__meta__ or { } // {
+      obj' = bareObj // { __meta = metaF (bareObj.__meta or { } // {
         base = base;
         proto = proto';
         ${if hookProto' != null then "hookProto" else null} = hookProto';
       }); };
     in obj';
-  hookObj = hookProto: obj: extendObj' hookProto null obj;
-  identityProto = final: prev: prev;
-  identityExtension = final: prev: { };
-  instantiateProto = proto: prev: let final = proto final prev; in final;
-  instantiateObj = proto: base:
+  lib.pop.hookObj = hookProto: obj: extendObj' hookProto null obj;
+  lib.pop.identityProto = final: prev: prev;
+  lib.pop.identityExtension = final: prev: { };
+  lib.pop.instantiateProto = proto: prev: let final = proto final prev; in final;
+  lib.pop.instantiateObj = proto: base:
     let
       bareObj = proto obj base;
       obj = bareObj // {
-        __meta__ = bareObj.__meta__ or { } // { inherit base proto; };
+        __meta = bareObj.__meta or { } // { inherit base proto; };
       };
     in obj;
-  mapMeta = f: obj: obj // { __meta__ = f (getMeta obj); };
-  removeMeta = obj: removeAttrs obj [ "__meta__" ];
-  setDefaultName = name: mapMeta (setDefaultNameOfMeta name);
-  setDefaultNameOfMeta = defaultName: meta: meta // { name = meta.name or defaultName; };
-  setName = name: mapMeta (setNameOfMeta name);
-  setNameOfMeta = name: meta: meta // { inherit name; };
-}
+  lib.pop.mapMeta = f: obj: obj // { __meta = f (getMeta obj); };
+  lib.pop.removeMeta = obj: removeAttrs obj [ "__meta" ];
+  lib.pop.setDefaultName = name: mapMeta (setDefaultNameOfMeta name);
+  lib.pop.setDefaultNameOfMeta = defaultName: meta: meta // { name = meta.name or defaultName; };
+  lib.pop.setName = name: mapMeta (setNameOfMeta name);
+  lib.pop.setNameOfMeta = name: meta: meta // { inherit name; };
+in
+prevLib // { pop = prevLib.pop or { } // lib.pop; }

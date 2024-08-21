@@ -48,128 +48,51 @@
 
   outputs =
     inputs:
-    let
-      inherit (byName)
-        byNameLib
-        config
-        lib
-        nameDirEntries
-        nameEntries
-        transposedNameEntries
-        ;
-      inherit (byNameLib) importNameDirEntries;
-      inherit (lib)
-        concatMapAttrs'
-        import
-        importModules
-        mapAttr
-        pipe
-        readDirEntries
-        removeAttr
-        transposeAttrs
-        ;
-      byName = builtins.import ./nix/by-name/byName/lib.nix { } { inherit byName; } // {
-        config.importNamedDirEntries =
-          let
-            importNamedDirEntries =
-              config: name: nameEntry: namedDirEntries:
-              let
-                final = pipe {
-                  inherit namedDirEntries;
-                  namedEntries = { };
-                } config.namedDirEntriesImporters;
-              in
-              assert final.namedDirEntries == { };
-              final.namedEntries;
-          in
-          importNamedDirEntries;
-        config.namedDirEntriesImporters =
-          let
-            lib' = transposedNameEntries'.lib;
-            mapNamedDirEntry =
-              namedBaseName: f: acc:
-              let
-                inherit (acc) namedDirEntries;
-                namedDirEntry = namedDirEntries.${namedBaseName};
-                namedDirEntries' = removeAttr namedBaseName namedDirEntries;
-                acc' = acc // {
-                  namedDirEntries = namedDirEntries';
-                };
-              in
-              if namedDirEntries ? ${namedBaseName} then f namedDirEntry acc' else acc;
-          in
-          [
-            (mapNamedDirEntry "flakeModule.nix" (
-              { path, ... }:
-              mapAttr "namedEntries" (
-                namedEntries: namedEntries // { flakeModule = importModules path [ (import' path) ]; }
-              )
-            ))
-            (mapNamedDirEntry "lib.nix" (
-              { path, ... }:
-              mapAttr "namedEntries" (
-                namedEntries: namedEntries // { lib = import path { inherit byName; } lib'; }
-              )
-            ))
-            (mapNamedDirEntry "nixpkgsOverlay.nix" (
-              { path, ... }:
-              mapAttr "namedEntries" (namedEntries: namedEntries // { nixpkgsOverlay = import' path; })
-            ))
-          ];
-        # by-name/<name>/package.nix -> packagesByName.<name>
-        # by-name/<name>/<resource>.nix -> <resource>sByName.<name>
-        # by-name/<name>/<resource>.nix -> resourcesByName.<name>.<resource>
-        # by-name/<name>/<resource-name>.nix -> byResourceNameByName.<name>.<resource-name>
-        # by-name/<name>/<resource-name>.nix -> byNameByResourceName.<resource-name>s.<name>
-        # by-name/<name>/package.nix -> byNameByResourceName.packages.<name>
+    ((import ./nix/by-name/byName/_lib.nix).byName.instantiateConfigurationProto (
+      { lib, ... }:
+      prevConfiguration: finalConfiguration:
+      let
+        inherit (finalConfiguration) configuration;
+        inherit (lib.attrs) removeAttr mapAttr transposeAttrs;
+        inherit (lib.bools) false true;
+        inherit (lib.filesystem) import pathExists readDirEntries;
+        inherit (lib.functions) pipe;
+        inherit (lib.modules) importModules;
+        inherit (lib.nulls) mapNull null;
+      in
+      prevConfiguration
+      // {
+        # by-name/<name>/<entryName>.nix -> entryValue = entryValueByEntryNameByName.<name>.<entryName>
+        # by-name/<name>/<entryName>.nix -> entryValue = entryValueByNameByEntryName.<entryName>.<name>
+        # by-name/<name>/<entryName>.nix -> entryValue = entryValueByNameByCollectionName.<collectionName(entryName)>.<name>
+        # by-name/<name>/<entryName>.nix -> entryValue = byName.collections.<collectionName(entryName)>.<name>
+        # by-name/<name>/<entryName>.nix -> value = byName.collections.<collectionName(entryName)>.<name>
+        # by-name/<name>/<entryName>.nix -> value = byName.entriesByName.<name>.<entryName>
 
-        # by-name/<name>/<named>.nix -> namedByName.<name>.<named>
-        # by-name/<name>/<named>.nix -> nameByNamed.<named>s.<name>
-        # by-name/<name>/package.nix -> nameByNamed.packages.<name>
-
-        # by-name/<name>/<type>.nix -> typedByName.<name>.<type>
-        # by-name/<name>/<type>.nix -> namedByType.<type>s.<name>
-        # by-name/<name>/package.nix -> namedByType.packages.<name>
-
-        # by-name/<name>/* -> dirEntriesByName.<name>
-        # by-name/<name>/<type>.nix ->
-
-        # by-name/<name>/package.nix -> by-name.named.packages.<name>
-        # by-name/<name>/package.nix -> by-name.names.<name>.package
-
-        # Maybe the non-transposed structure shouldn't be returned at all.
-
-        # by-name/<name>/<resource>.nix -> namedResources.<name>.<resource>
-        # by-name/hello/package.nix -> valueByTypeNameByName.hello.package
-        # helloTypedValues = valueByTypeByName.hello
-        # by-name/hello/package.nix -> valueByNameByType.package.hello
-        # packageDataByName = valueByNameByType.package
-        # by-name/hello/package.nix -> namedDataByType.package.hello
-        # namedPackageData = namedDataByType.package
-        config.transposedNameEntryNames = {
-          flakeModule = "flakeModules";
-          nixpkgsOverlay = "nixpkgsOverlays";
+        collections = prevConfiguration.collections // {
+          flakeModules.entries.flakeModule.suffixes.".nix".import =
+            { collections, ... }: { ... }: { path, ... }: importModules path [ (import path collections) ];
+          inputs.entries.input.values = inputs;
+          # inputs2.entries.input.values = inputs;
+          lib.entries.lib.suffixes.".nix".import =
+            byName@{ ... }: { ... }: { path, ... }: import path byName;
+          nixpkgsOverlays.entries.nixpkgsOverlay.suffixes.".nix".import =
+            { collections, ... }: { ... }: { path, ... }: import path collections;
         };
-        nameDirEntries = readDirEntries ./nix/by-name;
-        nameEntries = importNameDirEntries config nameDirEntries;
-        transposedNameEntries =
-          let
-            namesCfg = config.transposedNameEntryNames or { };
-          in
-          concatMapAttrs' (name: value: [
-            {
-              inherit value;
-              name = namesCfg.${name} or name;
-            }
-          ]) (transposeAttrs nameEntries);
-      };
-      import' = path: import path transposedNameEntries';
-      specialArgs.byName = byName;
-      specialArgs' = {
-        inherit inputs;
-      } // specialArgs;
-      transposedNameEntries' = specialArgs' // transposedNameEntries;
-    in
-    inputs.flake-parts.lib.mkFlake { inherit inputs specialArgs; } ./flake-module.nix;
+
+        outputs =
+          byName@{ collections, ... }:
+          collections.inputs.flake-parts.lib.mkFlake {
+            inherit (collections) inputs;
+            specialArgs = {
+              inherit byName;
+            };
+          } ./flake-module.nix;
+
+        path = ./nix/by-name;
+
+        readNameDirEntries = path: readDirEntries path;
+      }
+    )).outputs;
 }
 # vim: set sta et sw=2 ts=8:

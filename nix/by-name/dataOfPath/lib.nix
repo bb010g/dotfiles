@@ -1,15 +1,13 @@
+{ ... }:
 prevLib: finalLib:
 let
-  inherit (builtins)
+  inherit (finalLib.attrs)
     attrNames
-    concatMap
-    filter
     listToAttrs
-    map
+    ;
+  inherit (finalLib.filesystem)
     pathExists
     readDir
-    stringLength
-    substring
     ;
   inherit (finalLib.fixedPoints)
     makeExtensible
@@ -19,6 +17,9 @@ let
     toFunction
     ;
   inherit (finalLib.lists)
+    concatMap
+    filter
+    map
     ;
   inherit (finalLib.paths)
     concatMapDirEntriesToList
@@ -41,6 +42,8 @@ let
   inherit (finalLib.strings)
     hasPrefix
     hasSuffix
+    stringLength
+    substring
     ;
   inherit (genericLib)
     concatMapEntriesOfDirToList
@@ -49,7 +52,7 @@ let
     concatMapEntriesOfDirToList = pathFn: path:
       concatMapDirEntriesToList pathFn (readDirEntries path);
   };
-in genericLib // makeInheritable (makeExtensible (finalDataOfPath: let
+in prevLib // { dataOfPath = genericLib // makeInheritable (makeExtensible (finalDataOfPath: let
   inherit (finalDataOfPath)
     baseNameIsIgnored
     baseNameIsNix
@@ -139,4 +142,4 @@ in {
   #   moduleListBaseName = "nixos-module-list";
   #   modulesBaseName = "nixos-modules";
   # });
-}))
+})); }
