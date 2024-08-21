@@ -16,6 +16,9 @@
       pkgs.telegram-desktop # instant messenger (Telegram client, GUI)
     ];
 
+    # https://hexdocs.pm/mix/1.17.2/Mix.html
+    home.sessionVariables.MIX_XDG = "1";
+
     home.username = "bb010g";
 
     programs.atuin.enable = true;
