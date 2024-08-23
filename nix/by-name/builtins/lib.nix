@@ -41,6 +41,7 @@ let
   lib.attrs.unionAttrs = builtins.unionAttrs;
   lib.attrs.unsafeGetAttrPos = builtins.unsafeGetAttrPos;
   lib.attrs.zipAttrsWith = builtins.zipAttrsWith;
+  lib.attrs.zipConcatMapAttrsWith = builtins.zipConcatMapAttrsWith;
   lib.attrs.zipMapAttrsWith = builtins.zipMapAttrsWith;
 
   lib.bools.false = builtins.false;

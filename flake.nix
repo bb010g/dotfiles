@@ -53,32 +53,33 @@
       prevConfiguration: finalConfiguration:
       let
         inherit (finalConfiguration) configuration;
-        inherit (lib.attrs) removeAttr mapAttr transposeAttrs;
+        inherit (lib) builtins;
+        inherit (lib.attrs) attrValues mapAttr removeAttr transposeAttrs;
         inherit (lib.bools) false true;
         inherit (lib.filesystem) import pathExists readDirEntries;
         inherit (lib.functions) pipe;
         inherit (lib.modules) importModules;
         inherit (lib.nulls) mapNull null;
+        inherit (lib.protos) instantiateProto pipeProtos;
       in
       prevConfiguration
       // {
-        # by-name/<name>/<entryName>.nix -> entryValue = entryValueByEntryNameByName.<name>.<entryName>
-        # by-name/<name>/<entryName>.nix -> entryValue = entryValueByNameByEntryName.<entryName>.<name>
-        # by-name/<name>/<entryName>.nix -> entryValue = entryValueByNameByCollectionName.<collectionName(entryName)>.<name>
-        # by-name/<name>/<entryName>.nix -> entryValue = byName.collections.<collectionName(entryName)>.<name>
-        # by-name/<name>/<entryName>.nix -> value = byName.collections.<collectionName(entryName)>.<name>
-        # by-name/<name>/<entryName>.nix -> value = byName.entriesByName.<name>.<entryName>
-
         collections = prevConfiguration.collections // {
-          flakeModules.entries.flakeModule.suffixes.".nix".import =
+          flakeModules.entryBaseNames."flakeModule.nix".import =
             { collections, ... }: { ... }: { path, ... }: importModules path [ (import path collections) ];
-          inputs.entries.input.values = inputs;
-          # inputs2.entries.input.values = inputs;
-          lib.entries.lib.suffixes.".nix".import =
-            byName@{ ... }: { ... }: { path, ... }: import path byName;
-          nixpkgsOverlays.entries.nixpkgsOverlay.suffixes.".nix".import =
+          flakeModules.entryName = "flakeModule";
+          inputs.entryByName = { ... }: { ... }: inputs;
+          inputs.entryName = "input";
+          lib.entryByName = { collections, ... }: { ... }: instantiateProto (pipeProtos (attrValues collections.libProtos or { })) { builtinsProto = prevBuiltins: finalBuiltins: { inherit builtins; }; };
+          lib.entryName = "lib";
+          libProtos.entryBaseNames."lib.nix".import = byName@{ ... }: { ... }: { path, ... }: import path byName;
+          libProtos.entryName = "libProtos";
+          nixpkgsOverlays.entryBaseNames."nixpkgsOverlay.nix".import =
             { collections, ... }: { ... }: { path, ... }: import path collections;
+          nixpkgsOverlays.entryName = "nixpkgsOverlay";
         };
+
+        entriesByNamePath = ./nix/by-name;
 
         outputs =
           byName@{ collections, ... }:
@@ -89,9 +90,7 @@
             };
           } ./flake-module.nix;
 
-        path = ./nix/by-name;
-
-        readNameDirEntries = path: readDirEntries path;
+        readEntriesDirEntryByName = entriesByNamePath: readDirEntries entriesByNamePath;
       }
     )).outputs;
 }

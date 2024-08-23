@@ -2,10 +2,10 @@ flakeModuleArgs@{ byName, config, getSystem, inputs, lib, moduleLocation, option
 let
   inherit (builtins) attrNames concatMap listToAttrs;
   inherit (flakeLib.attrs) concatMapAttrsToList zipMapAttrsWith;
-  inherit (flakeLib.lists) head length;
+  inherit (flakeLib.lists) head length getSingletonElem;
   inherit (flakeLib.byName.supportLib.modules) importModules;
   flakeConfig = config;
-  flakeLib = byName.lib.protos.instantiateProto (byName.lib.protos.pipeProtos (byName.lib.attrs.attrValues byName.collections.lib or { })) { builtinsProto = prevBuiltins: finalBuiltins: { inherit (byName.lib) builtins; }; };
+  flakeLib = byName.collections.lib;
   flakeOptions = options;
   flakeSelf = self;
   homeManagerData = homeManagerDataForPath ./home-manager;
@@ -52,7 +52,7 @@ in
   config.flake.byName = byName;
   config.flake.flakeModules = byName.collections.flakeModules or { };
   config.flake.homeConfigurations = lib.mkMerge [
-    (zipMapAttrsWith (name: values: assert length values == 1; head values) (
+    (zipMapAttrsWith (name: values: getSingletonElem values) (
       moduleName: module:
       let
         nameMatches = builtins.match "configuration-(.*)" moduleName;
@@ -88,7 +88,7 @@ in
   ];
   config.flake.lib = flakeLib;
   config.flake.nixosConfigurations = lib.mkMerge [
-    (zipMapAttrsWith (name: values: assert length values == 1; head values) (
+    (zipMapAttrsWith (name: values: getSingletonElem values) (
       moduleName: module:
       let
         nameMatches = builtins.match "configuration-(.*)" moduleName;

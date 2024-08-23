@@ -14,7 +14,8 @@ let
       attrsLib = builtinsLib.filesystem.import ../attrs/lib.nix protosLib finalLib;
       listsLib = builtinsLib.filesystem.import ../lists/lib.nix attrsLib finalLib;
       nullsLib = builtinsLib.filesystem.import ../nulls/lib.nix listsLib finalLib;
+      stringsLib = builtinsLib.filesystem.import ../strings/lib.nix nullsLib finalLib;
     in
-    builtinsLib.filesystem.import ./lib.nix nullsLib finalLib;
+    builtinsLib.filesystem.import ./lib.nix stringsLib finalLib;
 in
 lib

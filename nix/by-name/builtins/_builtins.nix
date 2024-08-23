@@ -70,6 +70,7 @@ let
     baseNameOf
     break
     concatMap
+    concatMapAttrsToList
     derivation
     derivationStrict
     dirOf
@@ -830,6 +831,31 @@ let
   builtins.unionAttrs = newAttrs: attrs: attrs // newAttrs;
 
   builtins.unsafeGetAttrPos = name: attrs: null;
+
+  /**
+    Like `zipAttrsWith`,
+    except that the zipped attrs come from the lists from mapping a function
+    over an attrset.
+
+    # Inputs
+
+    `valueFunction`
+    : Function that, given an attribute's name and values,
+      returns a final value.
+
+    `attrsListFunction`
+    : Function that, given an attribute's name and value,
+      returns a list of attribute sets.
+
+    # Type
+
+    ```
+    builtins.zipConcatMapAttrsWith :: (m <: String, n <: String) => (n -> [b] -> c) -> (m -> a -> [Attrs n b]) -> Attrs m a -> Attrs n c
+    ```
+  */
+  builtins.zipConcatMapAttrsWith =
+    valueFunction: attrsListFunction: attrs:
+    zipAttrsWith valueFunction (concatMapAttrsToList attrsListFunction attrs);
 
   /**
     Like `zipAttrsWith`,

@@ -10,40 +10,10 @@
 
 prevLib: finalLib:
 let
-  inherit (finalLib) builtins;
-  inherit (finalLib.attrs) filterAttrs mapAttrs removeAttrs;
-  inherit (finalLib.bools) false true;
-  inherit (finalLib.byName)
-    importNameDirEntries
-    importNameDirEntry
-    importNamedDirEntries
-    isIgnoredDirEntry
-    supportLib
-    supportLibProto
-    ;
-  inherit (finalLib.derivations)
-    derivation
-    derivationStrict
-    fetchGit
-    fetchMercurial
-    fetchTarball
-    fetchTree
-    placeholder
-    ;
-  inherit (finalLib.evaluation) abort break throw;
-  inherit (finalLib.filesystem) import readDirEntries scopedImport;
-  inherit (finalLib.lists) map;
-  inherit (finalLib.nulls)
-    filterNullable
-    ifNull
-    isNull
-    mapNullable
-    null
-    visitNullable
-    ;
-  inherit (finalLib.protos) composeProtos identityProto instantiateProto;
-  inherit (finalLib.strings) baseNameOf dirOf hasPrefix;
-  inherit (finalLib.values) fromTOML toString;
+  inherit (finalLib.byName) supportLib supportLibProto;
+  inherit (finalLib.filesystem) import;
+  inherit (finalLib.protos) instantiateProto;
+  inherit (finalLib.strings) hasPrefix;
 
   currentLib = prevLib // {
     byName = prevByName // lib.byName;
@@ -55,31 +25,49 @@ let
       prevByName: finalByName:
       let
         inherit (finalByName)
+          collectionNameByEntryName
           collections
+          collectionsFromEntriesByNamePath
+          collectionsFromConfiguration
           configuration
+          entriesDirEntryByName
           entriesByName
+          entriesByNameFromEntriesByNamePath
+          entriesByNameFromConfiguration
+          entryNameByEntryBaseName
           lib
-          metadata
-          nameDirEntriesByName
           ;
+        inherit (lib) builtins;
         inherit (lib.attrs)
           attrNames
           concatMapAttrsToList
+          filterAttrs
+          listToAttrs
           mapAttrs
           mapAttrsToList
+          wrapAttrPosString
           zipAttrsWith
+          zipConcatMapAttrsWith
           zipMapAttrsWith
           ;
-        inherit (lib.evaluation) throw;
+        inherit (lib.byName) isIgnoredEntryDirEntry;
+        inherit (lib.evaluation) addErrorContext throw;
         inherit (lib.lists)
           concatMap
           filter
-          map
+          getSingletonElem
           head
           length
+          map
+          visitSingleton
           ;
-        inherit (lib.filesystem) import pathExists;
-        inherit (lib.functions) identity;
+        inherit (lib.filesystem)
+          import
+          pathExists
+          readDir
+          readDirEntries
+          ;
+        inherit (lib.functions) identity const;
         inherit (lib.nulls)
           filterNullable
           ifNull
@@ -88,28 +76,100 @@ let
           null
           visitNullable
           ;
-        inherit (lib.protos) instantiateProto;
-        inherit (lib.strings) concatStringsSep escapeNixIdentifier;
-        inherit (lib.values) toJson;
-        baseNameConfigurationMetadata = metadata.baseNameConfigurations;
+        inherit (lib.protos) composeProtos instantiateProto;
+        inherit (lib.strings)
+          addPrefix
+          baseNameOf
+          concatStringsSep
+          dirOf
+          escapeNixIdentifier
+          ;
+        inherit (lib.values) toString;
+        byNameConfigurations = collections.byNameConfigurations or { };
         collectionConfigurations = configuration.collections or { };
-        entryConfigurationMetadata = metadata.entryConfigurations;
-        getSingleton =
-          list:
-          assert length list == 1;
-          head list;
       in
       prevByName
       // {
+        entryNameByEntryBaseName =
+          zipConcatMapAttrsWith
+            (
+              entryBaseName: entryNames:
+              visitSingleton (
+                entryNames:
+                throw "lib.byName: entry base name ${escapeNixIdentifier entryBaseName} defined by more than one collection:\n${
+                  concatStringsSep "\n" (
+                    map (
+                      entryName:
+                      let
+                        collectionName = collectionNameByEntryName.${entryName};
+                      in
+                      "- `collections.${escapeNixIdentifier collectionName}`${
+                        wrapAttrPosString " at " "" entryBaseName collectionConfigurations.${collectionName}.entryBaseNames
+                      }"
+                    ) entryNames
+                  )
+                }"
+              ) identity entryNames
+            )
+            (
+              collectionName: collectionConfiguration:
+              mapAttrsToList (entryBaseName: entryBaseNameConfiguration: {
+                ${entryBaseName} =
+                  collectionConfiguration.entryName
+                    or (throw "lib.byName: entry name for collection `${escapeNixIdentifier collectionName}` is not configured");
+              }) collectionConfiguration.entryBaseNames or { }
+            )
+            collectionConfigurations;
+        collectionNameByEntryName =
+          zipMapAttrsWith
+            (
+              entryName: collectionNames:
+              visitSingleton (
+                collectionNames:
+                throw "lib.byName: entry `${escapeNixIdentifier entryName}` defined by more than one collection:\n${
+                  concatStringsSep "\n" (
+                    map (
+                      collectionName:
+                      "- `collections.${escapeNixIdentifier collectionName}`${
+                        wrapAttrPosString " at " "" "entryName" collectionConfigurations.${collectionName}
+                      }"
+                    ) collectionNames
+                  )
+                }"
+              ) identity collectionNames
+            )
+            (collectionName: collectionConfiguration: {
+              ${
+                collectionConfiguration.entryName
+                  or (throw "lib.byName: entry name for collection `${escapeNixIdentifier collectionName}` is not configured")
+              } = collectionName;
+            })
+            collectionConfigurations;
         collections =
-          zipAttrsWith (collectionName: values: zipAttrsWith (name: values: getSingleton values) values)
+          collectionsFromConfiguration
+          // mapAttrs (
+            collectionName: entryByName: collectionsFromConfiguration.${collectionName} or { } // entryByName
+          ) collectionsFromEntriesByNamePath;
+        collectionsFromConfiguration =
+          filterAttrs (collectionName: entryByName: collectionConfigurations.${collectionName} ? entryByName)
+            (
+              mapAttrs (
+                collectionName: collectionConfiguration:
+                collectionConfiguration.entryByName finalByName {
+                  inherit byNameConfigurations collectionConfiguration collectionName;
+                  inherit (collectionConfiguration) entryName;
+                }
+              ) collectionConfigurations
+            );
+        collectionsFromEntriesByNamePath =
+          zipAttrsWith (collectionName: values: zipAttrsWith (name: values: getSingletonElem values) values)
             (
               concatMapAttrsToList (
                 name: entries:
                 mapAttrsToList (entryName: entry: {
-                  ${entryConfigurationMetadata.${entryName}.collectionName}.${name} = entry;
+                  ${collectionNameByEntryName.${entryName}}.${name} = entry;
                 }) entries
-              ) entriesByName
+              ) entriesByNameFromEntriesByNamePath
             );
         configuration =
           let
@@ -120,175 +180,161 @@ let
               prevConfiguration
               // {
                 collections = {
-                  byNameConfigurations.entries.byNameConfiguration.suffixes.".nix".import =
+                  byNameConfigurations.entryBaseNames."byNameConfiguration.nix".import =
                     byName@{ lib, ... }: named@{ ... }: { path, ... }: import path byName named;
+                  byNameConfigurations.entryName = "byNameConfiguration";
                 };
-                configurationPath = mapNullable (path: path + "/by-name.nix") finalConfiguration.path;
+                entriesByNameConfigurationPath = mapNullable (
+                  entriesByNamePath: entriesByNamePath + "/by-name.nix"
+                ) finalConfiguration.entriesByNamePath;
+                entriesByNamePath = null;
                 outputs = byName@{ ... }: byName;
-                path = null;
+                readEntriesDirEntryByName =
+                  entriesByNamePath:
+                  let
+                    entriesShardsPath = entriesByNamePath;
+                  in
+                  zipMapAttrsWith
+                    (
+                      name: entriesDirEntries:
+                      visitSingleton (
+                        entriesDirEntries:
+                        throw "lib.byName: name `${escapeNixIdentifier name}` defined by more than one entries by-name shard:\n${
+                          concatStringsSep "\n" (
+                            map (
+                              entriesDirEntry: "- ${escapeNixIdentifier (baseNameOf (dirOf (toString entriesDirEntry.path)))}"
+                            ) entriesDirEntries
+                          )
+                        }"
+                      ) identity entriesDirEntries
+                    )
+                    (
+                      entriesShardName: entriesShardType:
+                      if entriesShardType == "directory" then
+                        readDirEntries (entriesShardsPath + "/${entriesShardName}")
+                      else
+                        { }
+                    )
+                    (readDir entriesShardsPath);
               }
             );
           in
           visitNullable defaultedConfiguration (
-            configurationPath:
-            instantiateProto (composeProtos (import configurationPath {
+            entriesByNameConfigurationPath:
+            instantiateProto (composeProtos (import entriesByNameConfigurationPath {
               inherit lib;
             }) defaultedConfigurationProto) configurationBase
-          ) (mapNullable (filterNullable pathExists) defaultedConfiguration.configurationPath);
-        lib = supportLib;
-        nameDirEntriesByName = configuration.readNameDirEntries configuration.path;
-        # TODO: one collection name maps to many entry names, and a name must have at most one entry per collection
+          ) (mapNullable (filterNullable pathExists) defaultedConfiguration.entriesByNameConfigurationPath);
         entriesByName =
+          entriesByNameFromConfiguration
+          // mapAttrs (
+            name: entries:
+            let
+              entriesFromConfiguration = entriesByNameFromConfiguration.${name} or { };
+            in
+            if entriesFromConfiguration != { } then entriesFromConfiguration // entries else entries
+          ) entriesByNameFromEntriesByNamePath;
+        entriesDirEntryByName = configuration.readEntriesDirEntryByName configuration.entriesByNamePath;
+        entriesByNameFromConfiguration =
+          zipConcatMapAttrsWith
+            (name: entries: zipAttrsWith (name: entries: getSingletonElem entries) entries)
+            (
+              collectionName: entryByName:
+              mapAttrsToList (name: entry: {
+                ${name}.${
+                  collectionConfigurations.${collectionName}.entryName
+                    or (throw "lib.byName: entry name for collection `${escapeNixIdentifier collectionName}` is not configured")
+                } = entry;
+              }) entryByName
+            )
+            collectionsFromConfiguration;
+        entriesByNameFromEntriesByNamePath = mapAttrs (
+          name: entriesDirEntry:
           let
-            prevEntriesByName =
-              zipAttrsWith (name: entries: zipAttrsWith (name: entries: getSingleton entries) entries)
-                (
-                  concatMapAttrsToList (
-                    entryName:
-                    { entryConfiguration, ... }:
-                    mapAttrsToList (name: entry: { ${name}.${entryName} = entry; }) entryConfiguration.values or { }
-                  ) entryConfigurationMetadata
-                );
-            nameDirEntryToEntry =
-              name: nameDirEntry:
-              let
-                byNameConfiguration = entries.byNameConfiguration or { };
-                byNameCollectionsConfiguration = byNameConfiguration.collections or { };
-                dirEntries = readDirEntries nameDirEntry.path;
-                dirEntryNames = filter (baseName: !(isIgnoredDirEntry baseName dirEntries.${baseName})) (
-                  attrNames dirEntries
-                );
-                entries = zipAttrsWith (entryName: entries: getSingleton entries) (
-                  map (
-                    baseName:
-                    let
-                      inherit (baseNameConfigurationMetadatum)
-                        collectionName
-                        entryName
-                        suffix
-                        suffixConfiguration
-                        ;
-                      baseNameConfigurationMetadatum =
-                        baseNameConfigurationMetadata.${baseName}
-                          or (throw "Unknown by-name entry base name: ${toJson baseName}");
-                      byNameCollectionConfiguration = byNameCollectionsConfiguration.${collectionName} or { };
-                      byNameEntryConfiguration = (byNameCollectionConfiguration.entries or { }).${entryName} or { };
-                      byNameSuffixConfiguration = (byNameEntryConfiguration.suffixes or { }).${suffix} or { };
-                      dirEntry = dirEntries.${baseName};
-                      importDirEntry =
-                        if entryName != "byNameConfiguration" && byNameSuffixConfiguration ? import then
-                          byNameSuffixConfiguration.import
-                        else
-                          suffixConfiguration.import;
-                    in
-                    if prevEntries ? ${entryName} then
-                      throw "by-name entry value `entriesByName.${escapeNixIdentifier name}.${escapeNixIdentifier entryName}` is declared through both configuration for collection `${escapeNixIdentifier collectionName}` and a file ${toJson baseName}"
-                    else
-                      {
-                        ${entryName} = importDirEntry finalByName {
-                          inherit
-                            byNameConfiguration
-                            byNameCollectionConfiguration
-                            byNameEntryConfiguration
-                            byNameSuffixConfiguration
-                            collectionName
-                            entries
-                            entryName
-                            name
-                            suffix
-                            ;
-                        } dirEntry;
-                      }
-                  ) dirEntryNames
-                );
-                prevEntries = prevEntriesByName.${name} or { };
-              in
-              if prevEntries != { } then prevEntries // entries else entries;
+            byNameConfiguration = byNameConfigurations.${name} or { };
+            byNameCollectionsConfiguration = byNameConfiguration.collections or { };
+            entryDirEntries = readDirEntries entriesPath;
+            entries = entriesByName.${name};
+            entriesPath = entriesDirEntry.path;
+            prettyName = escapeNixIdentifier name;
+            skipEntryDirEntries = entriesDirEntry.skipDirEntries or false;
           in
-          prevEntriesByName // mapAttrs nameDirEntryToEntry nameDirEntriesByName;
-        metadata.baseNameConfigurations =
-          zipAttrsWith
-            (
-              fileName: baseNameConfigurationMetadata:
-              if length baseNameConfigurationMetadata > 1 then
-                throw "by-name base name ${toJson fileName} maps to multiple collection entries instead of at most one collection entry: ${
-                  concatStringsSep ", " (
-                    map (
+          listToAttrs (
+            concatMapAttrsToList (
+              entryBaseName: entryDirEntry:
+              let
+                byNameCollectionConfiguration = byNameCollectionsConfiguration.${collectionName} or { };
+                byNameEntryBaseNameConfiguration =
+                  (byNameCollectionConfiguration.entryBaseNames or { }).${entryBaseName} or { };
+                collectionConfiguration = collectionConfigurations.${collectionName};
+                collectionIsConfigured = entryNameByEntryBaseName ? ${entryBaseName};
+                collectionName = collectionNameByEntryName.${entryName};
+                entryBaseNameConfiguration =
+                  (collectionConfiguration.entryBaseNames or { }).${entryBaseName} or { };
+                entryName =
+                  entryNameByEntryBaseName.${entryBaseName}
+                    or (throw "lib.byName: collection for entry base name `${prettyEntryBaseName}` is not configured");
+                entryPath = entryDirEntry.path;
+                entryByNameConfiguration = collectionConfiguration.entryByName or { };
+                entryByNameConfigurationPosSuffix =
+                  wrapAttrPosString "\nat " "" "entryByName"
+                    collectionConfiguration;
+                entryFromConfigurationPosSuffix = wrapAttrPosString " at " "" name entryByNameConfiguration;
+                importDirEntry =
+                  if entryName != "byNameConfiguration" && byNameEntryBaseNameConfiguration ? import then
+                    byNameEntryBaseNameConfiguration.import
+                  else
+                    entryBaseNameConfiguration.import;
+                prettyEntryBaseName = escapeNixIdentifier entryBaseName;
+                prettyCollectionName =
+                  if collectionIsConfigured then escapeNixIdentifier collectionName else "<collection>";
+                prettyEntryName = if collectionIsConfigured then escapeNixIdentifier entryName else "<entry>";
+                prettyEntryPath = toString entryPath;
+              in
+              addErrorContext
+                "lib.byName: while evaluating entry value `entriesByName.${prettyName}.${prettyEntryName}` (for collection `collections.${prettyCollectionName}`)\nat ${prettyEntryPath}"
+                (
+                  if isIgnoredEntryDirEntry entryBaseName entryDirEntry then
+                    [ ]
+                  else
+                    [
                       {
-                        collectionName,
-                        entryName,
-                        suffix,
-                        ...
-                      }:
-                      "`collections.${escapeNixIdentifier collectionName}.entries.${escapeNixIdentifier entryName}.suffixes.${escapeNixIdentifier suffix}`"
-                    ) baseNameConfigurationMetadata
-                  )
-                }"
-              else
-                head baseNameConfigurationMetadata
-            )
-            (
-              concatMapAttrsToList (
-                entryName: entryConfigurationMetadata:
-                mapAttrsToList (suffix: suffixConfiguration: {
-                  "${entryName}${suffix}" = entryConfigurationMetadata // {
-                    inherit entryName suffix suffixConfiguration;
-                  };
-                }) entryConfigurationMetadata.entryConfiguration.suffixes or { }
-              ) entryConfigurationMetadata
-            );
-        metadata.entryConfigurations =
-          zipAttrsWith
-            (
-              entryName: entryConfigurationMetadata:
-              if length entryConfigurationMetadata > 1 then
-                throw "by-name entry `${escapeNixIdentifier entryName}` maps to multiple collections instead of at most one collection: ${
-                  concatStringsSep ", " (
-                    map (
-                      { collectionName, ... }:
-                      "`collections.${escapeNixIdentifier collectionName}.entries.${escapeNixIdentifier entryName}`"
-                    ) entryConfigurationMetadata
-                  )
-                }"
-              else
-                head entryConfigurationMetadata
-            )
-            (
-              concatMapAttrsToList (
-                collectionName: collectionConfiguration:
-                mapAttrsToList (entryName: entryConfiguration: {
-                  ${entryName} = {
-                    inherit collectionConfiguration collectionName entryConfiguration;
-                  };
-                }) collectionConfiguration.entries or { }
-              ) collectionConfigurations
-            );
+                        name = entryName;
+                        value =
+                          if (collectionsFromConfiguration.${collectionName} or { }) ? ${name} then
+                            throw "lib.byName: entry ${prettyName} value${entryFromConfigurationPosSuffix} already defined by `collections.${prettyCollectionName}.entryByName`${entryByNameConfigurationPosSuffix}"
+                          else
+                            importDirEntry finalByName {
+                              inherit
+                                byNameEntryBaseNameConfiguration
+                                byNameCollectionConfiguration
+                                byNameConfiguration
+                                collectionName
+                                entries
+                                entryBaseName
+                                entryBaseNameConfiguration
+                                entryName
+                                name
+                                ;
+                            } entryDirEntry;
+                      }
+                    ]
+                )
+            ) entryDirEntries
+          )
+        ) entriesDirEntryByName;
+        lib = supportLib;
         outputs = configuration.outputs finalByName;
       }
     ) { };
 
-  lib.byName.importNamedDirEntries =
-    config: name: nameDirEntry: namedDirEntries:
-    config.importNamedDirEntries config name nameDirEntry (
-      filterAttrs (
-        namedBaseName: namedDirEntry: !(isIgnoredDirEntry namedBaseName namedDirEntry)
-      ) namedDirEntries
-    );
-
-  lib.byName.importNameDirEntry =
-    config: name: nameDirEntry:
-    importNamedDirEntries config name nameDirEntry (readDirEntries nameDirEntry.path);
-
-  lib.byName.importNameDirEntries =
-    config: nameDirEntries:
-    mapAttrs (name: nameDirEntry: importNameDirEntry config name nameDirEntry) nameDirEntries;
-
-  lib.byName.isIgnoredDirEntry =
+  lib.byName.isIgnoredEntryDirEntry =
     let
-      isIgnoredBaseName = hasPrefix "_";
-      lib.byName.isIgnoredDirEntry = baseName: dirEntry: isIgnoredBaseName baseName;
+      isIgnoredEntryBaseName = hasPrefix "_";
+      lib.byName.isIgnoredEntryDirEntry =
+        entryBaseName: entryDirEntry: isIgnoredEntryBaseName entryBaseName;
     in
-    lib.byName.isIgnoredDirEntry;
+    lib.byName.isIgnoredEntryDirEntry;
 
   lib.byName.supportLib = supportLibProto currentLib finalLib;
 

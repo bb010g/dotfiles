@@ -47,8 +47,9 @@ let
       attrsLib = builtinsLib.filesystem.scopedImport scope ../attrs/lib.nix protosLib finalLib;
       listsLib = builtinsLib.filesystem.scopedImport scope ../lists/lib.nix attrsLib finalLib;
       nullsLib = builtinsLib.filesystem.scopedImport scope ../nulls/lib.nix listsLib finalLib;
+      stringsLib = builtinsLib.filesystem.scopedImport scope ../strings/lib.nix nullsLib finalLib;
     in
-    builtinsLib.filesystem.scopedImport scope ./lib.nix nullsLib finalLib;
+    builtinsLib.filesystem.scopedImport scope ./lib.nix stringsLib finalLib;
   scope = bareBuiltins';
 in
 scope // { inherit lib; } // lib // lib.byName

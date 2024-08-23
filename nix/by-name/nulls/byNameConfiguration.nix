@@ -4,5 +4,5 @@ let
   inherit (lib.filesystem) import;
 in
 {
-  collections.lib.entries.lib.suffixes.".nix".import = { ... }: { ... }: { path, ... }: import path;
+  collections.libProtos.entryBaseNames."lib.nix".import = { ... }: { ... }: { path, ... }: import path;
 }
