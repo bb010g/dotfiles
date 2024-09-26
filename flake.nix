@@ -58,15 +58,19 @@
         inherit (lib.bools) false true;
         inherit (lib.filesystem) import pathExists readDirEntries;
         inherit (lib.functions) pipe;
-        inherit (lib.modules) importModules;
-        inherit (lib.nulls) mapNull null;
+        inherit (lib.modules) mkImport;
+        inherit (lib.nulls) ifNull null;
         inherit (lib.protos) instantiateProto pipeProtos;
+        importModuleDirEntry =
+          { collections, configuration, ... }:
+          { collectionName, name, ... }:
+          { path, ... }:
+          mkImport path ({ fallbackKey, ... }: "${ifNull fallbackKey configuration.entriesByNamePath or null}:${collectionName}.${name}") (import path collections);
       in
       prevConfiguration
       // {
         collections = prevConfiguration.collections // {
-          flakeModules.entryBaseNames."flakeModule.nix".import =
-            { collections, ... }: { ... }: { path, ... }: importModules path [ (import path collections) ];
+          flakeModules.entryBaseNames."flakeModule.nix".import = importModuleDirEntry;
           flakeModules.entryName = "flakeModule";
           inputs.entryByName = { ... }: { ... }: inputs;
           inputs.entryName = "input";
