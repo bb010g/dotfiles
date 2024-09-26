@@ -80,6 +80,8 @@
           lib.entryName = "lib";
           libProtos.entryBaseNames."lib.nix".import = byName@{ ... }: { ... }: { path, ... }: import path byName;
           libProtos.entryName = "libProtos";
+          nixosModules.entryBaseNames."nixosModule.nix".import = importModuleDirEntry;
+          nixosModules.entryName = "nixosModule";
           nixpkgsOverlays.entryBaseNames."nixpkgsOverlay.nix".import =
             { collections, ... }: { ... }: { path, ... }: import path collections;
           nixpkgsOverlays.entryName = "nixpkgsOverlay";

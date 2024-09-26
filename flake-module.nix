@@ -1,4 +1,4 @@
-flakeModuleArgs@{ byName, config, getSystem, inputs, lib, moduleLocation, options, self, ... }:
+flakeModuleArgs@{ byName, config, getSystem, inputs, lib, options, self, ... }:
 let
   inherit (builtins) attrNames concatMap listToAttrs;
   inherit (flakeLib.attrs) concatMapAttrsToList zipMapAttrsWith;
@@ -8,24 +8,6 @@ let
   flakeLib = byName.collections.lib;
   flakeOptions = options;
   flakeSelf = self;
-  nixosData = nixosDataForPath ./nixos;
-  nixosDataForPath = flakeLib.dataOfPath.withShortNames.moduleDataForPath;
-  nixosModuleLists =
-    let
-      f =
-        parentName: name: value:
-        let
-          name' = "configuration-${name}";
-        in
-        [
-          {
-            name = name';
-            value = config.flake.nixosModuleLists.${parentName} ++ value.moduleList or [ ];
-          }
-        ]
-        ++ concatMapAttrsToList (f name') value.configs or { };
-    in
-    listToAttrs (concatMapAttrsToList (f "default") nixosData.configs);
 in
 {
   imports = [
@@ -43,9 +25,7 @@ in
         configuration = inputs.home-manager.lib.homeManagerConfiguration {
           # inherit pkgs;
           modules = [ module ];
-          extraSpecialArgs = {
-            inherit flakeLib flakeConfig flakeOptions flakeSelf;
-          };
+          extraSpecialArgs = { };
         };
       in
       { ${if nameMatches != null then configurationName else null} = configuration; }
@@ -60,71 +40,14 @@ in
         nameMatches = builtins.match "configuration-(.*)" moduleName;
         configurationName = builtins.elemAt nameMatches 0;
         configuration = inputs.nixpkgs.lib.nixosSystem {
-          modules =
-            [ config.flake.nixosModules.externalModules ]
-            ++ lib.optionals (configurationName != "nixzed") [ config.flake.nixosModules.impermanence-contrib ]
-            ++ [ module ];
-          specialArgs = {
-            inherit flakeLib flakeConfig flakeModuleArgs flakeOptions flakeSelf inputs;
-            inherit (config.flake) homeManagerModules;
-          };
+          modules = [ module ];
+          specialArgs = { };
         };
       in
       { ${if nameMatches != null then configurationName else null} = configuration; }
     ) config.flake.nixosModules)
   ];
-  config.flake._nixosData = nixosData;
-  config.flake.nixosModuleLists = lib.mkMerge [
-    {
-      default = nixosData.moduleList or [ ];
-      externalModules =
-        config.flake.nixosModuleLists.externalModules-lix
-        ++ config.flake.nixosModuleLists.externalModules-main
-        ++ config.flake.nixosModuleLists.externalModules-home-manager;
-      externalModules-home-manager = [
-        inputs.home-manager.nixosModules.home-manager
-
-        config.flake.nixosModules.home-manager-flakeIntegration
-      ];
-      externalModules-lix = [
-        inputs.lix-module.nixosModules.default
-
-        config.flake.nixosModules.lix-substituters
-      ];
-      externalModules-main = [
-        inputs.disko.nixosModules.disko
-        inputs.impermanence.nixosModules.impermanence
-        inputs.nix-flatpak.nixosModules.nix-flatpak
-        # ({ config, ... }: { config.assertions = [ { assertion = config.nixpkgs.overlays == [ ]; message = "Overlays were provided to Nixpkgs: ${lib.generators.toPretty { allowPrettyValues = true; } config.nixpkgs.overlays}"; } ]; })
-      ];
-      impermanence-contrib = [ nixos/modules/_impermanence-contrib/default.nix ];
-      sharedModules =
-        config.flake.nixosModuleLists.externalModules
-        ++ config.flake.nixosModuleLists.default;
-    }
-    nixosModuleLists
-  ];
-  config.flake.nixosModules = lib.mkMerge [
-    (builtins.mapAttrs (
-      name: importModules "${toString moduleLocation}#nixosModuleLists.${name}"
-    ) config.flake.nixosModuleLists)
-    {
-      home-manager-flakeIntegration = nixosModuleArgs@{ config, lib, options, pkgs, ... }: {
-        config.home-manager.sharedModules = [ flakeConfig.flake.homeManagerModules.default ];
-        config.home-manager.extraSpecialArgs = {
-          inherit flakeLib flakeConfig flakeModuleArgs flakeOptions flakeSelf inputs nixosModuleArgs;
-          # nixosConfig = config; # already passed by home-manager
-          nixosLib = lib;
-          nixosOptions = options;
-          nixosPkgs = pkgs;
-        };
-      };
-      lix-substituters = {
-        config.nix.settings.extra-substituters = [ "https://cache.lix.systems" ];
-        config.nix.settings.extra-trusted-public-keys = [ "cache.lix.systems:aBnZUw8zA7H35Cz2RyKFVs3H4PlGTLawyY5KRbvJR8o=" ];
-      };
-    }
-  ];
+  config.flake.nixosModules = byName.collections.nixosModules or { };
   config.flake.overlays = byName.collections.nixpkgsOverlays or { };
   config.perSystem = { config, pkgs, system, ... }: {
     config._module.args.pkgs = import inputs.nixpkgs {
