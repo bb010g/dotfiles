@@ -12,7 +12,6 @@ in
   imports = [
     (nixos-hardware + "/common/cpu/intel") # Intel Core i7-4790 (Haswell)
     (nixos-hardware + "/common/pc")
-    (nixos-hardware + "/common/pc/hdd")
   ];
   config = {
     boot.initrd.availableKernelModules = [

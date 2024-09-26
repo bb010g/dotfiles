@@ -474,7 +474,7 @@ in
       })
     ];
     programs.plasma.overrideConfig = true;
-    programs.plasma.overrideConfigFiles = [
+    programs.plasma.resetFiles = [
       "baloofilerc"
       # "dolphinrc"
       # "ffmpegthumbsrc"
@@ -506,7 +506,7 @@ in
       # "plasmashellrc"
       "systemsettingsrc"
     ];
-    programs.plasma.overrideConfigExclude = [
+    programs.plasma.resetFilesExclude = [
       "baloofilerc"
     ];
     # programs.plasma.globalAppletConfigs = {
