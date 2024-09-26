@@ -34,10 +34,27 @@ in
     (lib.mkDefault {
       boot.kernelPackages = pkgs.linuxPackages_latest;
     })
-    # Use the latest supported ZFS kernel.
-    (lib.mkIf (config.boot.supportedFilesystems.zfs or false || config.boot.initrd.supportedFilesystems.zfs or false) {
-      boot.kernelPackages = config.boot.zfs.package.latestCompatibleLinuxPackages;
-    })
+    # Use the latest Linux kernel compatible with ZFS staging.
+    (lib.mkIf (config.boot.supportedFilesystems.zfs or false || config.boot.initrd.supportedFilesystems.zfs or false) (let
+      latestZfsCompatibleLinuxPackages = lib.pipe pkgs.linuxKernel.packages [
+        builtins.attrValues
+        (builtins.filter (
+          kPkgs:
+          (builtins.tryEval kPkgs).success
+          && kPkgs ? kernel
+          && kPkgs.kernel.pname == "linux"
+          && !kPkgs.zfs_unstable.meta.broken
+        ))
+        (builtins.sort (a: b: (lib.versionOlder a.kernel.version b.kernel.version)))
+        lib.last
+      ];
+    in {
+      warnings = [
+        (lib.mkIf (lib.versionOlder config.boot.kernelPackages.kernel.version latestZfsCompatibleLinuxPackages.kernel.version) "Linux kernel ${config.boot.kernelPackages.kernel.version} configured while ${latestZfsCompatibleLinuxPackages.kernel.version} available")
+      ];
+      boot.kernelPackages = pkgs.linuxKernel.packages.linux_6_10;
+      boot.zfs.package = pkgs.zfs_unstable;
+    }))
     # Configure networking.
     {
       assertions = [
@@ -182,7 +199,7 @@ in
         # pkgs.clinfo # `clinfo(1)` # dependency of Info Center
         pkgs.foot # terminal
         # pkgs.glxinfo # `glxinfo(1)`, `eglinfo(1)` # dependency of Info Center
-        pkgs.libsForQt5.polonium # NOTE: Might move to Plasma 6 architecture soon
+        pkgs.polonium
         # pkgs.pciutils # `lspci(1)` # dependency of Info Center
         pkgs.quota # pkgs.unixtools.quota # dependency of Disk Quota widget
         # pkgs.vulkan-tools # `vulkaninfo(1)` # dependency of Info Center
@@ -221,7 +238,6 @@ in
       services.printing.tempDir = "/tmp/cups";
 
       # Enable sound.
-      sound.enable = true;
       services.pipewire.enable = true;
       services.pipewire.alsa.enable = true;
       services.pipewire.jack.enable = true;

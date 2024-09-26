@@ -24,7 +24,7 @@ in
       pkgs.bitwarden-cli # password manager (Bitwarden client, CLI)
       pkgs.bitwarden-desktop # password manager (Bitwarden client, GUI)
       pkgs.iamb # instant messenger (Matrix client, TUI)
-      pkgs.neochat # instant messenger (Matrix client, GUI)
+      # pkgs.neochat # instant messenger (Matrix client, GUI)
       pkgs.obsidian # information manager (text files, GUI)
       pkgs.signal-desktop # instant messenger (Signal client, GUI)
       pkgs.sublime-merge # version control (Git, GUI)

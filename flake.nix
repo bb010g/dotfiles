@@ -37,7 +37,7 @@
   inputs.nixpkgs-stable.url = "github:NixOS/nixpkgs/nixos-24.05";
   inputs.plasma-manager.inputs.home-manager.follows = "home-manager";
   inputs.plasma-manager.inputs.nixpkgs.follows = "nixpkgs";
-  inputs.plasma-manager.url = "github:pjones/plasma-manager";
+  inputs.plasma-manager.url = "github:nix-community/plasma-manager";
   inputs.pre-commit-hooks-nix.inputs.flake-compat.follows = "flake-compat";
   inputs.pre-commit-hooks-nix.inputs.gitignore.follows = "gitignore";
   inputs.pre-commit-hooks-nix.inputs.nixpkgs.follows = "nixpkgs";
