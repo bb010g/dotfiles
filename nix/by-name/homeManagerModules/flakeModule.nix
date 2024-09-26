@@ -9,6 +9,9 @@ let
     mkOption
     types
     ;
+  inherit (lib.modules)
+    setDefaultModuleLocation
+    ;
   inherit (flake-parts-lib)
     mkSubmoduleOptions
     ;
@@ -16,19 +19,10 @@ in
 {
   options = {
     flake = mkSubmoduleOptions {
-      homeManagerModuleLists = mkOption {
-        type = types.lazyAttrsOf (types.listOf types.unspecified);
-        default = { };
-        description = ''
-          home-manager module lists.
-
-          You may use this for reusable pieces of configuration, service modules, etc.
-        '';
-      };
       homeManagerModules = mkOption {
         type = types.lazyAttrsOf types.unspecified;
         default = { };
-        apply = mapAttrs (k: v: { _file = "${toString moduleLocation}#homeManagerModules.${k}"; imports = [ v ]; });
+        apply = mapAttrs (k: v: setDefaultModuleLocation "${toString moduleLocation}#homeManagerModules.${k}" v);
         description = ''
           home-manager modules.
 

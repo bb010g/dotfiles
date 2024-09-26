@@ -1,3 +1,4 @@
+{ ... }:
 { config, lib, nixosConfig ? null, pkgs, ... }:
 
 let

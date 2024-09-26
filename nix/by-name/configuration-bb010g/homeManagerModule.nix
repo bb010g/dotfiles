@@ -1,6 +1,21 @@
+collections@{ homeManagerModules, ... }:
 { lib, nixosConfig ? null, pkgs, ... }:
 
+let
+  inherit (builtins) import;
+  inherit (lib) setDefaultModuleLocation;
+  importApply = modulePath: staticArg:
+    setDefaultModuleLocation modulePath (import modulePath staticArg);
+in
 {
+  imports = [
+    homeManagerModules.default
+    (importApply ./_homeManagerModules/firefox.nix collections)
+    (importApply ./_homeManagerModules/git.nix collections)
+    (importApply ./_homeManagerModules/graphical.nix collections)
+    (importApply ./_homeManagerModules/plasma.nix collections)
+  ];
+
   config = {
     home.homeDirectory = "/home/bb010g";
 

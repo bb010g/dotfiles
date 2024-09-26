@@ -8,23 +8,6 @@ let
   flakeLib = byName.collections.lib;
   flakeOptions = options;
   flakeSelf = self;
-  homeManagerData = homeManagerDataForPath ./home-manager;
-  homeManagerDataForPath = flakeLib.dataOfPath.withShortNames.moduleDataForPath;
-  homeManagerModuleLists =
-    let
-      f =
-        parentName: name: value:
-        let
-          name' = "configuration-${name}";
-        in
-        [
-          {
-            name = name';
-            value = config.flake.homeManagerModuleLists.${parentName} ++ value.moduleList or [ ];
-          }
-        ] ++ concatMapAttrsToList (f name') value.configs or { };
-    in
-    listToAttrs (concatMapAttrsToList (f "default") homeManagerData.configs);
   nixosData = nixosDataForPath ./nixos;
   nixosDataForPath = flakeLib.dataOfPath.withShortNames.moduleDataForPath;
   nixosModuleLists =
@@ -59,33 +42,16 @@ in
         configurationName = builtins.elemAt nameMatches 0;
         configuration = inputs.home-manager.lib.homeManagerConfiguration {
           # inherit pkgs;
-          modules = [ config.flake.homeManagerModules.externalModules module ];
+          modules = [ module ];
           extraSpecialArgs = {
-            inherit flakeLib flakeConfig flakeOptions flakeSelf inputs;
+            inherit flakeLib flakeConfig flakeOptions flakeSelf;
           };
         };
       in
       { ${if nameMatches != null then configurationName else null} = configuration; }
     ) config.flake.homeManagerModules)
   ];
-  config.flake.homeManagerModuleLists = lib.mkMerge [
-    {
-      default = homeManagerData.moduleList or [ ];
-      externalModules = [
-        inputs.nix-flatpak.homeManagerModules.nix-flatpak
-        inputs.plasma-manager.homeManagerModules.plasma-manager
-      ];
-      sharedModules =
-        config.flake.homeManagerModuleLists.externalModules
-        ++ config.flake.homeManagerModuleLists.default;
-    }
-    homeManagerModuleLists
-  ];
-  config.flake.homeManagerModules = lib.mkMerge [
-    (builtins.mapAttrs (
-      name: importModules "${toString moduleLocation}#homeManagerModuleLists.${name}"
-    ) config.flake.homeManagerModuleLists)
-  ];
+  config.flake.homeManagerModules = byName.collections.homeManagerModules or { };
   config.flake.lib = flakeLib;
   config.flake.nixosConfigurations = lib.mkMerge [
     (zipMapAttrsWith (name: values: getSingletonElem values) (
@@ -100,7 +66,7 @@ in
             ++ [ module ];
           specialArgs = {
             inherit flakeLib flakeConfig flakeModuleArgs flakeOptions flakeSelf inputs;
-            inherit (config.flake) homeManagerModuleLists homeManagerModules;
+            inherit (config.flake) homeManagerModules;
           };
         };
       in
@@ -144,7 +110,7 @@ in
     ) config.flake.nixosModuleLists)
     {
       home-manager-flakeIntegration = nixosModuleArgs@{ config, lib, options, pkgs, ... }: {
-        config.home-manager.sharedModules = flakeConfig.flake.homeManagerModuleLists.sharedModules;
+        config.home-manager.sharedModules = [ flakeConfig.flake.homeManagerModules.default ];
         config.home-manager.extraSpecialArgs = {
           inherit flakeLib flakeConfig flakeModuleArgs flakeOptions flakeSelf inputs nixosModuleArgs;
           # nixosConfig = config; # already passed by home-manager

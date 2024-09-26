@@ -72,6 +72,8 @@
         collections = prevConfiguration.collections // {
           flakeModules.entryBaseNames."flakeModule.nix".import = importModuleDirEntry;
           flakeModules.entryName = "flakeModule";
+          homeManagerModules.entryBaseNames."homeManagerModule.nix".import = importModuleDirEntry;
+          homeManagerModules.entryName = "homeManagerModule";
           inputs.entryByName = { ... }: { ... }: inputs;
           inputs.entryName = "input";
           lib.entryByName = { collections, ... }: { ... }: instantiateProto (pipeProtos (attrValues collections.libProtos or { })) { builtinsProto = prevBuiltins: finalBuiltins: { inherit builtins; }; };
