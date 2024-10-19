@@ -6,7 +6,7 @@ let
   nixosCfg = nixosConfig.programs.firefox;
 in
 {
-  config = lib.mkIf (nixosCfg != null) {
+  config = lib.mkIf (nixosConfig != null) {
     programs.firefox.enable = lib.mkDefault nixosCfg.enable;
     programs.firefox.package = lib.mkDefault nixosCfg.finalPackage;
   };

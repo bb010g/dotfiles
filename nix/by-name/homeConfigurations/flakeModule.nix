@@ -19,10 +19,11 @@ in
         description = ''
           Instantiated home-manager configurations. Used by `home-manager`.
 
-          `homeConfigurations` is for specific users. If you want to expose
-          reusable configurations, add them to [`homeManagerModules`](#opt-flake.homeManagerModules)
-          in the form of modules (no `home-manager.lib.homeManagerConfiguration`), so that you can reference
-          them in this or another flake's `homeConfigurations`.
+          `homeConfigurations` is for specific users.
+          If you want to expose reusable configurations,
+          add them to [`homeManagerModules`](#opt-flake.homeManagerModules)
+          in the form of modules (no `home-manager.lib.homeManagerConfiguration`),
+          so that you can reference them in this or another flake's `homeConfigurations`.
         '';
         example = literalExpression ''
           {

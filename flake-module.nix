@@ -13,6 +13,8 @@ in
   imports = [
     byName.collections.flakeModules.home-manager
     byName.collections.flakeModules.nixos
+    byName.collections.flakeModules.nixpkgs
+    byName.collections.flakeModules.system-manager
   ];
   config.flake.byName = byName;
   config.flake.flakeModules = byName.collections.flakeModules or { };
@@ -23,7 +25,7 @@ in
         nameMatches = builtins.match "configuration-(.*)" moduleName;
         configurationName = builtins.elemAt nameMatches 0;
         configuration = inputs.home-manager.lib.homeManagerConfiguration {
-          # inherit pkgs;
+          inherit (getSystem "x86_64-linux") pkgs; # TODO: respect system
           modules = [ module ];
           extraSpecialArgs = { };
         };
@@ -49,6 +51,22 @@ in
   ];
   config.flake.nixosModules = byName.collections.nixosModules or { };
   config.flake.overlays = byName.collections.nixpkgsOverlays or { };
+  config.flake.systemConfigs = lib.mkMerge [
+    (zipMapAttrsWith (name: values: getSingletonElem values) (
+      moduleName: module:
+      let
+        nameMatches = builtins.match "configuration-(.*)" moduleName;
+        configurationName = builtins.elemAt nameMatches 0;
+        configuration = inputs.system-manager.lib.makeSystemConfig {
+          inherit (getSystem "x86_64-linux") pkgs; # TODO: respect system
+          modules = [ module ];
+          extraSpecialArgs = { };
+        };
+      in
+      { ${if nameMatches != null then configurationName else null} = configuration; }
+    ) config.flake.systemManagerModules)
+  ];
+  config.flake.systemManagerModules = byName.collections.systemManagerModules or { };
   config.perSystem = { config, pkgs, system, ... }: {
     config._module.args.pkgs = import inputs.nixpkgs {
       inherit system;

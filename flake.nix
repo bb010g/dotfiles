@@ -27,7 +27,7 @@
   inputs.lix-module.inputs.nixpkgs.follows = "nixpkgs";
   inputs.lix-module.url = "git+https://git.lix.systems/lix-project/nixos-module.git";
   inputs.lix.flake = false;
-  inputs.lix.url = "git+https://git.lix.systems/lix-project/lix.git";
+  inputs.lix.url = "git+https://git.lix.systems/bb010g/lix.git";
   inputs.neovim.flake = false;
   inputs.neovim.url = "github:neovim/neovim";
   inputs.nix-flatpak.url = "github:gmodena/nix-flatpak";
@@ -43,6 +43,10 @@
   inputs.pre-commit-hooks-nix.inputs.nixpkgs.follows = "nixpkgs";
   inputs.pre-commit-hooks-nix.inputs.nixpkgs-stable.follows = "nixpkgs-stable";
   inputs.pre-commit-hooks-nix.url = "github:cachix/pre-commit-hooks.nix";
+  inputs.system-manager.url = "github:bb010g/system-manager";
+  inputs.system-manager.inputs.nixpkgs.follows = "nixpkgs";
+  inputs.system-manager.inputs.flake-utils.follows = "flake-utils";
+  inputs.system-manager.inputs.pre-commit-hooks.follows = "pre-commit-hooks-nix";
   inputs.systems.flake = false;
   inputs.systems.url = "github:nix-systems/default";
 
@@ -85,6 +89,8 @@
           nixpkgsOverlays.entryBaseNames."nixpkgsOverlay.nix".import =
             { collections, ... }: { ... }: { path, ... }: import path collections;
           nixpkgsOverlays.entryName = "nixpkgsOverlay";
+          systemManagerModules.entryBaseNames."systemManagerModule.nix".import = importModuleDirEntry;
+          systemManagerModules.entryName = "systemManagerModule";
         };
 
         entriesByNamePath = ./nix/by-name;

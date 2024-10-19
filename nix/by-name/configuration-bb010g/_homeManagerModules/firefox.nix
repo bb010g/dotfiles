@@ -7,7 +7,7 @@ let
 in
 {
   config = lib.mkMerge [
-    (lib.mkIf (nixosCfg != null) {
+    (lib.mkIf (nixosConfig != null) {
       programs.firefox.package = nixosCfg.finalPackage;
     })
   ];
