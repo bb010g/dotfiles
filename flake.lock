@@ -401,6 +401,22 @@
         "type": "github"
       }
     },
+    "rocks-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1729419970,
+        "narHash": "sha256-RzBaO2oh9NGt6vdCbgkcXs6iRD3WpVphq3rhAdAq4ng=",
+        "owner": "nvim-neorocks",
+        "repo": "rocks.nvim",
+        "rev": "65d563f63360dd4611c859029d65f649eb720a2a",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nvim-neorocks",
+        "repo": "rocks.nvim",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
         "disko": "disko",
@@ -421,6 +437,7 @@
         "nixpkgs-stable": "nixpkgs-stable",
         "plasma-manager": "plasma-manager",
         "pre-commit-hooks-nix": "pre-commit-hooks-nix",
+        "rocks-nvim": "rocks-nvim",
         "system-manager": "system-manager",
         "systems": "systems"
       }
