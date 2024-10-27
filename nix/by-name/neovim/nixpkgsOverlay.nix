@@ -49,5 +49,5 @@ in
 
       doCheck = (enableDeveloper && stdenv.isLinux) || prevAttrs.doCheck or false;
     }
-  );
+  ) { };
 }
