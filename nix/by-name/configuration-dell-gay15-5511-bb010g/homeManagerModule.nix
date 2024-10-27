@@ -16,6 +16,7 @@ in
     home.homeDirectory = "/home/bb010g";
 
     home.packages = [
+      (lib.getBin pkgs.gh)
       (lib.getBin pkgs.git-branchless)
       (lib.getBin pkgs.git-dive)
       (lib.getBin pkgs.git-octopus)
