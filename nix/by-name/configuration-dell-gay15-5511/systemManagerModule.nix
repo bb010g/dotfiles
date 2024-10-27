@@ -19,6 +19,7 @@ in
       (lib.getBin pkgs.eza)
       (lib.getBin pkgs.fd)
       (lib.getBin pkgs.libarchive) # bsdtar
+      (lib.getBin pkgs.neovim-unstable)
       pkgs.nix
       (lib.getBin pkgs.nix-search-cli)
       (lib.getBin pkgs.pipx)
