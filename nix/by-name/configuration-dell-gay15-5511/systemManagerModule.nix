@@ -27,9 +27,10 @@ in
       (lib.getBin pkgs.zstd)
     ];
 
-    home-manager = lib.mkMerge [
-      { users.bb010g = homeManagerModules.configuration-dell-gay15-5511-bb010g or { }; }
-      { users.bb010g.config.home.stateVersion = "24.05"; }
+    home-manager.useGlobalPkgs = true;
+    home-manager.users.bb010g = lib.mkMerge [
+      homeManagerModules.configuration-dell-gay15-5511-bb010g or { }
+      { config.home.stateVersion = "24.05"; }
     ];
 
     users.users.bb010g = {
