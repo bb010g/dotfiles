@@ -27,7 +27,7 @@
   inputs.lix-module.inputs.nixpkgs.follows = "nixpkgs";
   inputs.lix-module.url = "git+https://git.lix.systems/lix-project/nixos-module.git";
   inputs.lix.flake = false;
-  inputs.lix.url = "git+https://git.lix.systems/bb010g/lix.git";
+  inputs.lix.url = "git+https://git.lix.systems/lix-project/lix.git";
   inputs.neovim.flake = false;
   inputs.neovim.url = "github:neovim/neovim";
   inputs.nix-flatpak.url = "github:gmodena/nix-flatpak";
