@@ -1,7 +1,6 @@
 { inputs, systemManagerModules, ... }:
 {
   imports = [
-    systemManagerModules.environment
     systemManagerModules.flatpak
     systemManagerModules.home-manager
     systemManagerModules.home-manager-default

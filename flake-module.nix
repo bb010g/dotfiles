@@ -85,6 +85,11 @@ in
       ];
     };
     config.legacyPackages.nixpkgs = lib.dontRecurseIntoAttrs pkgs;
+    config.packages.neovim-test = pkgs.wrapNeovimUnstable pkgs.neovim-unstable-unwrapped {
+      plugins = [
+        pkgs.vimPlugins.rocks-nvim
+      ];
+    };
   };
   config.systems = import inputs.systems;
 }

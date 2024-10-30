@@ -22,10 +22,6 @@ let
     { };
 in
 {
-  imports = [
-    systemManagerModules.environment
-  ];
-
   options = {
     i18n = {
       glibcLocales = lib.mkOption {

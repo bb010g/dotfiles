@@ -118,33 +118,19 @@ in
     programs.neovim.package = pkgs.neovim-unstable-unwrapped;
     programs.neovim.plugins = [
       pkgs.vimPlugins.rocks-nvim
+
+      pkgs.vimPlugins.rocks-config-nvim
+      pkgs.vimPlugins.rocks-dev-nvim
+      pkgs.vimPlugins.rocks-git-nvim
     ];
-    programs.neovim.extraLuaConfig = ''
-      -- Copied from installer.lua
-      local rocks_config = {
-        rocks_path = vim.fn.stdpath("data") .. "/rocks",
-        luarocks_binary = ${lib.generators.toLua { } "${pkgs.vimPlugins.rocks-nvim.luaAttr.passthru.luarocks}/bin/luarocks"},
-      }
-
-      vim.g.rocks_nvim = rocks_config
-
-      local luarocks_path = {
-        vim.fs.joinpath(rocks_config.rocks_path, "share", "lua", "5.1", "?.lua"),
-        vim.fs.joinpath(rocks_config.rocks_path, "share", "lua", "5.1", "?", "init.lua"),
-      }
-      package.path = package.path .. ";" .. table.concat(luarocks_path, ";")
-
-      local luarocks_cpath = {
-        vim.fs.joinpath(rocks_config.rocks_path, "lib", "lua", "5.1", "?.so"),
-        vim.fs.joinpath(rocks_config.rocks_path, "lib64", "lua", "5.1", "?.so"),
-      }
-      package.cpath = package.cpath .. ";" .. table.concat(luarocks_cpath, ";")
-
-      vim.opt.runtimepath:append(vim.fs.joinpath(${lib.generators.toLua { } pkgs.vimPlugins.rocks-nvim}, "rocks.nvim-scm-1-rocks", "rocks.nvim", "*"))
-
-      vim.opt.number, vim.opt.relativenumber = true, true
-      vim.opt_global.scrolloff, vim.opt_global.sidescrolloff = 5, 4
-    '';
+    programs.neovim.extraLuaConfig =
+      let
+        inherit (lib.generators) toLua;
+      in
+      ''
+        vim.opt.number, vim.opt.relativenumber = true, true
+        vim.opt_global.scrolloff, vim.opt_global.sidescrolloff = 5, 4
+      '';
 
     programs.zellij.enable = true;
 
