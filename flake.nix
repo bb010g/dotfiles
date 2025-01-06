@@ -43,7 +43,6 @@
   inputs.pre-commit-hooks-nix.inputs.flake-compat.follows = "flake-compat";
   inputs.pre-commit-hooks-nix.inputs.gitignore.follows = "gitignore";
   inputs.pre-commit-hooks-nix.inputs.nixpkgs.follows = "nixpkgs";
-  inputs.pre-commit-hooks-nix.inputs.nixpkgs-stable.follows = "nixpkgs-stable";
   inputs.pre-commit-hooks-nix.url = "github:cachix/pre-commit-hooks.nix";
   inputs.rocks-nvim.flake = false;
   inputs.rocks-nvim.url = "github:nvim-neorocks/rocks.nvim";
@@ -55,8 +54,7 @@
   inputs.rocks-git-nvim.url = "github:nvim-neorocks/rocks-git.nvim";
   inputs.system-manager.url = "github:bb010g/system-manager";
   inputs.system-manager.inputs.nixpkgs.follows = "nixpkgs";
-  inputs.system-manager.inputs.flake-utils.follows = "flake-utils";
-  inputs.system-manager.inputs.pre-commit-hooks.follows = "pre-commit-hooks-nix";
+  # inputs.system-manager.inputs.pre-commit-hooks.follows = "pre-commit-hooks-nix";
   inputs.systems.flake = false;
   inputs.systems.url = "github:nix-systems/default";
 

@@ -105,7 +105,7 @@ if prevPkgs ? neovim-unstable-unwrapped then {
         buildRustPackage = mirrorFunctionArgs prevArgs'.rustPlatform.buildRustPackage (args: prevArgs'.rustPlatform.buildRustPackage (args // {
           version = "bundled";
           src = prevArgs.fetchurl finalPkgs.neovim-unstable-unwrapped.passthru.deps.treesitter;
-          cargoHash = "sha256-umNoJn5fctYk3J2ekYjJx1fCwfAMspEHjmYUvw6Qb0Y=";
+          cargoHash = "sha256-BPYNFcsDHrDUw86mJ9NJxPugm5yscsln2xvVc5Qkn6I=";
         }));
       };
     });
