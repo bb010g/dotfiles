@@ -13,6 +13,12 @@ in
   ];
 
   config = {
+    documentation.dev.enable = true;
+    documentation.doc.enable = true;
+    documentation.enable = true;
+    documentation.info.enable = true;
+    documentation.man.enable = true;
+
     environment.extraOutputsToInstall = [
       "devdoc"
       "devinfo"
@@ -22,20 +28,68 @@ in
       "man"
     ];
 
+    environment.pathsToLink = [
+      "/share/X11/fonts"
+
+      "/share/emacs"
+      "/share/hunspell"
+
+      "/share/nvim"
+
+      "/share/terminfo"
+
+      "/etc/xdg/autostart"
+
+      "/share/icons"
+      "/share/pixmaps"
+
+      "/share/applications"
+      "/share/desktop-directories"
+      "/etc/xdg/menus"
+      "/etc/xdg/menus/applications-merged"
+
+      "/share/mime"
+
+      "/share/sounds"
+
+      "/etc/bash_completion.d"
+      "/share/bash-completion"
+
+      "/share/fish/vendor_conf.d"
+      "/share/fish/vendor_completions.d"
+      "/share/fish/vendor_functions.d"
+
+      "/share/X11"
+
+      "/share/zsh"
+
+      "/share/wallpapers"
+
+      "/etc/dbus-1"
+      "/share/dbus-1"
+    ];
+
     environment.systemPackages = [
       pkgs.bat
       pkgs.curl
+      pkgs.earthly
+      pkgs.ed
       pkgs.eza
       pkgs.fd
+      pkgs.fsarchiver
       pkgs.libarchive # bsdtar
       pkgs.neovim-unstable
       pkgs.nix
       pkgs.nix-search-cli
+      pkgs.partclone
       pkgs.pipx
       pkgs.ripgrep
       pkgs.roswell
       pkgs.zstd
     ];
+
+    environment.variables.EDITOR = "ed";
+    environment.variables.VISUAL = "nvim";
 
     home-manager.useGlobalPkgs = true;
     home-manager.users.bb010g = lib.mkMerge [

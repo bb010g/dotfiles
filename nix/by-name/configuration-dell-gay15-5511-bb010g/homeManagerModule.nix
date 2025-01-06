@@ -24,16 +24,21 @@ in
 
     home.homeDirectory = "/home/bb010g";
 
-    home.packages = [
-      pkgs.gh
-      pkgs.git-branchless
-      pkgs.git-dive
-      pkgs.git-octopus
-      pkgs.git-revise
-      pkgs.git-stack
-      pkgs.glamoroustoolkit
-      pkgs.kdotool
-      pkgs.nix-search-cli
+    home.packages = lib.mkMerge [
+      [
+        pkgs.gh
+        pkgs.git-branchless
+        pkgs.git-dive
+        pkgs.git-octopus
+        pkgs.git-revise
+        pkgs.git-stack
+        pkgs.glamoroustoolkit
+        pkgs.kdotool
+        pkgs.nix-search-cli
+      ]
+      (lib.mkIf config.services.keybase.enable [
+        pkgs.keybase-gui
+      ])
     ];
 
     home.preferXdgDirectories = true;
@@ -111,6 +116,7 @@ in
       url."ssh://git@git.lix.systems/".pushInsteadOf = "https://git.lix.systems/";
       url."ssh://git@git.sr.ht/".pushInsteadOf = "https://git.sr.ht/";
       url."ssh://git@github.com/".pushInsteadOf = "https://github.com/";
+      url."ssh://git@github.com/VoxelStorm-Ltd/".insteadOf = "https://github.com/VoxelStorm-Ltd/";
       url."ssh://git@gitlab.com/".pushInsteadOf = "https://gitlab.com/";
       url."ssh://git@gitlab.gnome.org/".pushInsteadOf = "https://gitlab.gnome.org/";
     };
@@ -162,6 +168,10 @@ in
 
     # Discord (via Vesktop)
     services.arrpc.enable = lib.mkIf (nixosConfig != null) nixosConfig.programs.vesktop.enable;
+
+    services.kbfs.enable = true;
+    services.kbfs.mountPoint = "Keybase";
+    services.keybase.enable = true;
 
     services.squeezelite.enable = true;
     services.squeezelite.audioBackend.pulseAudio.enable = true;

@@ -21,7 +21,7 @@ let
   */
   lib.modules.mkImport = file: key: content:
     { _type = "import";
-      ${if file != null then "_file" else null} = file;
+      ${if file != null then "file" else null} = file;
       ${if key != null then "key" else null} = key;
       inherit content;
     };
