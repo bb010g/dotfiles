@@ -13,17 +13,27 @@ in
   ];
 
   config = {
+    home.extraOutputsToInstall = [
+      "devdoc"
+      "devinfo"
+      "devman"
+      "doc"
+      "info"
+      "man"
+    ];
+
     home.homeDirectory = "/home/bb010g";
 
     home.packages = [
-      (lib.getBin pkgs.gh)
-      (lib.getBin pkgs.git-branchless)
-      (lib.getBin pkgs.git-dive)
-      (lib.getBin pkgs.git-octopus)
-      (lib.getBin pkgs.git-revise)
-      (lib.getBin pkgs.git-stack)
-      (lib.getBin pkgs.kdotool)
-      (lib.getBin pkgs.nix-search-cli)
+      pkgs.gh
+      pkgs.git-branchless
+      pkgs.git-dive
+      pkgs.git-octopus
+      pkgs.git-revise
+      pkgs.git-stack
+      pkgs.glamoroustoolkit
+      pkgs.kdotool
+      pkgs.nix-search-cli
     ];
 
     home.preferXdgDirectories = true;
@@ -64,6 +74,7 @@ in
     programs.blesh.enable = true;
 
     programs.direnv.enable = true;
+    programs.direnv.gitIntegration.enable = true;
     programs.direnv.nix-direnv.enable = true;
 
     programs.eza.enable = true;
@@ -87,6 +98,9 @@ in
     programs.git.enable = true;
     programs.git.extraConfig = {
       commit.cleanup = "scissors";
+      core.autocrlf = "input";
+      core.eol = "lf";
+      core.safecrlf = true;
       diff.algorithm = "histogram";
       fetch.fsckObjects = true;
       fetch.showForcedUpdates = true;
@@ -103,6 +117,7 @@ in
     programs.git.ignores = [
       # Vim
       "*.swp"
+      "Session.vim"
     ];
     programs.git.lfs.enable = true;
     programs.git.package = pkgs.gitFull;
@@ -119,8 +134,8 @@ in
     programs.neovim.plugins = [
       pkgs.vimPlugins.rocks-nvim
 
-      pkgs.vimPlugins.rocks-config-nvim
-      pkgs.vimPlugins.rocks-dev-nvim
+      # pkgs.vimPlugins.rocks-config-nvim # provides `rocks-dev.rocks.hooks.preload`
+      # pkgs.vimPlugins.rocks-dev-nvim # provides `rocks-dev.rocks.hooks.preload`
       pkgs.vimPlugins.rocks-git-nvim
     ];
     programs.neovim.extraLuaConfig =
@@ -128,9 +143,20 @@ in
         inherit (lib.generators) toLua;
       in
       ''
+        if vim._submodules.site == nil then vim._submodules.site = true end
+
         vim.opt.number, vim.opt.relativenumber = true, true
         vim.opt_global.scrolloff, vim.opt_global.sidescrolloff = 5, 4
       '';
+    programs.neovim.extraPackages =
+      let
+        neovim-unwrapped = config.programs.neovim.package;
+        nlua = neovim-unwrapped.lua.pkgs.nlua.override { inherit neovim-unwrapped; };
+      in
+      [
+        neovim-unwrapped.lua
+        nlua
+      ];
 
     programs.zellij.enable = true;
 

@@ -13,19 +13,28 @@ in
   ];
 
   config = {
+    environment.extraOutputsToInstall = [
+      "devdoc"
+      "devinfo"
+      "devman"
+      "doc"
+      "info"
+      "man"
+    ];
+
     environment.systemPackages = [
-      (lib.getBin pkgs.bat)
-      (lib.getBin pkgs.curl)
-      (lib.getBin pkgs.eza)
-      (lib.getBin pkgs.fd)
-      (lib.getBin pkgs.libarchive) # bsdtar
-      (lib.getBin pkgs.neovim-unstable)
+      pkgs.bat
+      pkgs.curl
+      pkgs.eza
+      pkgs.fd
+      pkgs.libarchive # bsdtar
+      pkgs.neovim-unstable
       pkgs.nix
-      (lib.getBin pkgs.nix-search-cli)
-      (lib.getBin pkgs.pipx)
-      (lib.getBin pkgs.ripgrep)
-      (lib.getBin pkgs.roswell)
-      (lib.getBin pkgs.zstd)
+      pkgs.nix-search-cli
+      pkgs.pipx
+      pkgs.ripgrep
+      pkgs.roswell
+      pkgs.zstd
     ];
 
     home-manager.useGlobalPkgs = true;
@@ -50,6 +59,8 @@ in
       { appId = "org.mozilla.firefox"; origin = "flathub"; }
       { appId = "org.signal.Signal"; origin = "flathub"; }
     ];
+
+    system-graphics.enable = true;
 
     system-manager.allowAnyDistro = true;
   };

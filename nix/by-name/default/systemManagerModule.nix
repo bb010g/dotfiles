@@ -1,6 +1,7 @@
 { inputs, systemManagerModules, ... }:
 {
   imports = [
+    inputs.nix-system-graphics.systemModules.default
     systemManagerModules.flatpak
     systemManagerModules.home-manager
     systemManagerModules.home-manager-default

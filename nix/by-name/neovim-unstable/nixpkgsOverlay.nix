@@ -49,7 +49,7 @@ if prevPkgs ? neovim-unstable-unwrapped then {
             listToAttrs
             (treesitter-parsers: treesitter-parsers // {
               markdown = treesitter-parsers.markdown // { location = "tree-sitter-markdown"; };
-              markdown-inline = treesitter-parsers.markdown // { language = "markdown_inline"; location = "tree-sitter-markdown-inline"; };
+              markdown_inline = treesitter-parsers.markdown // { language = "markdown_inline"; location = "tree-sitter-markdown-inline"; };
             })
           ]
         else

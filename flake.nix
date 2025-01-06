@@ -31,6 +31,8 @@
   inputs.neovim.flake = false;
   inputs.neovim.url = "github:neovim/neovim";
   inputs.nix-flatpak.url = "github:gmodena/nix-flatpak";
+  inputs.nix-system-graphics.inputs.nixpkgs.follows = "nixpkgs";
+  inputs.nix-system-graphics.url = "github:soupglasses/nix-system-graphics";
   inputs.nixos-hardware.url = "github:NixOS/nixos-hardware";
   inputs.nixpkgs.url = "github:bb010g/nixpkgs/nixos-unstable";
   # inputs.nixpkgs.url = "github:NixOS/nixpkgs/nixos-unstable";
@@ -45,6 +47,12 @@
   inputs.pre-commit-hooks-nix.url = "github:cachix/pre-commit-hooks.nix";
   inputs.rocks-nvim.flake = false;
   inputs.rocks-nvim.url = "github:nvim-neorocks/rocks.nvim";
+  inputs.rocks-config-nvim.flake = false;
+  inputs.rocks-config-nvim.url = "github:nvim-neorocks/rocks-config.nvim";
+  inputs.rocks-dev-nvim.flake = false;
+  inputs.rocks-dev-nvim.url = "github:nvim-neorocks/rocks-dev.nvim";
+  inputs.rocks-git-nvim.flake = false;
+  inputs.rocks-git-nvim.url = "github:nvim-neorocks/rocks-git.nvim";
   inputs.system-manager.url = "github:bb010g/system-manager";
   inputs.system-manager.inputs.nixpkgs.follows = "nixpkgs";
   inputs.system-manager.inputs.flake-utils.follows = "flake-utils";
