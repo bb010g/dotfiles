@@ -7,6 +7,7 @@
     homeManagerModules.direnv
     homeManagerModules.element-desktop
     homeManagerModules.firefox
+    homeManagerModules.jujutsu
     homeManagerModules.kdeconnect
     homeManagerModules.squeezelite
   ];
