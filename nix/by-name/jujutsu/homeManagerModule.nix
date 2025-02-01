@@ -91,7 +91,7 @@ let
 in
 {
   options.programs.jujutsu = {
-    difftastic.enable = mkEnableOption "the Difftastic syntax highlighter.";
+    difftastic.enable = mkEnableOption "the Difftastic syntax highlighter";
     difftastic.package = mkPackageOption pkgs "Difftastic" { default = [ "difftastic" ]; };
     difftastic.tool = mkOption {
       default = "difft";
@@ -178,6 +178,8 @@ in
           "$right"
         ]'';
     };
+    watchman.enable = mkEnableOption "the Watchman filesystem monitor";
+    watchman.package = mkPackageOption pkgs "Watchman" { default = [ "watchman" ]; };
   };
   config = mkIf cfg.enable (mkMerge [
     (mkIf cfg.difftastic.enable {
@@ -187,6 +189,12 @@ in
           program = mkDefault (getExe cfg.difftastic.package);
           diff-args = cfg.difftastic.args;
         };
+      };
+    })
+    (mkIf cfg.watchman.enable {
+      home.packages = [ cfg.watchman.package ];
+      programs.jujutsu.settings = {
+        core.fsmonitor = mkDefault "watchman";
       };
     })
   ]);
