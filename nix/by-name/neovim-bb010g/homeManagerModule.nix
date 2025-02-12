@@ -1,4 +1,4 @@
-{ rows, ... }:
+{ homeManagerModules, ... }:
 {
   config,
   lib,
@@ -6,14 +6,14 @@
   ...
 }:
 let
-  inherit (lib.modules) mkDefault mkEnableOption mkIf;
+  inherit (lib.modules) mkBefore mkDefault mkIf;
+  inherit (lib.options) mkEnableOption;
   inherit (lib.strings) readFile;
   cfg = config.programs.neovim;
-  opts = options.programs.neovim;
 in
 {
   imports = [
-    rows.neovim.homeManagerModule
+    homeManagerModules.neovim
   ];
 
   options.programs.neovim.presets.boring-bb010g.enable =
@@ -33,8 +33,14 @@ in
     (mkIf cfg.presets.default-bb010g.enable {
       programs.neovim.package = mkDefault pkgs.neovim-unstable-unwrapped;
       programs.neovim.presets.vim-site-bb010g.enable = mkDefault true;
+      programs.neovim.extraLuaConfig = ''
+        vim.opt_global.scrolloff, vim.opt_global.sidescrolloff = 5, 4
+      '';
     })
     (mkIf cfg.presets.boring-bb010g.enable {
+      programs.neovim.extraLuaConfigFirst = ''
+        vim.loader.enable(true)
+      '';
       programs.neovim.plugins = [
         {
           plugin = pkgs.vimPlugins.mini-nvim;
@@ -66,10 +72,9 @@ in
                 style = 'ascii',
               })
 
-              local MiniPick = require('mini.pick')
-              MiniPick.setup({
+              require('mini.pick').setup({
               })
-              vim.ui.select = MiniPick.ui_select
+              vim.ui.select = require('mini.pick').ui_select
 
               require('mini.align').setup({
                 mappings = {
@@ -81,8 +86,7 @@ in
               require('mini.bracketed').setup({
               })
 
-              local MiniNotify = require('mini.notify')
-              MiniNotify.setup({
+              require('mini.notify').setup({
                 window = {
                   config = function(buf_id)
                     local current_win = vim.api.nvim_get_current_win()
@@ -96,7 +100,7 @@ in
                   end,
                 },
               })
-              vim.notify = MiniNotify.make_notify({
+              vim.notify = require('mini.notify').make_notify({
               })
 
               require('mini.operators').setup({
@@ -141,8 +145,7 @@ in
               })
 
               if false then
-              local MiniClue = require('mini.clue')
-              MiniClue.setup({
+              require('mini.clue').setup({
                 triggers = {
                   -- Leader triggers
                   { mode = 'n', keys = '<Leader>' },
@@ -176,12 +179,12 @@ in
                 },
 
                 clues = {
-                  MiniClue.gen_clues.builtin_completion(),
-                  MiniClue.gen_clues.g(),
-                  MiniClue.gen_clues.marks(),
-                  MiniClue.gen_clues.registers(),
-                  MiniClue.gen_clues.windows(),
-                  MiniClue.gen_clues.z(),
+                  require('mini.clue').gen_clues.builtin_completion(),
+                  require('mini.clue').gen_clues.g(),
+                  require('mini.clue').gen_clues.marks(),
+                  require('mini.clue').gen_clues.registers(),
+                  require('mini.clue').gen_clues.windows(),
+                  require('mini.clue').gen_clues.z(),
                 },
               })
               end
@@ -199,7 +202,61 @@ in
             end'';
         }
 
-        { plugin = pkgs.vimPlugins.ale; }
+        {
+          plugin = pkgs.vimPlugins.nvim-treesitter;
+          type = "lua";
+          config = ''
+            require('nvim-treesitter.configs').setup({
+              highlight = {
+                enable = true,
+                disable = function(lang, buf)
+                  local max_filesize = 100 * 1024 -- 100 KB
+                  local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+                  if ok and stats and stats.size > max_filesize then
+                      return true
+                  end
+                end,
+              },
+            })'';
+        }
+
+        {
+          plugin = pkgs.vimPlugins.ale;
+          type = "lua";
+          config = ''
+            vim.g.ale_floating_preview, vim.g.ale_hover_to_preview = 1, 1'';
+        }
+        {
+          plugin = pkgs.vimPlugins.direnv-nvim;
+          type = "lua";
+          config = ''
+            require('direnv-nvim').setup({
+            })'';
+        }
+        { plugin = pkgs.vimPlugins.nvim-dap; }
+        {
+          plugin = pkgs.vimPlugins.nvim-dap-ui;
+          type = "lua";
+          config = ''
+            vim.site._submodules.dapui = true
+            vim.site.dapui.user_config = {
+            }'';
+        }
+        { plugin = pkgs.vimPlugins.plenary-nvim; }
+        {
+          plugin = pkgs.vimPlugins.ssr-nvim;
+          type = "lua";
+          config = ''
+            require('ssr').setup({
+              adjust_window = true,
+              border = 'rounded',
+              -- max_height = 25,
+              -- max_width = 120,
+              -- min_height = 5,
+              -- min_width = 50,
+            })
+            -- vim.keymap.set({ "n", "x" }, "<leader>sr", function() require("ssr").open() end)'';
+        }
         { plugin = pkgs.vimPlugins.vim-eunuch; }
         { plugin = pkgs.vimPlugins.vim-scriptease; }
       ];
@@ -207,6 +264,12 @@ in
       programs.neovim.presets.rocks-bb010g.enable = false;
     })
     (mkIf cfg.presets.rocks-bb010g.enable {
+      assertions = [
+        {
+          assertion = !cfg.presets.boring-bb010g;
+          message = "{option}`config.programs.neovim.presets.rocks-bb010g` is incompatible with {option}`config.programs.neovim.presets.boring-bb010g`";
+        }
+      ];
       programs.neovim.extraPackages =
         let
           neovim-unwrapped = cfg.package;
@@ -224,10 +287,8 @@ in
         pkgs.vimPlugins.rocks-git-nvim
       ];
       programs.neovim.presets.default-bb010g.enable = mkDefault true;
-      programs.neovim.presets.rocks-bb010g.enable = false;
       programs.neovim.extraLuaConfig = ''
         vim.opt.number, vim.opt.relativenumber = true, true
-        vim.opt_global.scrolloff, vim.opt_global.sidescrolloff = 5, 4
       '';
     })
   ];

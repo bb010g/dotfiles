@@ -9,6 +9,7 @@
     homeManagerModules.firefox
     homeManagerModules.jujutsu
     homeManagerModules.kdeconnect
+    homeManagerModules.neovim
     homeManagerModules.squeezelite
   ];
 }

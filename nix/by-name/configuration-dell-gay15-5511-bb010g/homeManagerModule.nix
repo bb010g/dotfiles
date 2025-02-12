@@ -10,6 +10,9 @@ in
 {
   imports = [
     homeManagerModules.default
+    homeManagerModules.jujutsu-bb010g
+    homeManagerModules.neovim-bb010g
+    homeManagerModules.vscode-bb010g
   ];
 
   config = {
@@ -28,7 +31,9 @@ in
       [
         pkgs.gh
         pkgs.git-branchless
+        pkgs.git-cinnabar
         pkgs.git-dive
+        pkgs.git-imerge
         pkgs.git-octopus
         pkgs.git-revise
         pkgs.git-stack
@@ -43,6 +48,10 @@ in
 
     home.preferXdgDirectories = true;
 
+    home.sessionPath = [
+      "$HOME/.juliaup/bin"
+    ];
+
     # https://hexdocs.pm/mix/1.17.2/Mix.html
     home.sessionVariables.MIX_XDG = "1";
     home.sessionVariables.SSH_AUTH_SOCK = "\${SSH_AUTH_SOCK:-$HOME/.var/app/com.quexten.Goldwarden/data/ssh-auth-sock}";
@@ -55,7 +64,7 @@ in
       dialect = "us";
       dotfiles.enabled = false;
       exit_mode = "return-query";
-      filter_mode = "global";
+      filter_mode = "workspace"; # falls back to `"global"`
       filter_mode_shell_up_key_binding = "session";
       local_timeout = 10; # default: 5
       search_mode = "skim";
@@ -100,6 +109,7 @@ in
 
     # version control (CLI)
     programs.git.difftastic.enable = true;
+    programs.git.difftastic.background = "dark";
     programs.git.enable = true;
     programs.git.extraConfig = {
       commit.cleanup = "scissors";
@@ -131,38 +141,14 @@ in
     programs.git.userName = "Dusk Banks";
     programs.gitui.enable = true;
 
-    programs.jujutsu.enable = true;
-    programs.jujutsu.settings.user.email = config.programs.git.userEmail;
-    programs.jujutsu.settings.user.name = config.programs.git.userName;
-
     programs.neovim.enable = true;
-    programs.neovim.package = pkgs.neovim-unstable-unwrapped;
-    programs.neovim.plugins = [
-      pkgs.vimPlugins.rocks-nvim
+    programs.neovim.presets.vim-site-bb010g.enable = true;
+    programs.neovim.presets.boring-bb010g.enable = true;
 
-      # pkgs.vimPlugins.rocks-config-nvim # provides `rocks-dev.rocks.hooks.preload`
-      # pkgs.vimPlugins.rocks-dev-nvim # provides `rocks-dev.rocks.hooks.preload`
-      pkgs.vimPlugins.rocks-git-nvim
-    ];
-    programs.neovim.extraLuaConfig =
-      let
-        inherit (lib.generators) toLua;
-      in
-      ''
-        if vim._submodules.site == nil then vim._submodules.site = true end
-
-        vim.opt.number, vim.opt.relativenumber = true, true
-        vim.opt_global.scrolloff, vim.opt_global.sidescrolloff = 5, 4
-      '';
-    programs.neovim.extraPackages =
-      let
-        neovim-unwrapped = config.programs.neovim.package;
-        nlua = neovim-unwrapped.lua.pkgs.nlua.override { inherit neovim-unwrapped; };
-      in
-      [
-        neovim-unwrapped.lua
-        nlua
-      ];
+    programs.vscode.userSettings = {
+      "editor.fontFamily" = "'Cascadia Code', 'Droid Sans Mono', 'monospace', monospace";
+      # "workbench.colorTheme" = "modus-vivendi-tinted";
+    };
 
     programs.zellij.enable = true;
 

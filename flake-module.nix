@@ -79,6 +79,8 @@ in
         flakeConfig.flake.overlays.neovim-stable
         flakeConfig.flake.overlays.neovim-unstable
         flakeConfig.flake.overlays.rocks-nvim
+        flakeConfig.flake.overlays.vimPlugins
+        flakeConfig.flake.overlays.vscode-extensions
         (prevPkgs: finalPkgs: {
           openssh_noGssapi = prevPkgs.openssh;
           openssh = prevPkgs.openssh_gssapi;

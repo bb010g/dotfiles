@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "alicorn-vscode-extension": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1729289797,
+        "narHash": "sha256-qE61OaXwUFPuFre4PFPk6c4/3YSi+gYO9w+8L4ZUfKY=",
+        "owner": "Fundament-Software",
+        "repo": "alicorn-vscode-extension",
+        "rev": "adfb77a5fab010175ba94cdabe18de397780e0ea",
+        "type": "github"
+      },
+      "original": {
+        "owner": "Fundament-Software",
+        "repo": "alicorn-vscode-extension",
+        "type": "github"
+      }
+    },
     "disko": {
       "inputs": {
         "nixpkgs": [
@@ -427,6 +443,7 @@
     },
     "root": {
       "inputs": {
+        "alicorn-vscode-extension": "alicorn-vscode-extension",
         "disko": "disko",
         "flake-compat": "flake-compat",
         "flake-parts": "flake-parts",

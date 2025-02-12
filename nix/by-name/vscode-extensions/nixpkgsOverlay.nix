@@ -2,8 +2,16 @@
 let
   input = inputs.alicorn-vscode-extension;
 in
-pkgsFinal: pkgsPrev: {
-  vscode-extensions = pkgsPrev.vscode-extensions.extend (extensionsFinal: extensionsPrev: {
-    fundament.alicorn-test = pkgsFinal.callPackage (input + "/alicorn-vscode-extension.nix") { };
-  });
+finalPkgs: prevPkgs:
+let
+  inherit (finalPkgs) lib;
+in
+{
+  vscode-extensions = lib.recursiveUpdate prevPkgs.vscode-extensions (
+    (finalExtensions: prevExtensions: {
+      fundament.alicorn-test = finalPkgs.callPackage (input + "/alicorn-vscode-extension.nix") { };
+    })
+      finalPkgs.vscode-extensions
+      prevPkgs.vscode-extensions
+  );
 }

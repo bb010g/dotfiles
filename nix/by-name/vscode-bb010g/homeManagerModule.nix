@@ -1,11 +1,10 @@
 { ... }:
-{ lib, pkgs, ... }:
+{ config, lib, pkgs, ... }:
 let
 in
 {
   config.programs.vscode.enable = true;
   config.programs.vscode.extensions = [
-    pkgs.vscode-extensions.alygin.vscode-tlaplus
     pkgs.vscode-extensions.bazelbuild.vscode-bazel
     pkgs.vscode-extensions.cweijan.vscode-database-client2
     pkgs.vscode-extensions.daohong-emilio.yash
@@ -17,6 +16,7 @@ in
     pkgs.vscode-extensions.esbenp.prettier-vscode
     pkgs.vscode-extensions.firefox-devtools.vscode-firefox-debug
     pkgs.vscode-extensions.firsttris.vscode-jest-runner
+    pkgs.vscode-extensions.fundament.alicorn-test
     pkgs.vscode-extensions.github.github-vscode-theme
     pkgs.vscode-extensions.github.vscode-github-actions
     pkgs.vscode-extensions.golang.go
@@ -53,6 +53,7 @@ in
     pkgs.vscode-extensions.rust-lang.rust-analyzer
     pkgs.vscode-extensions.stylelint.vscode-stylelint
     pkgs.vscode-extensions.tamasfe.even-better-toml
+    # pkgs.vscode-extensions.tlaplus.vscode-ide
     pkgs.vscode-extensions.twxs.cmake
     pkgs.vscode-extensions.vadimcn.vscode-lldb
     pkgs.vscode-extensions.valentjn.vscode-ltex
@@ -71,6 +72,7 @@ in
     "Lua.codeLens.enable" = true;
     "accessibility.sounds.terminalBell"."sound" = "on";
     "code-eol.highlightNonDefault" = true;
+    "database-client.autoSync" = true;
     "debug.showSubSessionsInToolBar" = true;
     "debug.showVariableTypes" = true;
     "editor.accessibilitySupport" = true;
@@ -119,11 +121,15 @@ in
     "terminal.integrated.tabs.showActiveTerminal" = "always";
     "todo-tree.general.schemes" = [ "file" "ssh" "untitled" "vscode-notebook-cell" "vscode" ];
     "visualjj.showSourceControlColocated" = true;
+    "window.autoDetectColorScheme" = lib.mkDefault false;
     "window.confirmBeforeClose" = "keyboardOnly";
     "window.openFoldersInNewWindow" = "on";
     "window.titleBarStyle" = "custom";
+    "workbench.preferredDarkColorTheme" = lib.mkDefault "GitHub Dark Default";
+    "workbench.preferredLightColorTheme" = "GitHub Light Default";
     # "workbench.colorTheme" = "modus-vivendi-tinted"; # TODO(<me@bb010g.com>)
-    "workbench.colorTheme" = "GitHub Light Default";
+    # "workbench.colorTheme" = config.programs.vscode.userSettings."workbench.preferredDarkColorTheme";
+    "workbench.colorTheme" = "GitHub Dark Default";
     "xml.codeLens.enabled" = true;
     "xml.validation.resolveExternalEntities" = true;
   };

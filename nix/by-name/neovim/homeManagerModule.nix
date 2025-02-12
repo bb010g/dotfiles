@@ -2,7 +2,8 @@
 { config, lib, ... }:
 let
   inherit (lib.types) types;
-  inherit (lib.modules) mkBefore mkIf mkOption;
+  inherit (lib.modules) mkBefore mkIf;
+  inherit (lib.options) mkOption;
   cfg = config.programs.neovim;
 in
 {

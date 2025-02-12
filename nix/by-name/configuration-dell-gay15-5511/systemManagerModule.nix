@@ -71,6 +71,7 @@ in
 
     environment.systemPackages = [
       pkgs.bat
+      pkgs.comma
       pkgs.curl
       pkgs.earthly
       pkgs.ed
@@ -85,6 +86,7 @@ in
       pkgs.pipx
       pkgs.ripgrep
       pkgs.roswell
+      pkgs.watchman
       pkgs.zstd
     ];
 

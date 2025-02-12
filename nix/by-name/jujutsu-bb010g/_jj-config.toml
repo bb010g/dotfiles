@@ -1,6 +1,17 @@
+[git]
+private-commits = 'private()'
+
 [revset-aliases]
+'midstream_trunks()' = 'coalesce(builtin_midstream_trunks(), remote_trunk_bookmarks(exact:"bb010g"))'
+'private()' = 'description(glob:"[[]PRIVATE[]]*")'
 'recent_committer_date()' = 'none()'
 'recently_committed_heads()' = 'heads(recent_committer_date())'
+'remote_trunk(remote_pattern)' = 'latest(coalesce(upstream_trunk(remote_pattern), midstream_trunk(remote_pattern), downstream_trunk(remote_pattern)))'
+'remote_trunk()' = 'latest(coalesce(present(upstream_trunk()), present(midstream_trunk()), present(downstream_trunk())))'
+'remote_trunk_bookmarks(remote_pattern)' = '''
+builtin_remote_trunk_bookmarks(remote_pattern) |
+remote_bookmarks(regex:"^(trunks?|integration)/", remote_pattern)
+'''
 
 [revsets]
 log = "builtin_log() | ancestors(recently_committed_heads(), 2)"
