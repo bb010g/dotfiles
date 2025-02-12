@@ -1,0 +1,6 @@
+[revset-aliases]
+'recent_committer_date()' = 'none()'
+'recently_committed_heads()' = 'heads(recent_committer_date())'
+
+[revsets]
+log = "builtin_log() | ancestors(recently_committed_heads(), 2)"
