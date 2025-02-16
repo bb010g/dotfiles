@@ -2,13 +2,15 @@
 private-commits = 'private()'
 
 [revset-aliases]
-'midstream_trunks()' = 'coalesce(builtin_midstream_trunks(), remote_trunk_bookmarks(exact:"bb010g"))'
-'private()' = 'description(glob:"[[]PRIVATE[]]*")'
-'recent_committer_date()' = 'none()'
-'remote_trunk(remote_pattern)' = 'latest(coalesce(upstream_trunk(remote_pattern), midstream_trunk(remote_pattern), downstream_trunk(remote_pattern)))'
-'remote_trunk()' = 'latest(coalesce(present(upstream_trunk()), present(midstream_trunk()), present(downstream_trunk())))'
-'remote_trunk_bookmarks(remote_pattern)' = '''
-builtin_remote_trunk_bookmarks(remote_pattern) |
-remote_bookmarks(regex:"^(trunks?|integration)/", remote_pattern)
+'remote_plural_immutable_trunk_bookmarks(remote_pattern)' = '''
+builtin_remote_plural_immutable_trunk_bookmarks(remote_pattern) |
+remote_bookmarks(glob:"integration/**/*", remote_pattern)
 '''
+'remote_plural_mutable_trunk_bookmarks(remote_pattern)' = '''
+builtin_remote_plural_mutable_trunk_bookmarks(remote_pattern)
+'''
+
+'recent_committer_date()' = 'none()'
 'log_domain()' = 'builtin_log_domain() | heads(recent_committer_date())'
+
+'private()' = 'description(glob:"[[]PRIVATE[]]*")'

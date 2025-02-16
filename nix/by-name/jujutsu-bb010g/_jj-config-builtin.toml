@@ -1,10 +1,7 @@
 [revset-aliases]
 'builtin_log_domain()' = 'immutable_heads()..'
-'log_domain()' = 'builtin_log_domain()'
 'builtin_log(domain)' = 'present(@) | ancestors(domain, 2) | present(trunk())'
-'log(domain)' = 'builtin_log(domain)'
 'builtin_log()' = 'log(log_domain())'
-'log()' = 'builtin_log()'
 
 [revsets]
 log = 'log()'
