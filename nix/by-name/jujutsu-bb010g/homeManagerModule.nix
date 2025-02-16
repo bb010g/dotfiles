@@ -13,6 +13,7 @@ in
   imports = [
     homeManagerModules.jujutsu
     (mapImportModuleTo (file: mapAttrs (name: mapAttrs (name: mkOverride 1100)) (importTOML file)) [ "programs" "jujutsu" "settings" ] ./_jj-config-builtin.toml)
+    (mapImportModuleTo (file: mapAttrs (name: mapAttrs (name: mkOverride 1050)) (importTOML file)) [ "programs" "jujutsu" "settings" ] ./_jj-config-builtin-trunks.toml)
     (mapImportModuleTo (file: importTOML file) [ "programs" "jujutsu" "settings" ] ./_jj-config.toml)
   ];
 

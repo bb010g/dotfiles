@@ -35,6 +35,7 @@ in
       programs.neovim.presets.vim-site-bb010g.enable = mkDefault true;
       programs.neovim.extraLuaConfig = ''
         vim.opt_global.scrolloff, vim.opt_global.sidescrolloff = 5, 4
+        if vim.fn.has('nvim-0.9') then vim.opt_global.exrc = true end
       '';
     })
     (mkIf cfg.presets.boring-bb010g.enable {
@@ -224,7 +225,7 @@ in
           plugin = pkgs.vimPlugins.ale;
           type = "lua";
           config = ''
-            vim.g.ale_floating_preview, vim.g.ale_hover_to_preview = 1, 1'';
+            vim.g.ale_floating_preview = 1'';
         }
         {
           plugin = pkgs.vimPlugins.direnv-nvim;
@@ -233,6 +234,7 @@ in
             require('direnv-nvim').setup({
             })'';
         }
+        { plugin = pkgs.vimPlugins.netman-nvim; }
         { plugin = pkgs.vimPlugins.nvim-dap; }
         {
           plugin = pkgs.vimPlugins.nvim-dap-ui;
