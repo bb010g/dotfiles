@@ -196,11 +196,7 @@ in
           plugin = pkgs.vimPlugins.vim-polyglot;
           type = "lua";
           config = ''
-            do
-              local polyglot_disabled = vim.g.polyglot_disabled
-              if polyglot_disabled == nil then polyglot_disabled = {}; vim.g.polyglot_disabled = polyglot_disabled end
-              if not vim.list_contains(polyglot_disabled, 'sensible') then table.insert(polyglot_disabled, 'sensible') end
-            end'';
+            vim.g.polyglot_disabled = vim.site.list_extend_unique(vim.g.polyglot_disabled or {}, { 'sensible' })'';
         }
 
         {
@@ -243,6 +239,16 @@ in
             vim.site._submodules.dapui = true
             vim.site.dapui.user_config = {
             }'';
+        }
+        {
+          plugin = pkgs.vimPlugins.nvim-treesitter-context;
+          type = "lua";
+          config = ''
+            require('treesitter-context.config').update({
+              enable = true,
+              multiwindow = true,
+              mode = 'topline',
+            })'';
         }
         { plugin = pkgs.vimPlugins.plenary-nvim; }
         {
