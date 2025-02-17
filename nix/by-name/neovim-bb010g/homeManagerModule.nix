@@ -43,6 +43,14 @@ in
         vim.loader.enable(true)
       '';
       programs.neovim.plugins = [
+        # I'm pretty sure mini-nvim executes `runtime filetype.vim` somewhere, so disabling polyglot must be first.
+        {
+          plugin = pkgs.vimPlugins.vim-polyglot;
+          type = "lua";
+          config = ''
+            vim.g.polyglot_disabled = vim.site.list_extend_unique(vim.g.polyglot_disabled or {}, { 'sensible' })'';
+        }
+
         {
           plugin = pkgs.vimPlugins.mini-nvim;
           type = "lua";
@@ -190,13 +198,6 @@ in
               })
               end
             end'';
-        }
-
-        {
-          plugin = pkgs.vimPlugins.vim-polyglot;
-          type = "lua";
-          config = ''
-            vim.g.polyglot_disabled = vim.site.list_extend_unique(vim.g.polyglot_disabled or {}, { 'sensible' })'';
         }
 
         {
