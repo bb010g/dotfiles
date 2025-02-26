@@ -14,3 +14,190 @@ builtin_remote_plural_mutable_trunk_bookmarks(remote_pattern)
 'log_domain()' = 'builtin_log_domain() | heads(recent_committer_date())'
 
 'private()' = 'description(glob:"[[]PRIVATE[]]*")'
+
+[template-aliases]
+'description_subject(description)' = '''
+description.first_line()
+'''
+
+'commit_subject(commit)' = '''
+description_subject(commit.description())
+'''
+
+# please give me integer addition jj
+'description_body(description)' = '''
+description.remove_prefix(
+  description.first_line()
+).remove_prefix("\n").remove_prefix("\n").remove_suffix("\n")
+'''
+
+'format_description(description, empty)' = '''
+coalesce(
+  description,
+  label(if(empty, "empty"), description_placeholder),
+)
+'''
+
+'format_full_description(description, empty, body_prefix, body_suffix, body_indent)' = '''
+format_description(
+  concat(
+    description_subject(description),
+    surround(body_prefix, body_suffix,
+      indent(body_indent, description_body(description)),
+    ),
+  ),
+  empty,
+)
+'''
+
+'format_full_description(description, empty, body_prefix, body_suffix)' = '''
+format_description(
+  concat(
+    description_subject(description),
+    surround(body_prefix, body_suffix,
+      description_body(description),
+    ),
+  ),
+  empty,
+)
+'''
+
+'format_full_description(description, empty)' = '''
+format_full_description(description, empty, "\n\n", "\n")
+'''
+
+'format_commit_full_description(commit, body_prefix, body_suffix, body_indent)' = '''
+format_full_description(
+  commit.description(),
+  commit.empty(),
+  body_prefix,
+  body_suffix,
+  body_indent,
+)
+'''
+
+'format_commit_full_description(commit, body_prefix, body_suffix)' = '''
+format_full_description(
+  commit.description(),
+  commit.empty(),
+  body_prefix,
+  body_suffix,
+)
+'''
+
+'format_commit_full_description(commit)' = '''
+format_full_description(commit.description(), commit.empty())
+'''
+
+'format_short_signature(signature)' = '''
+if(signature.email(),
+  if(signature.email().local() == "noreply", signature.email().domain(),
+  if(signature.email().domain() == "users.noreply.github.com", concat(
+    signature.email().local(),
+    truncate_end(1, truncate_start(25, signature.email())),
+    signature.email().domain().substr(14, 20),
+  ),
+  signature.email(),
+)), email_placeholder)
+'''
+
+# give me timestamp equality comparisons jj
+'format_short_commit_header(commit)' = '''
+separate(" ",
+  format_short_change_id_with_hidden_and_divergent_info(commit),
+  label("author", format_short_signature(commit.author())),
+  label("committer", surround("(", ")",
+    if(commit.author().email() != commit.committer().email(),
+      format_short_signature(commit.committer()),
+    ),
+  )),
+  label("committer", format_timestamp(commit.committer().timestamp())),
+  commit.bookmarks(),
+  commit.tags(),
+  commit.working_copies(),
+  if(commit.git_head(), label("git_head", "git_head()")),
+  format_short_commit_id(commit.commit_id()),
+  if(commit.conflict(), label("conflict", "conflict")),
+  label("author", surround("(", ")",
+    if(format_timestamp(commit.committer().timestamp()) != format_timestamp(commit.author().timestamp()),
+      format_timestamp(commit.author().timestamp()),
+    ),
+  )),
+)
+'''
+# ^0.26.0
+# if(config("ui.show-cryptographic-signatures").as_boolean(),
+#   format_short_cryptographic_signature(commit.signature())),
+
+log_compact = '''
+if(root,
+  format_root_commit(self),
+  label(if(current_working_copy, "working_copy"),
+    separate("\n",
+      format_short_commit_header(self),
+      separate(" ",
+        if(empty, label("empty", " (empty)"), "        "),
+        format_description(commit_subject(self), empty),
+      ),
+    ) ++ "\n",
+  ),
+)
+'''
+
+log_compact_full_description = '''
+if(root,
+  format_root_commit(self),
+  label(if(current_working_copy, "working_copy"),
+    separate("\n",
+      format_short_commit_header(self),
+      separate(" ",
+        if(empty, label("empty", " (empty)"), "        "),
+        format_commit_full_description(
+          self,
+          "\n\n",
+          "",
+          "         ",
+        ),
+      ),
+    ) ++ "\n",
+  ),
+)
+'''
+
+log_oneline = '''
+if(root,
+  format_root_commit(self),
+  label(if(current_working_copy, "working_copy"),
+    separate("\n",
+      separate(" ",
+        format_short_commit_header(self),
+        if(empty, label("empty", "(empty)")),
+        format_description(commit_subject(self), empty),
+      ),
+    ) ++ "\n",
+  ),
+)
+'''
+
+log_oneline_full_description = '''
+if(root,
+  format_root_commit(self),
+  label(if(current_working_copy, "working_copy"),
+    separate("\n",
+      separate(" ",
+        format_short_commit_header(self),
+        if(empty, label("empty", "(empty)")),
+        format_commit_full_description(
+          self,
+          "\n",
+          "",
+          "         ",
+        ),
+      ),
+    ) ++ "\n",
+  ),
+)
+'''
+
+[templates]
+log = 'log_compact'

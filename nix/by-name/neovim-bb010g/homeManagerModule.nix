@@ -34,8 +34,9 @@ in
       programs.neovim.package = mkDefault pkgs.neovim-unstable-unwrapped;
       programs.neovim.presets.vim-site-bb010g.enable = mkDefault true;
       programs.neovim.extraLuaConfig = ''
-        vim.opt_global.scrolloff, vim.opt_global.sidescrolloff = 5, 4
         if vim.fn.has('nvim-0.9') then vim.opt_global.exrc = true end
+        vim.opt_global.scrolloff, vim.opt_global.sidescrolloff = 5, 4
+        vim.opt_global.grepprg, vim.opt_global.grepformat = 'rg --vimgrep -S', '%f:%l:%c:%m'
       '';
     })
     (mkIf cfg.presets.boring-bb010g.enable {
@@ -70,10 +71,12 @@ in
                   relnum_in_visual_mode = false,
                 },
               })
-              vim.o.cursorlineopt = 'number'
-              vim.o.ruler = true
-              vim.o.showmode = true
-              vim.opt.shortmess:remove('WcC')
+              local o, opt = vim.o, vim.opt
+              o.cursorlineopt = 'number'
+              o.ruler = true
+              o.showmode = true
+              o.splitkeep = 'cursor'
+              opt.shortmess:remove('WcC')
 
               vim.keymap.set({'n', 'v'}, 's', '<Nop>', { silent = true }) -- disable synonym for `cl`
 
@@ -208,8 +211,8 @@ in
               highlight = {
                 enable = true,
                 disable = function(lang, buf)
-                  local max_filesize = 100 * 1024 -- 100 KB
-                  local ok, stats = pcall(vim.loop.fs_stat, vim.api.nvim_buf_get_name(buf))
+                  local max_filesize = 2 * (1024 * 1024) -- 2 MiB
+                  local ok, stats = pcall(vim.uv.fs_stat, vim.api.nvim_buf_get_name(buf))
                   if ok and stats and stats.size > max_filesize then
                       return true
                   end
